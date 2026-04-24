@@ -29,6 +29,11 @@
 - Q: FeeObligation Forfeit Terminal State? → A: APPROVE forfeit sets status=WAIVED (terminal). Refunds (FULL/PARTIAL) recorded as negative FeePayment records. NO_REFUND also sets WAIVED.
 - Q: Fixed-Rupee Refunds? → A: All refund decisions use fixed rupee integers, never percentages. Validated as 0 <= amount <= paidAmount.
 - Q: Waiting List Concurrency? → A: Recalculation uses PESSIMISTIC_WRITE row-level locking (SELECT ... FOR UPDATE) and a partial unique index on (leagueId, position) WHERE status = WAITING.
+- Q: UI Connectivity Feedback? → A: SnackBar blocks auction writes when connectivity_plus reports offline. No automatic retries; manual reconnect required for SSE connection error.
+- Q: SSE Reconnection? → A: Exponential backoff (2s to 30s cap) with unlimited retries. Re-fetches state snapshot before re-opening SSE to ensure gapless sequence synchronization.
+- Q: Drift Sync Rules? → A: Offline READ cache only; independent per device/tab. Auction state is never cached locally. Invalidate on league `AUCTION_LIVE` or foreground resume.
+- Q: Push Notification Handling? → A: FCM HIGH priority for auction events. Background: system notification + deep link. Foreground: in-app banner/SnackBar only (no system notification).
+- Q: Secure Storage on 401? → A: If token refresh fails on 401, clear flutter_secure_storage and Drift cache, then replace all routes with PhoneEntryScreen.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -101,7 +106,9 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **Pre-assignment Conflict**: What happens if an admin tries to pre-assign a player who is already sold? (System returns a 409 Conflict error; pre-assignment only allowed for AVAILABLE players).
 - **Insufficient Purse**: What happens if a bid exceeds the current purse? (System throws `InsufficientPurseException` during validation).
 - **Waiting List Promotion & Concurrency**: What happens to the waiting list when multiple people withdraw simultaneously? (Recalculation is serialized via pessimistic DB locking; positions auto-shift based on `createdAt ASC` to ensure gapless numbering).
-- **Network Loss during Auction**: What happens if the Auctioneer loses connection while recording a bid? (Auction bidding is ALWAYS online-only; command will fail and must be retried when connectivity is restored).
+- **Network Loss during Auction**: What happens if the Auctioneer loses connection while recording a bid? (Auction bidding is ALWAYS online-only; SnackBar blocks the call immediately if `connectivity_plus` reports offline. No automatic queuing; manual retry required for SSE connection errors).
+- **SSE Auto-Reconnection**: How does the app handle unstable connections? (Uses exponential backoff: 2s, 4s, 8s, 16s, capped at 30s. Unlimited retries. Re-fetches full state snapshot before re-opening SSE with `after=currentSequenceNumber`).
+- **Token Refresh & Storage Clearing**: What happens if a session is invalidated (401) and refresh fails? (Interceptor clears `flutter_secure_storage` and `Drift` cache, then redirects user to login using `auto_route` replaceAll).
 - **Redis Infrastructure Failure**: What happens if Redis pub/sub is unavailable? (PostgreSQL remains source of truth; SseBroadcaster logs error but backend continues; clients recover via AuditLog replay on reconnect).
 
 ## Requirements *(mandatory)*
@@ -156,12 +163,13 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **Framework**: Flutter (Single codebase for Android, iOS, and Web).
 - **State Management**: Riverpod (AsyncNotifier/AsyncValue) for all async state; Freezed for immutable state classes.
 - **API Client**: Dio + Retrofit (code-generated) with JWT interceptors and refresh token logic.
-- **Local Storage**: Drift (SQLite) for offline caching (leagues, players, notifications); no offline support for live auction bidding.
+- **Local Storage**: Drift (SQLite) for offline READ caching (leagues, players, notifications); no bidirectional sync. Independent cache per device/tab. Invalidate on league `AUCTION_LIVE` or foreground resume.
 - **Navigation**: `auto_route` with `AutoRouteGuard` for role-based access and deep linking.
 - **Architecture**: Feature-first hybrid Clean Architecture (`core/`, `features/`, etc.).
 - **Security**: `flutter_secure_storage` for JWTs; never expose AWS credentials to the client.
 - **Real-time**: SSE via `eventsource` feeding into Riverpod `StreamProvider`.
 - **Assets**: Direct-to-S3 upload (Presigned URL) with no AWS SDK on the client.
+- **Notifications**: FCM HIGH priority for auction events (PLAYER_SOLD, etc.). Background: system notification + deep link. Foreground: in-app banner/SnackBar only.
 
 ### Design Constraints
 - **Regional Targets**: Optimized for mid-range Indian Android devices.
