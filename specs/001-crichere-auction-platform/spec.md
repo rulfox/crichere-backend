@@ -18,6 +18,12 @@
 - Q: Notifications? → A: Push (FCM/APNs) and SMS events for all critical auction and administrative actions. Device token management for multi-platform delivery.
 - Q: Flutter Architecture and Tech Stack? → A: Clean Architecture + Riverpod (AsyncNotifier). Dio/Retrofit for API, Drift for local cache. SSE via `eventsource`. Online-only auction bidding. Direct-to-S3 upload flow.
 - Q: Scalability and Concurrent Auction Limits? → A: System targets 50 concurrently active auctions platform-wide for V1.
+- Q: Undo-Sold rules? → A: Deterministic purse recovery (currentAmount += finalPrice), player reverts to UP_FOR_BIDDING, only allowed if PLAYER_SOLD was the absolute last action in the audit log.
+- Q: Audit Log payloads? → A: Strict JSONB structures defined for all 15+ action types, including sequenceNumber, occurredAt, and actorId.
+- Q: Stale SSE handling? → A: Backend filters by sequenceNumber; Flutter client discards events with sequenceNumber <= local state. Cold reconnect requires state snapshot first.
+- Q: Undo-Last-Bid scope? → A: Only valid when player state is UP_FOR_BIDDING; cannot undo if sold/unsold/withdrawn; requires at least one active bid.
+- Q: Auctioneer browsing? → A: Pure read operation, AUCTIONEER role required, no SSE fires until confirmed 'put' action.
+- Q: Redis failure fallback? → A: PostgreSQL remains source of truth; SseBroadcaster logs error but backend continues; clients recover via AuditLog replay on reconnect.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -84,13 +90,14 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 ### Edge Cases
 
 - **OTP Expiry/Rate Limiting**: What happens if a user requests too many OTPs or uses an expired one? (System enforces 5 sends/hour and 3 verification attempts; previous OTPs expire immediately on new send).
-- **SSE Disconnection & Replay**: How does the client recover missed events? (Client sends `Last-Event-ID` header; server replays all `AuditLog` entries with `sequenceNumber > Last-Event-ID`).
-- **Undo Sold after Purse Change**: What happens if an "Undo Sold" is performed but the franchise no longer has the original purse state? (Principles mandate `FranchisePurseState` per round, so state restoration should be deterministic).
+- **SSE Disconnection & Replay**: How does the client recover missed events? (Client sends `Last-Event-ID` header; server replays all `AuditLog` entries with `sequenceNumber > Last-Event-ID`. Stale events with `sequenceNumber <= local state` are discarded by the client).
+- **Undo Sold after Purse Change**: What happens if an "Undo Sold" is performed but the franchise no longer has the original purse state? (Restoration is deterministic: `currentAmount += finalPrice`. Only allowed if `PLAYER_SOLD` was the absolute last auction action).
 - **Simultaneous Bids**: Auctioneer records a bid just as another franchise claims they bid first verbally. (Human auctioneer model: Auctioneer is the sole writer; their recording is final).
 - **Pre-assignment Conflict**: What happens if an admin tries to pre-assign a player who is already sold? (System returns a 409 Conflict error; pre-assignment only allowed for AVAILABLE players).
 - **Insufficient Purse**: What happens if a bid exceeds the current purse? (System throws `InsufficientPurseException` during validation).
 - **Waiting List Promotion**: What happens to the waiting list when the 2nd person in queue withdraws? (Positions of all entries > 2 automatically decrement by 1 to close the gap).
 - **Network Loss during Auction**: What happens if the Auctioneer loses connection while recording a bid? (Auction bidding is ALWAYS online-only; command will fail and must be retried when connectivity is restored).
+- **Redis Infrastructure Failure**: What happens if Redis pub/sub is unavailable? (PostgreSQL remains source of truth; SseBroadcaster logs error but backend continues; clients recover via AuditLog replay on reconnect).
 
 ## Requirements *(mandatory)*
 
@@ -105,12 +112,12 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **FR-001**: System MUST support OTP-only authentication for Indian phone numbers (`^[6-9]\d{9}$`).
 - **FR-002**: OTPs MUST be 6 digits, valid for 5 minutes, and allow max 3 verification attempts. Rate-limited to 5 sends per hour per phone.
 - **FR-003**: JWT Access tokens valid for 1 hour; Refresh tokens are opaque UUIDs valid for 30 days, stored in `refresh_tokens` table.
-- **FR-004**: System MUST provide an append-only `AuctionAuditLog` with monotonically increasing sequence numbers per auction.
+- **FR-004**: System MUST provide an append-only `AuctionAuditLog` with monotonically increasing sequence numbers per auction. Every entry MUST include a specific JSONB payload (e.g., `leaguePlayerId`, `franchiseId`, `amount`, `sequenceNumber`, `occurredAt`, `actorId`) as defined in the technical documentation.
 - **FR-005**: System MUST use Server-Sent Events (SSE) for all live auction updates via Spring `SseEmitter` and Redis pub/sub.
 - **FR-006**: System MUST store all money values as whole Indian Rupee (INR) integers.
 - **FR-007**: System MUST support three player order modes: RANDOM, FREE_PICK, and HYBRID (League level config).
 - **FR-008**: System MUST allow League Admins to pre-assign Captains (purse deduction) and Icon players (free).
-- **FR-009**: System MUST provide "Undo last bid" (auctioneer only, mandatory reason) and "Undo sold" (auctioneer only, most recent action only) actions.
+- **FR-009**: System MUST provide "Undo last bid" (only when player is `UP_FOR_BIDDING`) and "Undo sold" (only if it was the absolute last audit action) with mandatory reason logging and deterministic state restoration.
 - **FR-010**: System MUST support Force-Assign by League Admin (bypasses purse validation, price defaults to 0).
 - **FR-011**: System MUST support bulk CSV import for player profiles.
 - **FR-012**: Base price resolution order: 1. `basePriceOverride` (LeaguePlayer) → 2. `LeagueTagBasePrice` → 3. `LeagueCategoryBasePrice`.
