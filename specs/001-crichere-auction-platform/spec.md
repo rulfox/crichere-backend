@@ -24,6 +24,11 @@
 - Q: Undo-Last-Bid scope? → A: Only valid when player state is UP_FOR_BIDDING; cannot undo if sold/unsold/withdrawn; requires at least one active bid.
 - Q: Auctioneer browsing? → A: Pure read operation, AUCTIONEER role required, no SSE fires until confirmed 'put' action.
 - Q: Redis failure fallback? → A: PostgreSQL remains source of truth; SseBroadcaster logs error but backend continues; clients recover via AuditLog replay on reconnect.
+- Q: Bulk CSV Import Matching? → A: Exact sequence: 1. Reuse ACTIVE user (link only), 2. Reuse GHOST user (link + update name), 3. Create GHOST (if no match). Handles duplicates (already_in_league).
+- Q: ADMIN_PICKS Promotion? → A: League Admin can manually promote ANY entry (not just position 1). Positions recalculate (1, 2, 3...) based on createdAt ASC for remaining WAITING entries.
+- Q: FeeObligation Forfeit Terminal State? → A: APPROVE forfeit sets status=WAIVED (terminal). Refunds (FULL/PARTIAL) recorded as negative FeePayment records. NO_REFUND also sets WAIVED.
+- Q: Fixed-Rupee Refunds? → A: All refund decisions use fixed rupee integers, never percentages. Validated as 0 <= amount <= paidAmount.
+- Q: Waiting List Concurrency? → A: Recalculation uses PESSIMISTIC_WRITE row-level locking (SELECT ... FOR UPDATE) and a partial unique index on (leagueId, position) WHERE status = WAITING.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -95,7 +100,7 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **Simultaneous Bids**: Auctioneer records a bid just as another franchise claims they bid first verbally. (Human auctioneer model: Auctioneer is the sole writer; their recording is final).
 - **Pre-assignment Conflict**: What happens if an admin tries to pre-assign a player who is already sold? (System returns a 409 Conflict error; pre-assignment only allowed for AVAILABLE players).
 - **Insufficient Purse**: What happens if a bid exceeds the current purse? (System throws `InsufficientPurseException` during validation).
-- **Waiting List Promotion**: What happens to the waiting list when the 2nd person in queue withdraws? (Positions of all entries > 2 automatically decrement by 1 to close the gap).
+- **Waiting List Promotion & Concurrency**: What happens to the waiting list when multiple people withdraw simultaneously? (Recalculation is serialized via pessimistic DB locking; positions auto-shift based on `createdAt ASC` to ensure gapless numbering).
 - **Network Loss during Auction**: What happens if the Auctioneer loses connection while recording a bid? (Auction bidding is ALWAYS online-only; command will fail and must be retried when connectivity is restored).
 - **Redis Infrastructure Failure**: What happens if Redis pub/sub is unavailable? (PostgreSQL remains source of truth; SseBroadcaster logs error but backend continues; clients recover via AuditLog replay on reconnect).
 
@@ -119,10 +124,10 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **FR-008**: System MUST allow League Admins to pre-assign Captains (purse deduction) and Icon players (free).
 - **FR-009**: System MUST provide "Undo last bid" (only when player is `UP_FOR_BIDDING`) and "Undo sold" (only if it was the absolute last audit action) with mandatory reason logging and deterministic state restoration.
 - **FR-010**: System MUST support Force-Assign by League Admin (bypasses purse validation, price defaults to 0).
-- **FR-011**: System MUST support bulk CSV import for player profiles.
+- **FR-011**: System MUST support bulk CSV import for player profiles with phone-matching sequence (Reuse ACTIVE > Reuse GHOST > Create GHOST).
 - **FR-012**: Base price resolution order: 1. `basePriceOverride` (LeaguePlayer) → 2. `LeagueTagBasePrice` → 3. `LeagueCategoryBasePrice`.
-- **FR-013**: Fee management MUST track `PLAYER_FEE` and `FRANCHISE_FEE` obligations and record `CASH` payments.
-- **FR-014**: Forfeit system MUST support `AUTO_PROMOTE` logic where the next user in the `WaitingList` is promoted upon forfeit approval.
+- **FR-013**: Fee management MUST track `PLAYER_FEE` and `FRANCHISE_FEE` obligations and record `CASH` payments. Forfeit approvals MUST set obligations to terminal `WAIVED` state with fixed-rupee refunds.
+- **FR-014**: Forfeit system MUST support `AUTO_PROMOTE` logic (automatic next) and `ADMIN_PICKS` logic (manual override). Position recalculation MUST be gapless and createdAt-ordered.
 - **FR-015**: System MUST deliver push notifications (FCM/APNs) for critical events like `AUCTION_STARTED`, `PLAYER_SOLD`, and `FEE_PAYMENT_RECORDED`.
 - **FR-016**: API responses MUST use `ResponseHelper.success` or `ResponseHelper.error`.
 - **FR-017**: Auction bidding operations MUST be online-only; no offline queuing for auction recording actions.
