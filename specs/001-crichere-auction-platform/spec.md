@@ -16,6 +16,7 @@
 - Q: Auction State Machine and SSE? → A: Strict transitions for Auction, Round, and Player states. SSE using Redis pub/sub with `Last-Event-ID` replay. Detailed rules for Undo-Bid, Undo-Sold, and Force-Assign.
 - Q: Fees, Forfeits, and Waiting List? → A: Specific entities for FeeObligations (PLAYER_FEE/FRANCHISE_FEE), ForfeitRequests (AUTO_PROMOTE vs ADMIN_PICKS), and WaitingList management with auto-shifting positions.
 - Q: Notifications? → A: Push (FCM/APNs) and SMS events for all critical auction and administrative actions. Device token management for multi-platform delivery.
+- Q: Flutter Architecture and Tech Stack? → A: Clean Architecture + Riverpod (AsyncNotifier). Dio/Retrofit for API, Drift for local cache. SSE via `eventsource`. Online-only auction bidding. Direct-to-S3 upload flow.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -87,6 +88,7 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **Pre-assignment Conflict**: What happens if an admin tries to pre-assign a player who is already sold? (System returns a 409 Conflict error; pre-assignment only allowed for AVAILABLE players).
 - **Insufficient Purse**: What happens if a bid exceeds the current purse? (System throws `InsufficientPurseException` during validation).
 - **Waiting List Promotion**: What happens to the waiting list when the 2nd person in queue withdraws? (Positions of all entries > 2 automatically decrement by 1 to close the gap).
+- **Network Loss during Auction**: What happens if the Auctioneer loses connection while recording a bid? (Auction bidding is ALWAYS online-only; command will fail and must be retried when connectivity is restored).
 
 ## Requirements *(mandatory)*
 
@@ -114,6 +116,8 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **FR-014**: Forfeit system MUST support `AUTO_PROMOTE` logic where the next user in the `WaitingList` is promoted upon forfeit approval.
 - **FR-015**: System MUST deliver push notifications (FCM/APNs) for critical events like `AUCTION_STARTED`, `PLAYER_SOLD`, and `FEE_PAYMENT_RECORDED`.
 - **FR-016**: API responses MUST use `ResponseHelper.success` or `ResponseHelper.error`.
+- **FR-017**: Auction bidding operations MUST be online-only; no offline queuing for auction recording actions.
+- **FR-018**: File uploads (photos, PDFs) MUST follow the direct-to-S3 flow using presigned URLs provided by the backend.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -132,6 +136,24 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **InAppNotification**: `id`, `userId`, `type`, `title`, `body`, `payload`, `readAt`.
 - **Membership Tables**: `UserPlatformMembership`, `UserLeagueMembership`, `UserFranchiseMembership`.
 
+## Constraints & Tradeoffs
+
+### Technical Constraints
+- **Framework**: Flutter (Single codebase for Android, iOS, and Web).
+- **State Management**: Riverpod (AsyncNotifier/AsyncValue) for all async state; Freezed for immutable state classes.
+- **API Client**: Dio + Retrofit (code-generated) with JWT interceptors and refresh token logic.
+- **Local Storage**: Drift (SQLite) for offline caching (leagues, players, notifications); no offline support for live auction bidding.
+- **Navigation**: `auto_route` with `AutoRouteGuard` for role-based access and deep linking.
+- **Architecture**: Feature-first hybrid Clean Architecture (`core/`, `features/`, etc.).
+- **Security**: `flutter_secure_storage` for JWTs; never expose AWS credentials to the client.
+- **Real-time**: SSE via `eventsource` feeding into Riverpod `StreamProvider`.
+- **Assets**: Direct-to-S3 upload (Presigned URL) with no AWS SDK on the client.
+
+### Design Constraints
+- **Regional Targets**: Optimized for mid-range Indian Android devices.
+- **Auctioneer Panel**: Optimized for Web (wider desktop layout) with comprehensive pool browsing and controls.
+- **Mobile Experience**: Portrait-first for players and franchise owners, utilizing Lottie animations and Shimmer loading states.
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
@@ -140,7 +162,8 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **SC-002**: 100% of auction actions are recorded in the `AuctionAuditLog` with correct sequence numbers.
 - **SC-003**: Waiting list positions are recalculated with 100% accuracy upon any promotion or withdrawal.
 - **SC-004**: Notifications are delivered to target users' registered device tokens within 2 seconds of the triggering event.
-- **SC-005**: System handles up to 5,000 concurrent viewers per active auction without degradation in message latency.
+- **SC-005**: Shareable squad images are generated at 1080x1080 pixels (PNG) for optimal WhatsApp sharing.
+- **SC-006**: System handles up to 5,000 concurrent viewers per active auction without degradation in message latency.
 
 ## Assumptions
 
