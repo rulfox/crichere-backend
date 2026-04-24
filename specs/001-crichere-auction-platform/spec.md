@@ -17,6 +17,7 @@
 - Q: Fees, Forfeits, and Waiting List? → A: Specific entities for FeeObligations (PLAYER_FEE/FRANCHISE_FEE), ForfeitRequests (AUTO_PROMOTE vs ADMIN_PICKS), and WaitingList management with auto-shifting positions.
 - Q: Notifications? → A: Push (FCM/APNs) and SMS events for all critical auction and administrative actions. Device token management for multi-platform delivery.
 - Q: Flutter Architecture and Tech Stack? → A: Clean Architecture + Riverpod (AsyncNotifier). Dio/Retrofit for API, Drift for local cache. SSE via `eventsource`. Online-only auction bidding. Direct-to-S3 upload flow.
+- Q: Scalability and Concurrent Auction Limits? → A: System targets 50 concurrently active auctions platform-wide for V1.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -164,6 +165,7 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **SC-004**: Notifications are delivered to target users' registered device tokens within 2 seconds of the triggering event.
 - **SC-005**: Shareable squad images are generated at 1080x1080 pixels (PNG) for optimal WhatsApp sharing.
 - **SC-006**: System handles up to 5,000 concurrent viewers per active auction without degradation in message latency.
+- **SC-007**: System supports at least 50 concurrently active auctions across the entire platform.
 
 ## Assumptions
 
