@@ -7,11 +7,11 @@
 
 **Purpose**: Project initialization and basic directory structure for backend and frontend
 
-- [ ] T001 Initialize Spring Boot backend project in `crichere-backend/` with Kotlin DSL
+- [x] T001 Initialize Spring Boot backend project in `crichere-backend/` with Kotlin DSL
 - [ ] T002 [P] Initialize Flutter frontend project in `crichere-flutter/`
-- [ ] T003 [P] Configure backend Flyway and PostgreSQL connection in `crichere-backend/src/main/resources/application.yml`
+- [x] T003 [P] Configure backend Flyway and PostgreSQL connection in `crichere-backend/src/main/resources/application.yml`
 - [ ] T004 [P] Configure frontend Riverpod, Dio, and Drift dependencies in `crichere-flutter/pubspec.yaml`
-- [ ] T005 [P] Create backend module structure: `domain/<module>/{entity, repository, service, controller, dto}`
+- [x] T005 [P] Create backend module structure: `domain/<module>/{entity, repository, service, controller, dto}`
 
 ---
 
@@ -19,11 +19,11 @@
 
 **Purpose**: Core security, authentication, and communication infrastructure
 
-- [ ] T006 Implement JWT Authentication Filter and security configuration in `crichere-backend/src/main/kotlin/common/security/`
-- [ ] T007 [P] Implement `ResponseHelper` and standard error envelope in `crichere-backend/src/main/kotlin/common/response/`
-- [ ] T008 [P] Implement pluggable `SmsProvider` (MSG91) and `PushProvider` (FCM) interfaces in `crichere-backend/src/main/kotlin/common/provider/`
-- [ ] T009 Create `User` and `OTP` entities and repositories in `crichere-backend/src/main/kotlin/domain/auth/`
-- [ ] T010 Implement S3 presigned URL service in `crichere-backend/src/main/kotlin/common/service/S3Service.kt`
+- [x] T006 Implement JWT Authentication Filter and security configuration in `crichere-backend/src/main/kotlin/common/security/`
+- [x] T007 [P] Implement `ResponseHelper` and standard error envelope in `crichere-backend/src/main/kotlin/common/response/`
+- [x] T008 [P] Implement pluggable `SmsProvider` (MSG91) and `PushProvider` (FCM) interfaces in `crichere-backend/src/main/kotlin/common/provider/`
+- [x] T009 Create `User` and `OTP` entities and repositories in `crichere-backend/src/main/kotlin/domain/auth/`
+- [x] T010 Implement S3 presigned URL service in `crichere-backend/src/main/kotlin/common/service/S3Service.kt`
 - [ ] T011 [P] Setup frontend Clean Architecture folders in `crichere-flutter/lib/` (core, features, shared)
 - [ ] T012 [P] Implement frontend JWT secure storage and Dio interceptors in `crichere-flutter/lib/core/network/`
 
@@ -71,7 +71,7 @@
 
 **Independent Test**: User enters phone, verifies OTP. Verification: Profile status changes from `GHOST` to `ACTIVE` and `claimedAt` is set.
 
-- [ ] T026 [US3] Implement `POST /api/v1/auth/profile/claim` endpoint in `crichere-backend/src/main/kotlin/domain/auth/`
+- [x] T026 [US3] Implement `POST /api/v1/auth/profile/claim` endpoint in `crichere-backend/src/main/kotlin/domain/auth/`
 - [ ] T027 [US3] Implement logic to auto-link all existing `LeaguePlayer` records to the claiming `User`
 - [ ] T028 [P] [US3] Create frontend Player feature module in `crichere-flutter/lib/features/player/`
 - [ ] T029 [US3] Implement frontend Profile Claiming flow (OTP input + Style/Role/Level configuration)

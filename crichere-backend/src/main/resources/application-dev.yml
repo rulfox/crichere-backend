@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    show-sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+logging:
+  level:
+    com.crichere: DEBUG
+    org.springframework.security: DEBUG
