@@ -5,6 +5,12 @@
 **Status**: Draft  
 **Input**: User description: "Build Crichere: a cricket league auction SaaS platform for India..."
 
+## Clarifications
+
+### Session 2026-04-24
+- Q: Authentication details and entity field names? → A: OTP-only (6 digits, 5m expiry, 3 attempts), JWT (1h access, 30d opaque refresh tokens), specific field names for User, OTP, and RefreshToken entities, 3-table membership role model.
+- Q: Response structure? → A: Standardized ResponseHelper with success/error signatures and specific HTTP statuses.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - League Configuration (Priority: P1)
@@ -68,6 +74,7 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 
 ### Edge Cases
 
+- **OTP Expiry/Rate Limiting**: What happens if a user requests too many OTPs or uses an expired one? (System enforces 5 sends/hour and 3 verification attempts; previous OTPs expire immediately on new send).
 - **SSE Disconnection**: How does the viewer app handle a momentary loss of SSE connection? (Should automatically reconnect and sync with the latest `sequenceNumber`).
 - **Undo Sold after Purse Change**: What happens if an "Undo Sold" is performed but the franchise no longer has the original purse state? (Principles mandate `FranchisePurseState` per round, so state restoration should be deterministic).
 - **Simultaneous Bids**: Auctioneer records a bid just as another franchise claims they bid first verbally. (Human auctioneer model: Auctioneer is the sole writer; their recording is final).
@@ -77,22 +84,60 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 ### Functional Requirements
 
 - **FR-001**: System MUST support OTP-only authentication for Indian phone numbers (`^[6-9]\d{9}$`).
-- **FR-002**: System MUST provide an append-only `AuctionAuditLog` with monotonically increasing sequence numbers.
-- **FR-003**: System MUST use Server-Sent Events (SSE) for all live auction updates; WebSockets are prohibited.
-- **FR-004**: System MUST store all money values as whole Indian Rupee (INR) integers.
-- **FR-005**: System MUST support three player order modes: RANDOM, FREE_PICK, and HYBRID.
-- **FR-006**: System MUST allow League Admins to pre-assign Captains (purse deduction) and Icon players (free).
-- **FR-007**: System MUST provide "Undo last bid" and "Undo sold" actions with mandatory reason logging.
-- **FR-008**: System MUST support bulk CSV import for player profiles.
-- **FR-009**: System MUST generate shareable squad images (PNG/JPG) for Franchise Owners.
-- **FR-010**: System MUST handle "mustSellAll" logic, allowing fallback manual assignment by the Auctioneer.
+- **FR-002**: OTPs MUST be 6 digits, valid for 5 minutes, and allow max 3 verification attempts. Rate-limited to 5 sends per hour per phone.
+- **FR-003**: JWT Access tokens valid for 1 hour; Refresh tokens are opaque UUIDs valid for 30 days, stored in `refresh_tokens` table.
+- **FR-004**: System MUST provide an append-only `AuctionAuditLog` with monotonically increasing sequence numbers.
+- **FR-005**: System MUST use Server-Sent Events (SSE) for all live auction updates; WebSockets are prohibited.
+- **FR-006**: System MUST store all money values as whole Indian Rupee (INR) integers.
+- **FR-007**: System MUST support three player order modes: RANDOM, FREE_PICK, and HYBRID.
+- **FR-008**: System MUST allow League Admins to pre-assign Captains (purse deduction) and Icon players (free).
+- **FR-009**: System MUST provide "Undo last bid" and "Undo sold" actions with mandatory reason logging.
+- **FR-010**: System MUST support bulk CSV import for player profiles.
+- **FR-011**: System MUST generate shareable squad images (PNG/JPG) for Franchise Owners.
+- **FR-012**: System MUST handle "mustSellAll" logic, allowing fallback manual assignment by the Auctioneer.
+- **FR-013**: API responses MUST use `ResponseHelper.success(data, message, messageKey)` or `ResponseHelper.error(code, message, messageKey)`.
 
 ### Key Entities *(include if feature involves data)*
 
-- **User**: Global entity, phone-based identity.
-- **Player**: Global entity linked to User; contains cricket-specific stats and profile.
+- **User**: 
+  - `id`: UUID (PK)
+  - `phone`: VARCHAR(15) UNIQUE NOT NULL
+  - `name`: VARCHAR(100)
+  - `email`: VARCHAR(255) UNIQUE
+  - `profilePhoto`: VARCHAR(500) (S3 URL)
+  - `profileStatus`: ENUM (GHOST, CLAIMED, ACTIVE)
+  - `playingRole`: ENUM (BATTER, BOWLER, ALL_ROUNDER, WICKET_KEEPER)
+  - `battingStyle`: ENUM (RIGHT_HAND, LEFT_HAND)
+  - `bowlingStyle`: ENUM (RIGHT_ARM, LEFT_ARM)
+  - `bowlingType`: ENUM (FAST, MEDIUM_FAST, MEDIUM, OFF_SPIN, LEG_SPIN, SLOW_LEFT_ARM, SLOW_LEFT_ARM_ORTHODOX)
+  - `experienceLevel`: ENUM (LOCAL, DISTRICT, STATE, NATIONAL)
+  - `jerseyNumber`: INT
+  - `dateOfBirth`: DATE
+  - `gender`: VARCHAR(20)
+  - `city`, `state`: VARCHAR(100)
+  - `createdBy`: UUID (FK -> users)
+  - `claimedAt`: TIMESTAMP
+- **OTP**:
+  - `id`: UUID
+  - `phone`: VARCHAR(15)
+  - `code`: VARCHAR(6)
+  - `isVerified`: BOOLEAN
+  - `attempts`: INT
+  - `expiresAt`: TIMESTAMP
+  - `createdAt`: TIMESTAMP
+- **RefreshToken**:
+  - `id`: UUID
+  - `token`: VARCHAR(255) UNIQUE
+  - `userId`: UUID (FK -> users)
+  - `expiresAt`: TIMESTAMP
+  - `revoked`: BOOLEAN
+  - `createdAt`: TIMESTAMP
 - **League**: Top-level container for an auction event; contains configuration and rules.
 - **Franchise**: Belonging to a League; has a purse, owner(s), and a squad.
+- **Membership Tables**:
+  - `UserPlatformMembership`: `id`, `userId`, `createdAt`
+  - `UserLeagueMembership`: `id`, `userId`, `leagueId`, `role` (LEAGUE_ADMIN, AUCTIONEER), `isPrimary`, `joinedAt`
+  - `UserFranchiseMembership`: `id`, `userId`, `franchiseId`, `joinedAt`
 - **AuctionRound**: Specific phase of a league auction with its own bidding rules and purse states.
 - **AuctionAuditLog**: Monotonic log of every bid, sale, and administrative action during an auction.
 - **FranchisePurseState**: Snapshots of a franchise's available balance at specific points/rounds.
@@ -113,3 +158,4 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 - **Infrastructure**: Deployment will be in the AWS Mumbai (`ap-south-1`) region to minimize latency for Indian users.
 - **Payment Scope**: V1 implementation handles cash/offline fee tracking only; Razorpay is V2.
 - **Auction Environment**: High-speed internet is assumed for the Auctioneer's device to ensure real-time command delivery.
+
