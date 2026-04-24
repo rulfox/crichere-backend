@@ -41,6 +41,7 @@
 - [ ] T014 [US1] Implement `LeagueService` with status transition logic and base price resolution in `crichere-backend/src/main/kotlin/domain/league/`
 - [ ] T015 [US1] Implement Bulk CSV Player Import with ghost profile creation in `crichere-backend/src/main/kotlin/domain/league/BulkImportService.kt`
 - [ ] T016 [US1] Create `LeagueController` with endpoints for creation and config update
+- [ ] T044 [P] [US1] Unit test `LeagueService` base price resolution logic (FR-012 priority order)
 - [ ] T017 [P] [US1] Create frontend League feature module (data, domain, presentation) in `crichere-flutter/lib/features/league/`
 - [ ] T018 [US1] Implement frontend League creation form and CSV upload logic
 
@@ -83,7 +84,7 @@
 
 **Independent Test**: Admin approves a forfeit. Verification: Next player in waiting list is automatically promoted in `AUTO_PROMOTE` mode.
 
-- [ ] T030 [US4] Create `FeeObligation`, `ForfeitRequest`, and `WaitingList` entities and Flyway migrations `V007`, `V008`, `V009`
+- [ ] T030 [US4] Create `FeeObligation`, `ForfeitRequest`, and `WaitingList` entities and Flyway migrations `V007-V011`
 - [ ] T031 [US4] Implement `ForfeitService` with `feeRefundDecision` rules and `AUTO_PROMOTE` logic
 - [ ] T032 [US4] Implement `WaitingList` position auto-shifting on promotion or withdrawal
 - [ ] T033 [US4] Implement backend Fee collection summary reporting
@@ -97,7 +98,7 @@
 
 - [ ] T035 [P] Implement backend PDF generation for squad summaries using iText/PDFBox
 - [ ] T036 Implement frontend shareable squad image capture using `screenshot` package
-- [ ] T037 [P] Configure FCM background message handling in `crichere-flutter/lib/core/notification/`
+- [ ] T037 [P] Configure FCM background message handling and backend dispatch timing telemetry (SC-004)
 - [ ] T038 Final UI/UX polish: Lottie animations and Shimmer loading states
 - [ ] T039 [P] Setup SSE load-test harness (JMeter/Gatling) targeting 5,000 viewers/auction
 - [ ] T040 [P] Perform Redis pub/sub benchmark for cross-instance latency validation
