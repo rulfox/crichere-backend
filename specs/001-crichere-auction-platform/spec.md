@@ -79,6 +79,7 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 
 1. **Given** a player has a `FeeObligation`, **When** the Admin records a `FeePayment`, **Then** the player's `auctionEligible` status is updated if the `minimumToRegister` threshold is met.
 2. **Given** a `ForfeitRequest` is APPROVED in an `AUTO_PROMOTE` league, **When** the resolution is processed, **Then** the next user on the `WaitingList` is automatically promoted and a `FeeObligation` is created for them.
+3. **Given** a franchise has multiple members, **When** a `PLAYER_SOLD` event occurs, **Then** all registered members of that franchise receive a push notification.
 
 ### Edge Cases
 
@@ -162,7 +163,7 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **SC-001**: Auction updates (bid, player up, sold) reach all connected viewers in under 500ms via SSE.
 - **SC-002**: 100% of auction actions are recorded in the `AuctionAuditLog` with correct sequence numbers.
 - **SC-003**: Waiting list positions are recalculated with 100% accuracy upon any promotion or withdrawal.
-- **SC-004**: Notifications are delivered to target users' registered device tokens within 2 seconds of the triggering event.
+- **SC-004**: Notifications are dispatched by the backend to FCM/APNs gateways within 1 second of the triggering event.
 - **SC-005**: Shareable squad images are generated at 1080x1080 pixels (PNG) for optimal WhatsApp sharing.
 - **SC-006**: System handles up to 5,000 concurrent viewers per active auction without degradation in message latency.
 - **SC-007**: System supports at least 50 concurrently active auctions across the entire platform.

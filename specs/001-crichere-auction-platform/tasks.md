@@ -97,7 +97,9 @@
 - [ ] T036 Implement frontend shareable squad image capture using `screenshot` package
 - [ ] T037 [P] Configure FCM background message handling in `crichere-flutter/lib/core/notification/`
 - [ ] T038 Final UI/UX polish: Lottie animations and Shimmer loading states
-- [ ] T039 Run platform-wide concurrency and SSE latency validation
+- [ ] T039 [P] Setup SSE load-test harness (JMeter/Gatling) targeting 5,000 viewers/auction
+- [ ] T040 [P] Perform Redis pub/sub benchmark for cross-instance latency validation
+- [ ] T041 Validate platform scaling to 50 simultaneous auctions (250k total connections)
 
 ---
 
