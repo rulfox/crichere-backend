@@ -10,7 +10,7 @@ Build "Crichere", an India-first cricket league auction SaaS platform. The imple
 
 **Language/Version**: Kotlin 2.0.21 (Backend), Dart (Flutter Stable)  
 **Primary Dependencies**: 
-- **Backend**: Spring Boot 3.3.5, Spring Security, Spring Data JPA, Spring Data Redis (SSE pub/sub), AWS SDK v2 (S3), MSG91 (SMS), FCM (Push), ShedLock, Flyway, JJWT.
+- **Backend**: Spring Boot 3.4.0, Spring Security, Spring Data JPA, Spring Data Redis (SSE pub/sub), AWS SDK v2 (S3), MSG91 (SMS), FCM (Push), ShedLock, Flyway, JJWT.
 - **Frontend**: Riverpod (State Management), Dio + Retrofit (API), Drift (Local DB), auto_route (Navigation), Freezed (Serialization), eventsource (SSE).
 **Storage**: PostgreSQL 16 (RDS/Managed), Redis (ElastiCache/Managed), AWS S3 (ap-south-1 Mumbai region).  
 **Testing**: JUnit 5, MockK, Testcontainers (PostgreSQL).  
