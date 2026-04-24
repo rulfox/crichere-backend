@@ -34,6 +34,10 @@
 - Q: Drift Sync Rules? → A: Offline READ cache only; independent per device/tab. Auction state is never cached locally. Invalidate on league `AUCTION_LIVE` or foreground resume.
 - Q: Push Notification Handling? → A: FCM HIGH priority for auction events. Background: system notification + deep link. Foreground: in-app banner/SnackBar only (no system notification).
 - Q: Secure Storage on 401? → A: If token refresh fails on 401, clear flutter_secure_storage and Drift cache, then replace all routes with PhoneEntryScreen.
+- Q: SSE Latency Measurement? → A: Measured from backend publish to client StreamProvider emission. Validated via JMeter/Gatling with Linux TC (3G/4G simulation). 95th percentile target < 500ms on 4G.
+- Q: S3 Upload Restrictions? → A: Max sizes: Photo (5MB), Logo/Banner (10MB), PDF (50MB). Restricted to JPEG/PNG/WebP and PDF. Enforced via backend presigned URL and S3 bucket policy.
+- Q: Shimmer Logic? → A: Show only if data > 300ms and no cache available. 1200ms duration, max 10 items. 10s timeout to error state.
+- Q: Web Accessibility? → A: Live regions for bids/sales via Semantics. Keyboard focus moves to franchise selector on player up. Ctrl+Z for undo on web.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -138,7 +142,7 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **FR-015**: System MUST deliver push notifications (FCM/APNs) for critical events like `AUCTION_STARTED`, `PLAYER_SOLD`, and `FEE_PAYMENT_RECORDED`.
 - **FR-016**: API responses MUST use `ResponseHelper.success` or `ResponseHelper.error`.
 - **FR-017**: Auction bidding operations MUST be online-only; no offline queuing for auction recording actions.
-- **FR-018**: File uploads (photos, PDFs) MUST follow the direct-to-S3 flow using presigned URLs provided by the backend.
+- **FR-018**: File uploads (photos, PDFs) MUST follow the direct-to-S3 flow using presigned URLs. Max sizes: Profile (5MB), Logo/Banner (10MB), PDF (50MB). Formats restricted to JPEG/PNG/WebP for images and PDF for documents. Enforced at both client (pre-validation) and backend (bucket policy).
 
 ### Key Entities *(include if feature involves data)*
 
@@ -167,20 +171,22 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **Navigation**: `auto_route` with `AutoRouteGuard` for role-based access and deep linking.
 - **Architecture**: Feature-first hybrid Clean Architecture (`core/`, `features/`, etc.).
 - **Security**: `flutter_secure_storage` for JWTs; never expose AWS credentials to the client.
-- **Real-time**: SSE via `eventsource` feeding into Riverpod `StreamProvider`.
+- **Real-time**: SSE via `eventsource` feeding into Riverpod `StreamProvider`. Redis channels MUST be partitioned per auctionId. SseEmitter pings sent every 15 seconds. Gzip compression MUST be disabled for SSE streams.
 - **Assets**: Direct-to-S3 upload (Presigned URL) with no AWS SDK on the client.
 - **Notifications**: FCM HIGH priority for auction events (PLAYER_SOLD, etc.). Background: system notification + deep link. Foreground: in-app banner/SnackBar only.
+- **Accessibility (Web)**: Auctioneer panel MUST use Flutter Semantics for live region announcements (bids, sales). Full keyboard focus management required (tab order: Player -> Franchise -> Bid -> Record).
 
 ### Design Constraints
 - **Regional Targets**: Optimized for mid-range Indian Android devices.
-- **Auctioneer Panel**: Optimized for Web (wider desktop layout) with comprehensive pool browsing and controls.
-- **Mobile Experience**: Portrait-first for players and franchise owners, utilizing Lottie animations and Shimmer loading states.
+- **Auctioneer Panel**: Optimized for Web (wider desktop layout). Active bid indicators MUST use icons/labels, not color alone (WCAG AA).
+- **Mobile Experience**: Portrait-first. Utilizes Lottie and Shimmer.
+- **Shimmer Logic**: Display if data fetch > 300ms and no cache available. Max 10 items. Timeout to error state with "Retry" button after 10s. Show cached data immediately on resume/return (stale-while-revalidate).
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: Auction updates (bid, player up, sold) reach all connected viewers in under 500ms via SSE.
+- **SC-001**: Auction updates reach all connected viewers in under 500ms (95th percentile on 4G) via SSE. Measurement: server publish timestamp to client emission. Validated with 5,000 simulated connections.
 - **SC-002**: 100% of auction actions are recorded in the `AuctionAuditLog` with correct sequence numbers.
 - **SC-003**: Waiting list positions are recalculated with 100% accuracy upon any promotion or withdrawal.
 - **SC-004**: Notifications are dispatched by the backend to FCM/APNs gateways within 1 second of the triggering event.
