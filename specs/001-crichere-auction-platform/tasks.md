@@ -58,7 +58,9 @@
 - [ ] T022 [US2] Implement Auctioneer bid recording and "Undo" logic with mandatory reasons
 - [ ] T023 [US2] Implement `GET /auctions/{id}/events` SSE stream with `Last-Event-ID` replay logic
 - [ ] T024 [P] [US2] Implement frontend SSE client using `eventsource` and Riverpod `StreamProvider` in `crichere-flutter/lib/features/auction/`
-- [ ] T025 [US2] Build frontend Auctioneer Panel (Web) and Viewer Dashboard (Mobile)
+- [ ] T025 [US2] Build frontend Auctioneer Panel (Web) with Undo/Force-Assign controls and Viewer Dashboard (Mobile)
+- [ ] T042 [US2] Implement Player Pre-assignment (Captain/Icon) logic with purse deduction in backend
+- [ ] T043 [US2] Implement League Admin Force-Assign logic (bypassing purse) in backend and frontend
 
 ---
 
@@ -71,7 +73,7 @@
 - [ ] T026 [US3] Implement `POST /api/v1/auth/profile/claim` endpoint in `crichere-backend/src/main/kotlin/domain/auth/`
 - [ ] T027 [US3] Implement logic to auto-link all existing `LeaguePlayer` records to the claiming `User`
 - [ ] T028 [P] [US3] Create frontend Player feature module in `crichere-flutter/lib/features/player/`
-- [ ] T029 [US3] Implement frontend Profile Claiming flow (OTP input + Style configuration)
+- [ ] T029 [US3] Implement frontend Profile Claiming flow (OTP input + Style/Role/Level configuration)
 
 ---
 
