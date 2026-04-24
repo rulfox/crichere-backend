@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    implementation(platform("software.amazon.awssdk:bom:2.25.15"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -37,7 +38,8 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
     
     // AWS S3
-    implementation("software.amazon.awssdk:s3:2.25.15")
+    implementation("software.amazon.awssdk:s3")
+    implementation("software.amazon.awssdk:s3-presigner")
     
     // Firebase for Push
     implementation("com.google.firebase:firebase-admin:9.2.0")

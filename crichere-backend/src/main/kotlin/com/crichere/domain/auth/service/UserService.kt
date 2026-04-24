@@ -1,7 +1,9 @@
 package com.crichere.domain.auth.service
 
 import com.crichere.common.exception.ResourceNotFoundException
+import com.crichere.domain.auth.dto.CricketProfileRequest
 import com.crichere.domain.auth.entity.User
+import com.crichere.domain.auth.enums.ProfileStatus
 import com.crichere.domain.auth.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service

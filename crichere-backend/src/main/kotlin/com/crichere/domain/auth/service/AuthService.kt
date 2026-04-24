@@ -1,7 +1,9 @@
 package com.crichere.domain.auth.service
 
+import com.crichere.common.exception.BusinessLogicException
 import com.crichere.common.exception.ResourceNotFoundException
 import com.crichere.common.exception.UnauthorizedException
+import com.crichere.domain.auth.dto.ClaimProfileRequest
 import com.crichere.domain.auth.entity.RefreshToken
 import com.crichere.domain.auth.entity.User
 import com.crichere.domain.auth.enums.ProfileStatus
