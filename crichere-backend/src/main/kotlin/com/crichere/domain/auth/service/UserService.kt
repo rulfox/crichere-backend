@@ -18,7 +18,7 @@ import java.util.*
 class UserService(
     private val userRepository: UserRepository,
     private val s3Presigner: S3Presigner,
-    @Value("${crichere.s3.bucket}") private val bucketName: String
+    @Value("\${crichere.s3.bucket}") private val bucketName: String
 ) {
 
     fun getUserById(id: UUID): User {

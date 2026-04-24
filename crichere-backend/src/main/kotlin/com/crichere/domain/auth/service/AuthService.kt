@@ -23,7 +23,7 @@ class AuthService(
     private val userRepository: UserRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtTokenProvider: JwtTokenProvider,
-    @Value("${crichere.jwt.refresh-expiration-days}") private val refreshExpirationDays: Long
+    @Value("\${crichere.jwt.refresh-expiration-days}") private val refreshExpirationDays: Long
 ) {
 
     fun sendOtp(phone: String) {

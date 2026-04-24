@@ -10,8 +10,8 @@ import javax.crypto.SecretKey
 
 @Component
 class JwtTokenProvider(
-    @Value("${crichere.jwt.secret}") private val secretKeyString: String,
-    @Value("${crichere.jwt.expiration-ms}") private val validityInMs: Long
+    @Value("\${crichere.jwt.secret}") private val secretKeyString: String,
+    @Value("\${crichere.jwt.expiration-ms}") private val validityInMs: Long
 ) {
     private val secretKey: SecretKey = Keys.hmacShaKeyFor(secretKeyString.toByteArray(StandardCharsets.UTF_8))
 
