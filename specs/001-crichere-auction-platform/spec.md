@@ -10,6 +10,9 @@
 ### Session 2026-04-24
 - Q: Authentication details and entity field names? → A: OTP-only (6 digits, 5m expiry, 3 attempts), JWT (1h access, 30d opaque refresh tokens), specific field names for User, OTP, and RefreshToken entities, 3-table membership role model.
 - Q: Response structure? → A: Standardized ResponseHelper with success/error signatures and specific HTTP statuses.
+- Q: League and Player details? → A: Comprehensive field lists for League, LeaguePlayer, and Global Player entities. Strict status transitions for Leagues.
+- Q: Auction Round and Pre-assignment? → A: Rounds are fully independent with specific config (purse, increments, eligibility). Pre-assignment rules for Captains (purse deduction) and Icons (free).
+- Q: Base Price and Bulk Import? → A: 3-level priority resolution for base price. Bulk CSV import for players with ghost profile creation.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -78,6 +81,7 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 - **SSE Disconnection**: How does the viewer app handle a momentary loss of SSE connection? (Should automatically reconnect and sync with the latest `sequenceNumber`).
 - **Undo Sold after Purse Change**: What happens if an "Undo Sold" is performed but the franchise no longer has the original purse state? (Principles mandate `FranchisePurseState` per round, so state restoration should be deterministic).
 - **Simultaneous Bids**: Auctioneer records a bid just as another franchise claims they bid first verbally. (Human auctioneer model: Auctioneer is the sole writer; their recording is final).
+- **Pre-assignment Conflict**: What happens if an admin tries to pre-assign a player who is already sold? (System returns a 409 Conflict error; pre-assignment only allowed for AVAILABLE players).
 
 ## Requirements *(mandatory)*
 
@@ -89,58 +93,30 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 - **FR-004**: System MUST provide an append-only `AuctionAuditLog` with monotonically increasing sequence numbers.
 - **FR-005**: System MUST use Server-Sent Events (SSE) for all live auction updates; WebSockets are prohibited.
 - **FR-006**: System MUST store all money values as whole Indian Rupee (INR) integers.
-- **FR-007**: System MUST support three player order modes: RANDOM, FREE_PICK, and HYBRID.
-- **FR-008**: System MUST allow League Admins to pre-assign Captains (purse deduction) and Icon players (free).
+- **FR-007**: System MUST support three player order modes: RANDOM, FREE_PICK, and HYBRID (League level config).
+- **FR-008**: System MUST allow League Admins to pre-assign Captains (purse deduction) and Icon players (free). Pre-assigned players are excluded from the auction pool.
 - **FR-009**: System MUST provide "Undo last bid" and "Undo sold" actions with mandatory reason logging.
-- **FR-010**: System MUST support bulk CSV import for player profiles.
-- **FR-011**: System MUST generate shareable squad images (PNG/JPG) for Franchise Owners.
-- **FR-012**: System MUST handle "mustSellAll" logic, allowing fallback manual assignment by the Auctioneer.
-- **FR-013**: API responses MUST use `ResponseHelper.success(data, message, messageKey)` or `ResponseHelper.error(code, message, messageKey)`.
+- **FR-010**: System MUST support bulk CSV import for player profiles (phone, name, category, style, basePrice).
+- **FR-011**: Base price resolution order: 1. `basePriceOverride` (LeaguePlayer) → 2. `LeagueTagBasePrice` → 3. `LeagueCategoryBasePrice`.
+- **FR-012**: League status transitions MUST follow: DRAFT → PUBLISHED → AUCTION_LIVE → COMPLETED → ARCHIVED.
+- **FR-013**: Auction Rounds MUST be independent with configurable purse, eligibility, and completion triggers.
+- **FR-014**: API responses MUST use `ResponseHelper.success(data, message, messageKey)` or `ResponseHelper.error(code, message, messageKey)`.
 
 ### Key Entities *(include if feature involves data)*
 
-- **User**: 
-  - `id`: UUID (PK)
-  - `phone`: VARCHAR(15) UNIQUE NOT NULL
-  - `name`: VARCHAR(100)
-  - `email`: VARCHAR(255) UNIQUE
-  - `profilePhoto`: VARCHAR(500) (S3 URL)
-  - `profileStatus`: ENUM (GHOST, CLAIMED, ACTIVE)
-  - `playingRole`: ENUM (BATTER, BOWLER, ALL_ROUNDER, WICKET_KEEPER)
-  - `battingStyle`: ENUM (RIGHT_HAND, LEFT_HAND)
-  - `bowlingStyle`: ENUM (RIGHT_ARM, LEFT_ARM)
-  - `bowlingType`: ENUM (FAST, MEDIUM_FAST, MEDIUM, OFF_SPIN, LEG_SPIN, SLOW_LEFT_ARM, SLOW_LEFT_ARM_ORTHODOX)
-  - `experienceLevel`: ENUM (LOCAL, DISTRICT, STATE, NATIONAL)
-  - `jerseyNumber`: INT
-  - `dateOfBirth`: DATE
-  - `gender`: VARCHAR(20)
-  - `city`, `state`: VARCHAR(100)
-  - `createdBy`: UUID (FK -> users)
-  - `claimedAt`: TIMESTAMP
-- **OTP**:
-  - `id`: UUID
-  - `phone`: VARCHAR(15)
-  - `code`: VARCHAR(6)
-  - `isVerified`: BOOLEAN
-  - `attempts`: INT
-  - `expiresAt`: TIMESTAMP
-  - `createdAt`: TIMESTAMP
-- **RefreshToken**:
-  - `id`: UUID
-  - `token`: VARCHAR(255) UNIQUE
-  - `userId`: UUID (FK -> users)
-  - `expiresAt`: TIMESTAMP
-  - `revoked`: BOOLEAN
-  - `createdAt`: TIMESTAMP
-- **League**: Top-level container for an auction event; contains configuration and rules.
-- **Franchise**: Belonging to a League; has a purse, owner(s), and a squad.
+- **User**: Global identity with `profilePhoto` (S3 URL), `playingRole` (BATTER, BOWLER, etc.), and `profileStatus` (GHOST, CLAIMED, ACTIVE).
+- **Player (Global)**: `id`, `userId`, `phone`, `name`, `playingRole`, `battingStyle`, `bowlingStyle`, `basePrice`, `createdBy`.
+- **League**: 
+  - Fields: `name`, `shortName`, `description`, `season`, `edition`, `logoUrl`, `bannerUrl`, `primaryColor`, `city`, `state`, `country` (India), `format` (T20, ODI, etc.), `registrationDates`, `squadLimits`, `ageLimits`, `genderRestriction`, `mustSellAll`, `fallbackRule`, `playerOrderMode`, `captainSettings`, `iconSettings`, `waitingListSettings`, `contactInfo`, `rulesUrl`, `status`, `planType`, `visibility`.
+- **LeaguePlayer (Junction)**: `id`, `leagueId`, `playerId`, `playerCategory`, `playerTag` (A/B/C/D), `basePriceOverride`, `auctionEligible`, `assignmentType`.
+- **AuctionRoundConfig**: `id`, `auctionId`, `roundNumber`, `name`, `currencyType` (POINTS, CASH), `purseAmount`, `purseSource` (FRESH, CARRY_OVER), `bidMode`, `playerPoolSource`, `franchiseEligibilityRule`, `completionTrigger`, `status`.
+- **BidIncrementSlab**: `id`, `roundId`, `fromAmount`, `toAmount`, `incrementBy`.
 - **Membership Tables**:
-  - `UserPlatformMembership`: `id`, `userId`, `createdAt`
-  - `UserLeagueMembership`: `id`, `userId`, `leagueId`, `role` (LEAGUE_ADMIN, AUCTIONEER), `isPrimary`, `joinedAt`
-  - `UserFranchiseMembership`: `id`, `userId`, `franchiseId`, `joinedAt`
-- **AuctionRound**: Specific phase of a league auction with its own bidding rules and purse states.
-- **AuctionAuditLog**: Monotonic log of every bid, sale, and administrative action during an auction.
-- **FranchisePurseState**: Snapshots of a franchise's available balance at specific points/rounds.
+  - `UserPlatformMembership`: Platform Admins.
+  - `UserLeagueMembership`: `userId`, `leagueId`, `role` (LEAGUE_ADMIN, AUCTIONEER), `isPrimary`.
+  - `UserFranchiseMembership`: `userId`, `franchiseId`.
+- **AuctionAuditLog**: Monotonic log of every bid, sale, and administrative action.
+- **FranchisePurseState**: Snapshots of a franchise's balance at specific points/rounds.
 
 ## Success Criteria *(mandatory)*
 
@@ -148,7 +124,7 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 
 - **SC-001**: Auction updates (bid, player up, sold) reach all connected viewers in under 500ms via SSE.
 - **SC-002**: 100% of auction actions are recorded in the `AuctionAuditLog` with correct sequence numbers.
-- **SC-003**: 99.9% of players can register and claim ghost profiles using only their phone number and OTP.
+- **SC-003**: Bulk import processes 1000+ players correctly, creating ghost profiles for new phones and reusing existing profiles.
 - **SC-004**: System handles up to 5,000 concurrent viewers per active auction without degradation in message latency.
 
 ## Assumptions
@@ -158,4 +134,5 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 - **Infrastructure**: Deployment will be in the AWS Mumbai (`ap-south-1`) region to minimize latency for Indian users.
 - **Payment Scope**: V1 implementation handles cash/offline fee tracking only; Razorpay is V2.
 - **Auction Environment**: High-speed internet is assumed for the Auctioneer's device to ensure real-time command delivery.
+
 
