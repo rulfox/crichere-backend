@@ -14,6 +14,8 @@
 - Q: Auction Round and Pre-assignment? → A: Rounds are fully independent with specific config (purse, increments, eligibility). Pre-assignment rules for Captains (purse deduction) and Icons (free).
 - Q: Base Price and Bulk Import? → A: 3-level priority resolution for base price. Bulk CSV import for players with ghost profile creation.
 - Q: Auction State Machine and SSE? → A: Strict transitions for Auction, Round, and Player states. SSE using Redis pub/sub with `Last-Event-ID` replay. Detailed rules for Undo-Bid, Undo-Sold, and Force-Assign.
+- Q: Fees, Forfeits, and Waiting List? → A: Specific entities for FeeObligations (PLAYER_FEE/FRANCHISE_FEE), ForfeitRequests (AUTO_PROMOTE vs ADMIN_PICKS), and WaitingList management with auto-shifting positions.
+- Q: Notifications? → A: Push (FCM/APNs) and SMS events for all critical auction and administrative actions. Device token management for multi-platform delivery.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -63,18 +65,18 @@ As a Player, I want to register and claim my profile so that my historical perfo
 
 ---
 
-### User Story 4 - Franchise Management & Owner Invite (Priority: P2)
+### User Story 4 - Fee and Forfeit Management (Priority: P2)
 
-As a League Admin, I want to invite Franchise Owners via SMS links so that they can manage their squads and participate in the auction.
+As a League Admin, I want to manage fee obligations and player forfeits so that the league's financial and participant records remain accurate.
 
-**Why this priority**: Necessary for multi-party participation.
+**Why this priority**: Essential for operational management of semi-pro leagues.
 
-**Independent Test**: Admin generates an invite link for a franchise. Owner clicks link, installs app, and is automatically linked to the franchise.
+**Independent Test**: Admin records a cash payment for a player's fee. Verification: Player's `paidAmount` updates and status moves toward `PAID`.
 
 **Acceptance Scenarios**:
 
-1. **Given** a franchise exists, **When** the Admin sends an SMS invite, **Then** a unique deep link is generated with a 7-day expiry.
-2. **Given** an owner uses a valid invite link, **When** they complete OTP verification, **Then** they gain owner permissions for that specific franchise.
+1. **Given** a player has a `FeeObligation`, **When** the Admin records a `FeePayment`, **Then** the player's `auctionEligible` status is updated if the `minimumToRegister` threshold is met.
+2. **Given** a `ForfeitRequest` is APPROVED in an `AUTO_PROMOTE` league, **When** the resolution is processed, **Then** the next user on the `WaitingList` is automatically promoted and a `FeeObligation` is created for them.
 
 ### Edge Cases
 
@@ -84,6 +86,7 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 - **Simultaneous Bids**: Auctioneer records a bid just as another franchise claims they bid first verbally. (Human auctioneer model: Auctioneer is the sole writer; their recording is final).
 - **Pre-assignment Conflict**: What happens if an admin tries to pre-assign a player who is already sold? (System returns a 409 Conflict error; pre-assignment only allowed for AVAILABLE players).
 - **Insufficient Purse**: What happens if a bid exceeds the current purse? (System throws `InsufficientPurseException` during validation).
+- **Waiting List Promotion**: What happens to the waiting list when the 2nd person in queue withdraws? (Positions of all entries > 2 automatically decrement by 1 to close the gap).
 
 ## Requirements *(mandatory)*
 
@@ -107,20 +110,26 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 - **FR-010**: System MUST support Force-Assign by League Admin (bypasses purse validation, price defaults to 0).
 - **FR-011**: System MUST support bulk CSV import for player profiles.
 - **FR-012**: Base price resolution order: 1. `basePriceOverride` (LeaguePlayer) → 2. `LeagueTagBasePrice` → 3. `LeagueCategoryBasePrice`.
-- **FR-013**: API responses MUST use `ResponseHelper.success` or `ResponseHelper.error`.
+- **FR-013**: Fee management MUST track `PLAYER_FEE` and `FRANCHISE_FEE` obligations and record `CASH` payments.
+- **FR-014**: Forfeit system MUST support `AUTO_PROMOTE` logic where the next user in the `WaitingList` is promoted upon forfeit approval.
+- **FR-015**: System MUST deliver push notifications (FCM/APNs) for critical events like `AUCTION_STARTED`, `PLAYER_SOLD`, and `FEE_PAYMENT_RECORDED`.
+- **FR-016**: API responses MUST use `ResponseHelper.success` or `ResponseHelper.error`.
 
 ### Key Entities *(include if feature involves data)*
 
-- **User**: Global identity with `profilePhoto` (S3 URL), `playingRole`, and `profileStatus`.
+- **User**: Global identity with `profilePhoto`, `playingRole`, and `profileStatus`.
 - **Player (Global)**: `id`, `userId`, `phone`, `name`, `playingRole`, `battingStyle`, `bowlingStyle`, `basePrice`.
-- **League**: Fields: `name`, `format`, `rulesUrl`, `status`, `mustSellAll`, `playerOrderMode`.
+- **League**: Fields: `name`, `format`, `rulesUrl`, `status`, `mustSellAll`, `playerOrderMode`, `waitingListMode`.
 - **Auction**: `id`, `leagueId` (unique), `auctioneerId`, `status`, `currentRoundId`, `currentLeaguePlayerId`.
-- **PlayerAuctionState**: `id`, `auctionId`, `leaguePlayerId` (unique per auction), `state`, `currentHighestBid`, `currentHighestBidderId`, `finalPrice`, `soldToFranchiseId`.
+- **PlayerAuctionState**: `id`, `auctionId`, `leaguePlayerId`, `state`, `currentHighestBid`, `finalPrice`.
 - **FranchisePurseState**: `id`, `franchiseId`, `roundId`, `startingAmount`, `currentAmount`, `reservedAmount`.
-- **Bid**: `id`, `auctionId`, `roundId`, `leaguePlayerId`, `franchiseId`, `bidAmount`, `status` (ACTIVE, UNDONE), `recordedBy`.
-- **AuctionAuditLog**: `id`, `auctionId`, `sequenceNumber`, `action` (PLAYER_UP, BID_PLACED, etc.), `payload` (JSONB), `actorId`.
-- **AuctionRoundConfig**: `id`, `roundNumber`, `purseAmount`, `bidMode`, `playerPoolSource`.
-- **BidIncrementSlab**: `id`, `roundId`, `fromAmount`, `toAmount`, `incrementBy`.
+- **FeeObligation**: `id`, `leagueId`, `userId`, `franchiseId`, `feeType`, `totalAmount`, `minimumToRegister`, `paidAmount`, `status` (UNPAID, PARTIALLY_PAID, PAID, WAIVED).
+- **FeePayment**: `id`, `obligationId`, `amount`, `paymentMode` (CASH, ONLINE), `recordedBy`.
+- **ForfeitRequest**: `id`, `leagueId`, `userId`, `type` (PLAYER, FRANCHISE), `status` (PENDING, APPROVED, REJECTED, CANCELLED), `feeRefundDecision`.
+- **WaitingList**: `id`, `leagueId`, `userId`, `position`, `status` (WAITING, PROMOTED, REJECTED, WITHDRAWN).
+- **AuctionAuditLog**: `id`, `auctionId`, `sequenceNumber`, `action`, `payload` (JSONB), `actorId`.
+- **DeviceToken**: `id`, `userId`, `token`, `platform` (ANDROID, IOS, WEB).
+- **InAppNotification**: `id`, `userId`, `type`, `title`, `body`, `payload`, `readAt`.
 - **Membership Tables**: `UserPlatformMembership`, `UserLeagueMembership`, `UserFranchiseMembership`.
 
 ## Success Criteria *(mandatory)*
@@ -129,12 +138,14 @@ As a League Admin, I want to invite Franchise Owners via SMS links so that they 
 
 - **SC-001**: Auction updates (bid, player up, sold) reach all connected viewers in under 500ms via SSE.
 - **SC-002**: 100% of auction actions are recorded in the `AuctionAuditLog` with correct sequence numbers.
-- **SC-003**: SSE reconnection successfully replays missed events using `Last-Event-ID`.
-- **SC-004**: System handles up to 5,000 concurrent viewers per active auction without degradation in message latency.
+- **SC-003**: Waiting list positions are recalculated with 100% accuracy upon any promotion or withdrawal.
+- **SC-004**: Notifications are delivered to target users' registered device tokens within 2 seconds of the triggering event.
+- **SC-005**: System handles up to 5,000 concurrent viewers per active auction without degradation in message latency.
 
 ## Assumptions
 
 - **SMS Provider**: MSG91 will be the primary provider for OTP and invite links.
+- **Push Provider**: FCM (Android) and APNs (iOS) will be used for mobile notifications.
 - **Storage**: All media assets (logos, PDFs) will be stored in S3 via presigned URL uploads from the client.
 - **Infrastructure**: Deployment will be in the AWS Mumbai (`ap-south-1`) region; Redis used for SSE broadcasting.
 - **Payment Scope**: V1 implementation handles cash/offline fee tracking only; Razorpay is V2.
