@@ -72,33 +72,11 @@ class LeagueService(
             throw BusinessLogicException("Auction already initialized for this league", "error.auction_already_initialized")
         }
 
-        val franchises = franchiseRepository.findByLeagueId(league.id)
-        if (franchises.isEmpty()) {
-            throw BusinessLogicException("Cannot initialize auction without franchises", "error.no_franchises")
-        }
-
-        val totalRounds = 1 // Default to 1 round for now, can be configurable
-        val auction = auctionRepository.save(
+        auctionRepository.save(
             Auction(
                 leagueId = league.id,
-                status = AuctionStatus.PENDING,
-                totalRounds = totalRounds
+                status = AuctionStatus.DRAFT
             )
         )
-
-        // Create FranchisePurseState for each franchise for each round
-        for (franchise in franchises) {
-            for (round in 1..totalRounds) {
-                franchisePurseStateRepository.save(
-                    FranchisePurseState(
-                        franchiseId = franchise.id,
-                        auctionId = auction.id,
-                        roundNumber = round,
-                        initialPurse = franchise.totalPurse,
-                        remainingPurse = franchise.totalPurse
-                    )
-                )
-            }
-        }
     }
 }

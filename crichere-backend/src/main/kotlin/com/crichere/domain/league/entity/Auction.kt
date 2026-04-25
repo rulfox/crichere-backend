@@ -11,18 +11,24 @@ class Auction(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     val leagueId: UUID,
+
+    @Column(name = "auctioneer_id")
+    var auctioneerId: UUID? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: AuctionStatus = AuctionStatus.PENDING,
+    var status: AuctionStatus = AuctionStatus.DRAFT,
 
-    @Column(nullable = false)
-    var currentRound: Int = 1,
+    @Column(name = "current_round_id")
+    var currentRoundId: UUID? = null,
 
-    @Column(nullable = false)
-    var totalRounds: Int = 1,
+    @Column(name = "current_league_player_id")
+    var currentLeaguePlayerId: UUID? = null,
+
+    var startedAt: Instant? = null,
+    var completedAt: Instant? = null,
 
     @Column(nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),

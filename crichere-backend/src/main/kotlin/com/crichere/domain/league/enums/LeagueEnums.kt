@@ -5,5 +5,5 @@ enum class LeagueStatus {
 }
 
 enum class AuctionStatus {
-    PENDING, ACTIVE, COMPLETED
+    DRAFT, LIVE, PAUSED, COMPLETED
 }
