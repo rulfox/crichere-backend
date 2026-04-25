@@ -1,0 +1,37 @@
+package com.crichere.domain.league.entity
+
+import com.crichere.domain.league.enums.LeagueStatus
+import jakarta.persistence.*
+import java.time.Instant
+import java.util.UUID
+
+@Entity
+@Table(name = "leagues")
+class League(
+    @Id
+    val id: UUID = UUID.randomUUID(),
+
+    @Column(nullable = false)
+    var name: String,
+
+    var logoUrl: String? = null,
+    var bannerUrl: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var status: LeagueStatus = LeagueStatus.DRAFT,
+
+    @Column(nullable = false)
+    val createdBy: UUID,
+
+    @Column(nullable = false, updatable = false)
+    val createdAt: Instant = Instant.now(),
+
+    @Column(nullable = false)
+    var updatedAt: Instant = Instant.now()
+) {
+    @PreUpdate
+    fun preUpdate() {
+        updatedAt = Instant.now()
+    }
+}
