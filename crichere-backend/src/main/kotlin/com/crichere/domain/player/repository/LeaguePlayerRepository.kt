@@ -6,5 +6,6 @@ import java.util.UUID
 
 interface LeaguePlayerRepository : JpaRepository<LeaguePlayer, UUID> {
     fun findByLeagueIdAndUserId(leagueId: UUID, userId: UUID): LeaguePlayer?
+    fun existsByLeagueIdAndUserId(leagueId: UUID, userId: UUID): Boolean
     fun findByLeagueId(leagueId: UUID): List<LeaguePlayer>
 }

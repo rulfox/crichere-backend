@@ -22,7 +22,8 @@ class PlayerController(
             LeaguePlayer(
                 leagueId = request.leagueId,
                 userId = request.userId,
-                basePrice = request.basePrice,
+                basePriceOverride = request.basePrice,
+                tag = request.tag,
                 category = request.category
             )
         )
@@ -31,6 +32,8 @@ class PlayerController(
             leagueId = player.leagueId,
             userId = player.userId,
             basePrice = player.basePrice,
+            basePriceOverride = player.basePriceOverride,
+            tag = player.tag,
             status = player.status,
             category = player.category
         )
@@ -45,6 +48,8 @@ class PlayerController(
             leagueId = player.leagueId,
             userId = player.userId,
             basePrice = player.basePrice,
+            basePriceOverride = player.basePriceOverride,
+            tag = player.tag,
             status = player.status,
             category = player.category
         )
@@ -60,6 +65,8 @@ class PlayerController(
                 leagueId = player.leagueId,
                 userId = player.userId,
                 basePrice = player.basePrice,
+                basePriceOverride = player.basePriceOverride,
+                tag = player.tag,
                 status = player.status,
                 category = player.category
             )

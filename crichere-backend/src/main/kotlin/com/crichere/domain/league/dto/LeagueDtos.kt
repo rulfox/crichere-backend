@@ -21,3 +21,17 @@ data class LeagueResponse(
 data class LeagueStatusUpdateRequest(
     val status: LeagueStatus
 )
+
+data class PlayerImportRequest(
+    val phone: String,
+    val name: String,
+    val category: String? = null,
+    val tag: String? = null,
+    val basePrice: Int? = null
+)
+
+data class BulkImportResponse(
+    val added: Int,
+    val skipped: Int,
+    val errors: List<String>
+)

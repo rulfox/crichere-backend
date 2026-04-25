@@ -10,7 +10,11 @@ import com.crichere.domain.league.entity.League
 import com.crichere.domain.league.enums.AuctionStatus
 import com.crichere.domain.league.enums.LeagueStatus
 import com.crichere.domain.league.repository.AuctionRepository
+import com.crichere.domain.league.repository.LeagueCategoryBasePriceRepository
 import com.crichere.domain.league.repository.LeagueRepository
+import com.crichere.domain.league.repository.LeagueTagBasePriceRepository
+import com.crichere.domain.player.entity.LeaguePlayer
+import com.crichere.domain.player.repository.LeaguePlayerRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -20,7 +24,10 @@ class LeagueService(
     private val leagueRepository: LeagueRepository,
     private val auctionRepository: AuctionRepository,
     private val franchiseRepository: FranchiseRepository,
-    private val franchisePurseStateRepository: FranchisePurseStateRepository
+    private val franchisePurseStateRepository: FranchisePurseStateRepository,
+    private val leagueCategoryBasePriceRepository: LeagueCategoryBasePriceRepository,
+    private val leagueTagBasePriceRepository: LeagueTagBasePriceRepository,
+    private val leaguePlayerRepository: LeaguePlayerRepository
 ) {
 
     @Transactional
@@ -78,5 +85,38 @@ class LeagueService(
                 status = AuctionStatus.DRAFT
             )
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun resolveBasePrice(leaguePlayerId: UUID): Int {
+        val player = leaguePlayerRepository.findById(leaguePlayerId)
+            .orElseThrow { ResourceNotFoundException("League player not found", "error.league_player_not_found") }
+        
+        return resolveBasePrice(player)
+    }
+
+    fun resolveBasePrice(player: LeaguePlayer): Int {
+        // Priority 1: basePriceOverride
+        if (player.basePriceOverride != null) {
+            return player.basePriceOverride!!
+        }
+
+        // Priority 2: LeagueTagBasePrice
+        if (player.tag != null) {
+            val tagPrice = leagueTagBasePriceRepository.findByLeagueIdAndTag(player.leagueId, player.tag!!)
+            if (tagPrice != null) {
+                return tagPrice.price
+            }
+        }
+
+        // Priority 3: LeagueCategoryBasePrice
+        if (player.category != null) {
+            val categoryPrice = leagueCategoryBasePriceRepository.findByLeagueIdAndCategory(player.leagueId, player.category!!)
+            if (categoryPrice != null) {
+                return categoryPrice.price
+            }
+        }
+
+        return 0
     }
 }

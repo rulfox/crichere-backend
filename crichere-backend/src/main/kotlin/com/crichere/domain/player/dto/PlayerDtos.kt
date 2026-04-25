@@ -6,8 +6,9 @@ import java.util.UUID
 data class PlayerRegisterRequest(
     val leagueId: UUID,
     val userId: UUID,
-    val basePrice: Int,
-    val category: String? = null
+    val basePrice: Int? = null,
+    val category: String? = null,
+    val tag: String? = null
 )
 
 data class LeaguePlayerResponse(
@@ -15,6 +16,8 @@ data class LeaguePlayerResponse(
     val leagueId: UUID,
     val userId: UUID,
     val basePrice: Int,
+    val basePriceOverride: Int? = null,
+    val tag: String? = null,
     val status: LeaguePlayerStatus,
-    val category: String?
+    val category: String? = null
 )

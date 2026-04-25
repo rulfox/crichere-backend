@@ -17,8 +17,10 @@ class LeaguePlayer(
     @Column(nullable = false)
     val userId: UUID,
 
-    @Column(nullable = false)
-    var basePrice: Int = 0,
+    @Column(name = "base_price_override")
+    var basePriceOverride: Int? = null,
+
+    var tag: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -35,6 +37,9 @@ class LeaguePlayer(
     @Column(nullable = false)
     var updatedAt: Instant = Instant.now()
 ) {
+    val basePrice: Int
+        get() = basePriceOverride ?: 0
+
     @PreUpdate
     fun preUpdate() {
         updatedAt = Instant.now()

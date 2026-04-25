@@ -36,7 +36,8 @@ class AuctionService(
     private val leagueRepository: com.crichere.domain.league.repository.LeagueRepository,
     private val redisTemplate: StringRedisTemplate,
     private val objectMapper: ObjectMapper,
-    private val notificationService: com.crichere.domain.notification.service.NotificationService
+    private val notificationService: com.crichere.domain.notification.service.NotificationService,
+    private val leagueService: com.crichere.domain.league.service.LeagueService
 ) {
 
     @Transactional
@@ -209,10 +210,11 @@ class AuctionService(
         
         val savedState = playerStateRepository.save(playerState)
         val player = leaguePlayerRepository.findById(playerId).get()
+        val basePrice = leagueService.resolveBasePrice(player)
         logAndBroadcast(auctionId, AuctionAction.PLAYER_UP, mapOf(
             "leaguePlayerId" to playerId,
             "playerName" to player.userId.toString(), // This should probably be the user name, but we have user_id here. 
-            "basePrice" to player.basePrice,
+            "basePrice" to basePrice,
             "roundId" to roundId
         ), actorId)
         
@@ -234,8 +236,9 @@ class AuctionService(
         
         val currentBid = playerState.currentHighestBid
         val player = leaguePlayerRepository.findById(playerId).get()
+        val basePrice = leagueService.resolveBasePrice(player)
         if (currentBid == null) {
-            if (bidAmount < player.basePrice) throw BusinessLogicException("Bid must be at least base price", "error.invalid_bid_amount")
+            if (bidAmount < basePrice) throw BusinessLogicException("Bid must be at least base price", "error.invalid_bid_amount")
         } else {
             if (bidAmount <= currentBid) throw BusinessLogicException("Bid must be higher than current highest bid", "error.invalid_bid_amount")
         }

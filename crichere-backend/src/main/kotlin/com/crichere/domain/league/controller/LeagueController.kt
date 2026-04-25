@@ -4,8 +4,10 @@ import com.crichere.common.response.ApiResponse
 import com.crichere.common.response.ResponseHelper
 import com.crichere.domain.league.dto.*
 import com.crichere.domain.league.entity.League
+import com.crichere.domain.league.service.BulkImportService
 import com.crichere.domain.league.service.LeagueService
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
@@ -15,7 +17,8 @@ import java.util.*
 @RequestMapping("/leagues")
 @Tag(name = "League Management")
 class LeagueController(
-    private val leagueService: LeagueService
+    private val leagueService: LeagueService,
+    private val bulkImportService: BulkImportService
 ) {
 
     @PostMapping
@@ -57,6 +60,7 @@ class LeagueController(
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
     fun updateLeagueStatus(
         @PathVariable id: UUID,
         @RequestBody request: LeagueStatusUpdateRequest
@@ -71,5 +75,15 @@ class LeagueController(
             createdBy = league.createdBy
         )
         return ResponseHelper.success(data = response, message = "League status updated successfully", messageKey = "success.league_status_updated")
+    }
+
+    @PostMapping("/{id}/players/bulk-import")
+    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    fun bulkImportPlayers(
+        @PathVariable id: UUID,
+        @RequestBody request: List<PlayerImportRequest>
+    ): ApiResponse<BulkImportResponse> {
+        val result = bulkImportService.importPlayers(id, request)
+        return ResponseHelper.success(data = result, message = "Bulk import completed", messageKey = "success.bulk_import_completed")
     }
 }
