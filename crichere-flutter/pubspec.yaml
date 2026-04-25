@@ -24,6 +24,7 @@ dependencies:
   
   # Database
   drift: ^2.16.0
+  sqlite3: ^2.9.0
   sqlite3_flutter_libs: ^0.6.0+eol
   
   # Navigation

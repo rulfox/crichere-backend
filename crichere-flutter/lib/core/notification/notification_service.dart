@@ -30,7 +30,7 @@ class NotificationService {
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       debugPrint('User granted permission');
-      
+
       // Get token
       String? token = await _fcm.getToken();
       if (token != null) {
@@ -40,20 +40,22 @@ class NotificationService {
       // Handle token refresh
       _fcm.onTokenRefresh.listen(_registerDeviceToken);
 
-      // Initialize local notifications for foreground
-      const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
-      const InitializationSettings initializationSettings =
-          InitializationSettings(android: initializationSettingsAndroid);
-      await _localNotifications.initialize(initializationSettings);
+      if (!kIsWeb) {
+        // Initialize local notifications for foreground (native only)
+        const AndroidInitializationSettings initializationSettingsAndroid =
+            AndroidInitializationSettings('@mipmap/ic_launcher');
+        const InitializationSettings initializationSettings =
+            InitializationSettings(android: initializationSettingsAndroid);
+        await _localNotifications.initialize(initializationSettings);
+
+        // Background messages require a service worker on web
+        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      }
 
       // Handle foreground messages
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         _handleIncomingMessage(message, isForeground: true);
       });
-
-      // Handle background messages
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     }
   }
 
@@ -79,8 +81,8 @@ class NotificationService {
       ),
     );
 
-    if (isForeground) {
-      // Show local notification or Snackbar
+    if (!kIsWeb && isForeground) {
+      // Show local notification (native only)
       const AndroidNotificationDetails androidPlatformChannelSpecifics =
           AndroidNotificationDetails('high_importance_channel', 'High Importance Notifications',
               importance: Importance.max, priority: Priority.high);
