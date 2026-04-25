@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/router/app_router.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'core/router/auth_guard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(); // Uncomment when firebase_options.dart is generated
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -18,11 +17,14 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-  final _appRouter = AppRouter();
+  late final AppRouter _appRouter;
 
   @override
   void initState() {
     super.initState();
+    final storage = ref.read(storageProvider);
+    _appRouter = AppRouter(AuthGuard(storage));
+    
     // Initialize notifications
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(notificationServiceProvider).initialize();

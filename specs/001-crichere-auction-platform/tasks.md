@@ -33,7 +33,7 @@
 - [x] T016 [US1] Create `LeagueController`
 - [x] T044 [P] [US1] Unit test `LeagueService` base price resolution logic
 - [x] T017 [P] [US1] Create frontend League feature module
-- [ ] T018 [US1] Implement frontend League creation form (Admin only)
+- [x] T018 [P] [US1] Implement frontend League creation form (Admin only)
 
 ---
 
@@ -44,7 +44,7 @@
 - [x] T021 [US2] Implement `AuctionService` state machine
 - [x] T022 [US2] Implement Auctioneer bid recording and "Undo" logic
 - [x] T023 [US2] Implement `GET /auctions/{id}/events` SSE stream
-- [x] T024 [P] [US2] Implement frontend SSE client and StreamProvider
+- [x] T024 [P] [US2] Implement frontend SSE client with state sync logic
 - [x] T025 [P] [US2] Build frontend Auctioneer Panel (Web) and Viewer Dashboard (Mobile)
 - [x] T042 [US2] Implement Player Pre-assignment logic
 - [x] T043 [US2] Implement League Admin Force-Assign logic
@@ -73,9 +73,9 @@
 ## Phase 7: Polish & Cross-Cutting Concerns
 
 - [x] T035 [P] Implement backend PDF generation
-- [x] T036 Implement frontend shareable squad image/PDF export
+- [x] T036 [P] Implement frontend shareable squad image/PDF export
 - [x] T037 [P] Configure FCM messaging and NotificationService
-- [x] T038 Final UI/UX polish: Lottie animations, Shimmer loading, and Connectivity watcher
+- [x] T038 [P] Final UI/UX polish: Lottie, Shimmer, Shortcuts, and Semantics
 - [ ] T039 [P] Setup SSE load-test harness
 - [ ] T040 [P] Perform Redis pub/sub benchmark
 - [ ] T041 Validate platform scaling

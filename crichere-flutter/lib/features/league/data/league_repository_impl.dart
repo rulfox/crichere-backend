@@ -2,7 +2,9 @@ import '../../../core/database/app_database.dart';
 import '../domain/entities/league.dart' as domain;
 import '../domain/repositories/league_repository.dart';
 import 'league_api.dart';
+import 'models/league_request.dart';
 import 'package:drift/drift.dart';
+import 'dart:io';
 
 class LeagueRepositoryImpl implements LeagueRepository {
   final LeagueApi _api;
@@ -27,7 +29,6 @@ class LeagueRepositoryImpl implements LeagueRepository {
 
     final remote = await _api.getLeagues();
     
-    // Cache remote data
     await _db.batch((batch) {
       batch.deleteAll(_db.leagues);
       batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
@@ -45,5 +46,15 @@ class LeagueRepositoryImpl implements LeagueRepository {
   @override
   Future<domain.League> getLeagueDetail(String id) async {
     return await _api.getLeagueDetail(id);
+  }
+
+  @override
+  Future<domain.League> createLeague(LeagueCreateRequest request) async {
+    return await _api.createLeague(request);
+  }
+
+  @override
+  Future<void> importPlayers(String leagueId, File csvFile) async {
+    await _api.importPlayers(leagueId, csvFile);
   }
 }

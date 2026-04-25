@@ -31,7 +31,6 @@ class LiveAuctionViewerScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Player Card
           if (auctionState.currentPlayerName != null)
             _PlayerAuctionCard(
               name: auctionState.currentPlayerName!,
@@ -42,7 +41,6 @@ class LiveAuctionViewerScreen extends ConsumerWidget {
           else
             const Expanded(child: Center(child: Text('Waiting for next player...'))),
 
-          // Bid History Strip
           if (auctionState.bidHistory.isNotEmpty)
             _BidHistoryStrip(history: auctionState.bidHistory),
         ],
@@ -107,10 +105,17 @@ class _PlayerAuctionCard extends StatelessWidget {
         children: [
           const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 50)),
           const SizedBox(height: 16),
-          Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          Semantics(
+            liveRegion: true,
+            child: Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          ),
           const SizedBox(height: 24),
           const Text('CURRENT BID', style: TextStyle(color: Colors.grey, letterSpacing: 1.2)),
-          Text('₹$currentBid', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.blue)),
+          Semantics(
+            liveRegion: true,
+            label: 'The bid is now $currentBid',
+            child: Text('₹$currentBid', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.blue)),
+          ),
           if (leadingFranchise != null) ...[
             const SizedBox(height: 8),
             Text('by $leadingFranchise', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
