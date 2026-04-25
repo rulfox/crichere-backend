@@ -42,7 +42,10 @@ class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
                 final directory = await getTemporaryDirectory();
                 final imagePath = await File('${directory.path}/squad.png').create();
                 await imagePath.writeAsBytes(image);
-                await Share.shareXFiles([XFile(imagePath.path)], text: 'My Crichere Squad');
+                await SharePlus.instance.share(ShareParams(
+                  files: [XFile(imagePath.path)],
+                  text: 'My Crichere Squad',
+                ));
               }
             },
           ),

@@ -4,7 +4,7 @@ part 'franchise_player.freezed.dart';
 part 'franchise_player.g.dart';
 
 @freezed
-class FranchisePlayer with _$FranchisePlayer {
+abstract class FranchisePlayer with _$FranchisePlayer {
   const factory FranchisePlayer({
     required String playerId,
     required String name,

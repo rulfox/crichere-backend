@@ -4,7 +4,6 @@ import 'package:eventsource/eventsource.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:crichere_flutter/core/network/api_endpoints.dart';
 import 'package:crichere_flutter/core/providers/auth_provider.dart';
-import '../providers/auction_state_provider.dart';
 import '../../data/auction_api.dart';
 import '../../data/auction_repository_impl.dart';
 import '../../domain/repositories/auction_repository.dart';
@@ -21,8 +20,8 @@ Stream<AuctionEvent> auctionEvents(Ref ref, String auctionId) async* {
   while (true) {
     try {
       // 1. Mandated Sync: Fetch current state first
-      final stateData = await api.getAuctionState(auctionId);
-      // We could use this to initialize or verify AuctionStateNotifier
+      await api.getAuctionState(auctionId);
+      // Sync current state before opening SSE stream
       
       // 2. Open SSE stream
       final url = '${ApiEndpoints.baseUrl}/auctions/$auctionId/events';

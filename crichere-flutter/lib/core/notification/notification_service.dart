@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:crichere_flutter/core/database/app_database.dart';
 import 'package:crichere_flutter/core/network/api_endpoints.dart';
@@ -8,7 +9,7 @@ import 'package:drift/drift.dart';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Handle background message
-  print("Handling a background message: ${message.messageId}");
+  debugPrint("Handling a background message: ${message.messageId}");
 }
 
 class NotificationService {
@@ -28,7 +29,7 @@ class NotificationService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
+      debugPrint('User granted permission');
       
       // Get token
       String? token = await _fcm.getToken();
@@ -58,9 +59,9 @@ class NotificationService {
 
   Future<void> _registerDeviceToken(String token) async {
     try {
-      await _dio.post(ApiEndpoints.notifications + '/device-token', data: {'token': token});
+      await _dio.post('${ApiEndpoints.notifications}/device-token', data: {'token': token});
     } catch (e) {
-      print('Error registering device token: $e');
+      debugPrint('Error registering device token: $e');
     }
   }
 

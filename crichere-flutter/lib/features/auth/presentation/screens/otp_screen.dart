@@ -103,6 +103,7 @@ class OtpScreen extends HookConsumerWidget {
                            // Navigation handled by router based on auth state
                         }
                       } catch (e) {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(e.toString())),
                         );

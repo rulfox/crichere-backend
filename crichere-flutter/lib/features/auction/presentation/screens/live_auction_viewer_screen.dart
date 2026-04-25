@@ -66,7 +66,7 @@ class _ConnectionStatusIndicator extends StatelessWidget {
           ],
         ),
         loading: () => const Icon(Icons.circle, color: Colors.orange, size: 12),
-        error: (_, __) => const Row(
+        error: (_, _) => const Row(
           children: [
             Icon(Icons.circle, color: Colors.red, size: 12),
             SizedBox(width: 4),

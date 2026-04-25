@@ -23,7 +23,7 @@ class LeagueCreateScreen extends HookConsumerWidget {
     final isLoading = useState(false);
 
     Future<void> pickFile() async {
-      final result = await fp.FilePicker.platform.pickFiles(
+      final result = await fp.FilePicker.pickFiles(
         type: fp.FileType.custom,
         allowedExtensions: ['csv'],
       );
@@ -42,7 +42,7 @@ class LeagueCreateScreen extends HookConsumerWidget {
             TextField(controller: nameController, decoration: const InputDecoration(labelText: 'League Name', border: OutlineInputBorder())),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: format.value,
+              initialValue: format.value,
               decoration: const InputDecoration(labelText: 'Match Format', border: OutlineInputBorder()),
               items: ['T20', 'ODI', 'TEST'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               onChanged: (v) => format.value = v!,
@@ -55,7 +55,7 @@ class LeagueCreateScreen extends HookConsumerWidget {
             TextField(controller: maxPlayers, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Max Players Per Franchise', border: OutlineInputBorder())),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: waitingListMode.value,
+              initialValue: waitingListMode.value,
               decoration: const InputDecoration(labelText: 'Waiting List Mode', border: OutlineInputBorder()),
               items: ['AUTO_PROMOTE', 'MANUAL'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               onChanged: (v) => waitingListMode.value = v!,

@@ -5,7 +5,7 @@ part 'franchise_squad.freezed.dart';
 part 'franchise_squad.g.dart';
 
 @freezed
-class FranchiseSquad with _$FranchiseSquad {
+abstract class FranchiseSquad with _$FranchiseSquad {
   const factory FranchiseSquad({
     required String franchiseId,
     required String franchiseName,

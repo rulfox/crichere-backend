@@ -4,7 +4,7 @@ part 'league_request.freezed.dart';
 part 'league_request.g.dart';
 
 @freezed
-class LeagueCreateRequest with _$LeagueCreateRequest {
+abstract class LeagueCreateRequest with _$LeagueCreateRequest {
   const LeagueCreateRequest._();
 
   const factory LeagueCreateRequest({

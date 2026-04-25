@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:crichere_flutter/features/franchise/domain/entities/franchise_squad.dart';
@@ -18,7 +17,7 @@ class ExportService {
               pw.Header(level: 0, child: pw.Text('Squad: ${squad.franchiseName}')),
               pw.Text('Purse Remaining: INR ${squad.purseRemaining}'),
               pw.SizedBox(height: 20),
-              pw.Table.fromTextArray(
+              pw.TableHelper.fromTextArray(
                 context: context,
                 data: <List<String>>[
                   <String>['Player Name', 'Role', 'Assignment', 'Price'],
@@ -40,6 +39,9 @@ class ExportService {
     final file = File("${output.path}/squad_${squad.franchiseId}.pdf");
     await file.writeAsBytes(await pdf.save());
 
-    await Share.shareXFiles([XFile(file.path)], text: 'Check out the ${squad.franchiseName} squad!');
+    await SharePlus.instance.share(ShareParams(
+      files: [XFile(file.path)],
+      text: 'Check out the ${squad.franchiseName} squad!',
+    ));
   }
 }

@@ -51,8 +51,10 @@ class PhoneEntryScreen extends HookConsumerWidget {
                         isLoading.value = true;
                         try {
                           await ref.read(authRepositoryProvider).login(phoneController.text);
+                          if (!context.mounted) return;
                           context.router.push(OtpRoute(phone: phoneController.text));
                         } catch (e) {
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text(e.toString())),
                           );

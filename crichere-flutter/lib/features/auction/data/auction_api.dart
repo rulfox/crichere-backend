@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
-import '../domain/entities/auction_event.dart';
-import '../../league/domain/entities/league.dart';
 
 part 'auction_api.g.dart';
 

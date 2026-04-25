@@ -58,6 +58,7 @@ class ClaimProfileScreen extends HookConsumerWidget {
                         // After claiming, maybe show setup or go home
                         // context.router.replaceAll([const HomeRoute()]);
                       } catch (e) {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(e.toString())),
                         );
