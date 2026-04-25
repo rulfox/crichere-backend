@@ -94,3 +94,9 @@
 - [x] T058 [P] Add context.mounted checks to async navigation/UI logic.
 - [x] T059 [P] Enable core library desugaring in Android build.gradle.kts.
 - [x] T060 [P] Standardize Freezed entities with abstract keyword.
+
+## Web Support Implementation (2026-04-25)
+
+- [x] T061 [P] Implement conditional database connection for Web (Wasm SQLite).
+- [x] T062 [P] Configure NotificationService to handle Web platform constraints.
+- [x] T063 [P] Add sqlite3.wasm to web directory for drift compatibility.
