@@ -7,3 +7,11 @@ enum class LeagueStatus {
 enum class AuctionStatus {
     DRAFT, LIVE, PAUSED, COMPLETED
 }
+
+enum class PlayerOrderMode {
+    RANDOM, FREE_PICK, HYBRID
+}
+
+enum class WaitingListMode {
+    AUTO_PROMOTE, ADMIN_PICKS
+}

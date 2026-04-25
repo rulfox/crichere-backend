@@ -5,6 +5,11 @@ import java.util.UUID
 
 data class LeagueCreateRequest(
     val name: String,
+    val format: String? = null,
+    val rulesUrl: String? = null,
+    val mustSellAll: Boolean = false,
+    val playerOrderMode: com.crichere.domain.league.enums.PlayerOrderMode = com.crichere.domain.league.enums.PlayerOrderMode.RANDOM,
+    val waitingListMode: com.crichere.domain.league.enums.WaitingListMode = com.crichere.domain.league.enums.WaitingListMode.ADMIN_PICKS,
     val logoUrl: String? = null,
     val bannerUrl: String? = null
 )
@@ -12,6 +17,11 @@ data class LeagueCreateRequest(
 data class LeagueResponse(
     val id: UUID,
     val name: String,
+    val format: String?,
+    val rulesUrl: String?,
+    val mustSellAll: Boolean,
+    val playerOrderMode: com.crichere.domain.league.enums.PlayerOrderMode,
+    val waitingListMode: com.crichere.domain.league.enums.WaitingListMode,
     val logoUrl: String?,
     val bannerUrl: String?,
     val status: LeagueStatus,

@@ -1,6 +1,7 @@
 package com.crichere.domain.league.entity
 
 import com.crichere.domain.league.enums.LeagueStatus
+import com.crichere.domain.league.enums.WaitingListMode
 import jakarta.persistence.*
 import java.time.Instant
 import java.util.UUID
@@ -14,6 +15,18 @@ class League(
     @Column(nullable = false)
     var name: String,
 
+    var format: String? = null,
+    
+    @Column(name = "rules_url")
+    var rulesUrl: String? = null,
+    
+    @Column(name = "must_sell_all", nullable = false)
+    var mustSellAll: Boolean = false,
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "player_order_mode", nullable = false)
+    var playerOrderMode: com.crichere.domain.league.enums.PlayerOrderMode = com.crichere.domain.league.enums.PlayerOrderMode.RANDOM,
+
     var logoUrl: String? = null,
     var bannerUrl: String? = null,
 
@@ -24,8 +37,9 @@ class League(
     @Column(nullable = false)
     val createdBy: UUID,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "waiting_list_mode", nullable = false)
-    var waitingListMode: String = "ADMIN_PICKS", // AUTO_PROMOTE, ADMIN_PICKS
+    var waitingListMode: WaitingListMode = WaitingListMode.ADMIN_PICKS,
 
     @Column(name = "plan_type")
     var planType: String? = null,

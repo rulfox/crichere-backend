@@ -22,6 +22,10 @@ interface WaitingListEntryRepository : JpaRepository<WaitingListEntry, UUID> {
     
     fun findByLeagueIdAndStatusOrderByPositionAsc(leagueId: UUID, status: WaitingListStatus): List<WaitingListEntry>
 
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT e FROM WaitingListEntry e WHERE e.leagueId = :leagueId AND e.status = :status ORDER BY e.position ASC")
+    fun findByLeagueIdAndStatusOrderByPositionAscWithLock(leagueId: UUID, status: WaitingListStatus): List<WaitingListEntry>
+
     @Query("SELECT COALESCE(MAX(e.position), 0) FROM WaitingListEntry e WHERE e.leagueId = :leagueId")
     fun findMaxPositionByLeagueId(leagueId: UUID): Int
 

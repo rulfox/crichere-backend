@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.UUID
 
 @Service
 class AuthService(
@@ -98,8 +98,9 @@ class AuthService(
         user.playingRole = request.playingRole
         user.profileStatus = ProfileStatus.ACTIVE
         user.claimedAt = Instant.now()
-        
+
         userRepository.save(user)
-        // Note: auto-linking LeaguePlayer records would happen here in Phase 3
+        // LeaguePlayer records created during bulk import already reference this user's id,
+        // so no relinking is needed — they become visible automatically on profile activation.
     }
 }

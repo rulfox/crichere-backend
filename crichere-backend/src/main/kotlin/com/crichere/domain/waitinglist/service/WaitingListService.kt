@@ -16,6 +16,7 @@ import com.crichere.domain.waitinglist.entity.WaitingListEntry
 import com.crichere.domain.waitinglist.enums.WaitingListStatus
 import com.crichere.domain.waitinglist.enums.WaitingListType
 import com.crichere.domain.waitinglist.repository.WaitingListEntryRepository
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -48,15 +49,19 @@ class WaitingListService(
         }
 
         val position = waitingListEntryRepository.findMaxPositionByLeagueId(leagueId) + 1
-        
-        val entry = waitingListEntryRepository.save(WaitingListEntry(
-            leagueId = leagueId,
-            userId = userId,
-            franchiseId = request.franchiseId,
-            type = request.type,
-            position = position
-        ))
-        return mapToResponse(entry)
+
+        try {
+            val entry = waitingListEntryRepository.save(WaitingListEntry(
+                leagueId = leagueId,
+                userId = userId,
+                franchiseId = request.franchiseId,
+                type = request.type,
+                position = position
+            ))
+            return mapToResponse(entry)
+        } catch (e: DataIntegrityViolationException) {
+            throw AlreadyExistsException("Position conflict due to concurrent request. Please try again.", "error.waiting_list_position_conflict")
+        }
     }
 
     fun getWaitingList(leagueId: UUID, type: WaitingListType?, status: WaitingListStatus?, pageable: Pageable): Page<WaitingListEntryResponse> {
@@ -104,8 +109,8 @@ class WaitingListService(
         }
 
         val league = leagueRepository.findById(leagueId).get()
-        if (manual && league.waitingListMode == "AUTO_PROMOTE") {
-             throw BusinessLogicException("Auto-promote mode is active", "error.auto_promote_mode_active")
+        if (manual && league.waitingListMode == com.crichere.domain.league.enums.WaitingListMode.AUTO_PROMOTE) {
+            throw BusinessLogicException("Auto-promote mode is active", "error.auto_promote_mode_active")
         }
 
         entry.status = WaitingListStatus.PROMOTED
@@ -141,9 +146,8 @@ class WaitingListService(
     }
 
     private fun recalculatePositions(leagueId: UUID) {
-        // In a real app with high concurrency, use PESSIMISTIC_WRITE lock
-        val remaining = waitingListEntryRepository.findByLeagueIdAndStatusOrderByPositionAsc(leagueId, WaitingListStatus.WAITING)
-        remaining.sortedBy { it.createdAt }.forEachIndexed { index, entry ->
+        val remaining = waitingListEntryRepository.findByLeagueIdAndStatusOrderByPositionAscWithLock(leagueId, WaitingListStatus.WAITING)
+        remaining.forEachIndexed { index, entry ->
             entry.position = index + 1
             waitingListEntryRepository.save(entry)
         }

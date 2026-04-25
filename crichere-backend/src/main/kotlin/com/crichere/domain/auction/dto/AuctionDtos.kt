@@ -99,6 +99,13 @@ data class UndoSoldRequest(
     val reason: String
 )
 
+data class PreAssignRequest(
+    val leaguePlayerId: UUID,
+    val franchiseId: UUID,
+    val assignmentType: String, // CAPTAIN, ICON
+    val price: Int = 0
+)
+
 data class ForceAssignRequest(
     val leaguePlayerId: UUID,
     val franchiseId: UUID,

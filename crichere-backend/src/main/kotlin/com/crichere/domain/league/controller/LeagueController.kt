@@ -29,34 +29,22 @@ class LeagueController(
         val league = leagueService.createLeague(
             League(
                 name = request.name,
+                format = request.format,
+                rulesUrl = request.rulesUrl,
+                mustSellAll = request.mustSellAll,
+                playerOrderMode = request.playerOrderMode,
+                waitingListMode = request.waitingListMode,
                 logoUrl = request.logoUrl,
                 bannerUrl = request.bannerUrl,
                 createdBy = UUID.fromString(userDetails.username)
             )
         )
-        val response = LeagueResponse(
-            id = league.id,
-            name = league.name,
-            logoUrl = league.logoUrl,
-            bannerUrl = league.bannerUrl,
-            status = league.status,
-            createdBy = league.createdBy
-        )
-        return ResponseHelper.success(data = response, message = "League created successfully", messageKey = "success.league_created")
+        return ResponseHelper.success(data = toResponse(league), message = "League created successfully", messageKey = "success.league_created")
     }
 
     @GetMapping("/{id}")
     fun getLeague(@PathVariable id: UUID): ApiResponse<LeagueResponse> {
-        val league = leagueService.getLeague(id)
-        val response = LeagueResponse(
-            id = league.id,
-            name = league.name,
-            logoUrl = league.logoUrl,
-            bannerUrl = league.bannerUrl,
-            status = league.status,
-            createdBy = league.createdBy
-        )
-        return ResponseHelper.success(data = response)
+        return ResponseHelper.success(data = toResponse(leagueService.getLeague(id)))
     }
 
     @PatchMapping("/{id}/status")
@@ -66,15 +54,7 @@ class LeagueController(
         @RequestBody request: LeagueStatusUpdateRequest
     ): ApiResponse<LeagueResponse> {
         val league = leagueService.updateLeagueStatus(id, request.status)
-        val response = LeagueResponse(
-            id = league.id,
-            name = league.name,
-            logoUrl = league.logoUrl,
-            bannerUrl = league.bannerUrl,
-            status = league.status,
-            createdBy = league.createdBy
-        )
-        return ResponseHelper.success(data = response, message = "League status updated successfully", messageKey = "success.league_status_updated")
+        return ResponseHelper.success(data = toResponse(league), message = "League status updated successfully", messageKey = "success.league_status_updated")
     }
 
     @PostMapping("/{id}/players/bulk-import")
@@ -86,4 +66,18 @@ class LeagueController(
         val result = bulkImportService.importPlayers(id, request)
         return ResponseHelper.success(data = result, message = "Bulk import completed", messageKey = "success.bulk_import_completed")
     }
+
+    private fun toResponse(league: League) = LeagueResponse(
+        id = league.id,
+        name = league.name,
+        format = league.format,
+        rulesUrl = league.rulesUrl,
+        mustSellAll = league.mustSellAll,
+        playerOrderMode = league.playerOrderMode,
+        waitingListMode = league.waitingListMode,
+        logoUrl = league.logoUrl,
+        bannerUrl = league.bannerUrl,
+        status = league.status,
+        createdBy = league.createdBy
+    )
 }

@@ -13,7 +13,7 @@ class Otp(
     val code: String,
     var isVerified: Boolean = false,
     var attempts: Int = 0,
-    val expiresAt: Instant,
+    var expiresAt: Instant,
     val createdAt: Instant = Instant.now()
 )
 

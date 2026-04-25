@@ -119,8 +119,8 @@ class ForfeitService(
         notificationService.notifyForfeitApproved(forfeitRequest.userId, league.name)
 
         // Auto-promote if enabled
-        if (league.waitingListMode == "AUTO_PROMOTE") {
-             waitingListService.promoteNext(leagueId)
+        if (league.waitingListMode == com.crichere.domain.league.enums.WaitingListMode.AUTO_PROMOTE) {
+            waitingListService.promoteNext(leagueId)
         }
 
         return mapToResponse(forfeitRequest)

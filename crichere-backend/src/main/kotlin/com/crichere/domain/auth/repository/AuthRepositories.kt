@@ -21,6 +21,7 @@ interface UserFranchiseMembershipRepository : JpaRepository<UserFranchiseMembers
 interface OtpRepository : JpaRepository<Otp, UUID> {
     fun findTopByPhoneOrderByCreatedAtDesc(phone: String): Otp?
     fun findAllByPhoneAndIsVerifiedFalse(phone: String): List<Otp>
+    fun countByPhoneAndCreatedAtAfter(phone: String, after: java.time.Instant): Long
 }
 
 interface RefreshTokenRepository : JpaRepository<RefreshToken, UUID> {

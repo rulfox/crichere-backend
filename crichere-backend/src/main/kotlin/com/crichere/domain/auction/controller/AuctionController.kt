@@ -140,6 +140,20 @@ class AuctionController(
         return ResponseHelper.success(data = mapToStateResponse(state))
     }
 
+    @PostMapping("/{id}/player/pre-assign")
+    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    fun preAssign(
+        @PathVariable id: UUID,
+        @RequestBody request: PreAssignRequest,
+        @AuthenticationPrincipal user: UserDetails
+    ): ApiResponse<PlayerAuctionStateResponse> {
+        val state = auctionService.preAssign(
+            id, request.leaguePlayerId, request.franchiseId, 
+            request.assignmentType, request.price, UUID.fromString(user.username)
+        )
+        return ResponseHelper.success(data = mapToStateResponse(state))
+    }
+
     @PostMapping("/{id}/player/unsold")
     fun unsoldPlayer(
         @PathVariable id: UUID,

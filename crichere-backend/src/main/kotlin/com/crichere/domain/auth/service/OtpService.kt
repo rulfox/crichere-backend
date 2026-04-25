@@ -1,5 +1,6 @@
 package com.crichere.domain.auth.service
 
+import com.crichere.common.exception.BusinessLogicException
 import com.crichere.common.exception.InvalidOtpException
 import com.crichere.common.provider.SmsProvider
 import com.crichere.domain.auth.entity.Otp
@@ -18,25 +19,25 @@ class OtpService(
 
     @Transactional
     fun generateAndSendOtp(phone: String) {
-        // Expire previous OTPs
+        if (!phone.matches(Regex("^[6-9]\\d{9}$"))) {
+            throw BusinessLogicException("Invalid Indian mobile number", "error.invalid_phone")
+        }
+
+        // Rate limit check before any mutation: max 5 sends per hour
+        val count = otpRepository.countByPhoneAndCreatedAtAfter(phone, Instant.now().minus(1, ChronoUnit.HOURS))
+        if (count >= 5) {
+            throw BusinessLogicException("Too many OTP requests. Please try again later.", "error.otp_rate_limit_exceeded")
+        }
+
+        // Expire all pending OTPs for this phone
         val pendingOtps = otpRepository.findAllByPhoneAndIsVerifiedFalse(phone)
-        pendingOtps.forEach { it.expiresAt == Instant.now() } // Logic to expire is usually checking the timestamp
-        // Actually, we should just let them expire or mark them. 
-        // For simplicity, we just create a new one, and only the latest one will be checked.
-        
-        // Rate limiting check (simplified for now: max 5 sends per hour)
-        // val count = ...
-        
+        pendingOtps.forEach { it.expiresAt = Instant.now() }
+        otpRepository.saveAll(pendingOtps)
+
         val code = (100000 + Random.nextInt(900000)).toString()
         val expiresAt = Instant.now().plus(5, ChronoUnit.MINUTES)
-        
-        val otp = Otp(
-            phone = phone,
-            code = code,
-            expiresAt = expiresAt
-        )
-        
-        otpRepository.save(otp)
+
+        otpRepository.save(Otp(phone = phone, code = code, expiresAt = expiresAt))
         smsProvider.sendOtp(phone, code)
     }
 
