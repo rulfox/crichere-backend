@@ -85,3 +85,12 @@
 ## Bug-Fix Pass (post-review, 2026-04-25)
 
 - [x] T045-T054 All backend correctness fixes applied and verified.
+
+## Bug-Fix Pass (Frontend & Architectural Refinements, 2026-04-25)
+
+- [x] T055 [P] Fix DropdownButtonFormField initial value and FilePicker static usage.
+- [x] T056 [P] Switch to SharePlus for improved squad export.
+- [x] T057 [P] Refine SSE state sync logic in auctionEvents provider.
+- [x] T058 [P] Add context.mounted checks to async navigation/UI logic.
+- [x] T059 [P] Enable core library desugaring in Android build.gradle.kts.
+- [x] T060 [P] Standardize Freezed entities with abstract keyword.
