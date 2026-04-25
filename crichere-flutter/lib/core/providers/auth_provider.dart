@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:crichere_flutter/core/network/dio_client.dart';
+import 'package:crichere_flutter/core/notification/notification_service.dart';
+import 'package:crichere_flutter/features/league/presentation/providers/league_repository_provider.dart';
 
 part 'auth_provider.g.dart';
 
@@ -35,4 +37,11 @@ Future<void> authCheck(Ref ref) async {
   } else {
     ref.read(authStateProvider.notifier).setUnauthenticated();
   }
+}
+
+@riverpod
+NotificationService notificationService(Ref ref) {
+  final db = ref.watch(appDatabaseProvider);
+  final dio = ref.watch(dioClientProvider).dio;
+  return NotificationService(db, dio);
 }

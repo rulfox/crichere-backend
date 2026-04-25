@@ -85,18 +85,67 @@ class AuctioneerPanelRouteArgs {
 
 /// generated route for
 /// [_i2.ClaimProfileScreen]
-class ClaimProfileRoute extends _i11.PageRouteInfo<void> {
-  const ClaimProfileRoute({List<_i11.PageRouteInfo>? children})
-    : super(ClaimProfileRoute.name, initialChildren: children);
+class ClaimProfileRoute extends _i11.PageRouteInfo<ClaimProfileRouteArgs> {
+  ClaimProfileRoute({
+    _i12.Key? key,
+    required String profileId,
+    required String suggestedName,
+    List<_i11.PageRouteInfo>? children,
+  }) : super(
+         ClaimProfileRoute.name,
+         args: ClaimProfileRouteArgs(
+           key: key,
+           profileId: profileId,
+           suggestedName: suggestedName,
+         ),
+         initialChildren: children,
+       );
 
   static const String name = 'ClaimProfileRoute';
 
   static _i11.PageInfo page = _i11.PageInfo(
     name,
     builder: (data) {
-      return const _i2.ClaimProfileScreen();
+      final args = data.argsAs<ClaimProfileRouteArgs>();
+      return _i2.ClaimProfileScreen(
+        key: args.key,
+        profileId: args.profileId,
+        suggestedName: args.suggestedName,
+      );
     },
   );
+}
+
+class ClaimProfileRouteArgs {
+  const ClaimProfileRouteArgs({
+    this.key,
+    required this.profileId,
+    required this.suggestedName,
+  });
+
+  final _i12.Key? key;
+
+  final String profileId;
+
+  final String suggestedName;
+
+  @override
+  String toString() {
+    return 'ClaimProfileRouteArgs{key: $key, profileId: $profileId, suggestedName: $suggestedName}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ClaimProfileRouteArgs) return false;
+    return key == other.key &&
+        profileId == other.profileId &&
+        suggestedName == other.suggestedName;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^ profileId.hashCode ^ suggestedName.hashCode;
 }
 
 /// generated route for
