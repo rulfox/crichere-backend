@@ -100,3 +100,9 @@
 - [x] T061 [P] Implement conditional database connection for Web (Wasm SQLite).
 - [x] T062 [P] Configure NotificationService to handle Web platform constraints.
 - [x] T063 [P] Add sqlite3.wasm to web directory for drift compatibility.
+
+## iOS Support Implementation (2026-04-25)
+
+- [x] T064 [P] Configure CocoaPods and Podfile for iOS dependencies.
+- [x] T065 [P] Update IPHONEOS_DEPLOYMENT_TARGET to 15.0 in project.pbxproj.
+- [x] T066 [P] Integrate Pods framework into Xcode workspace and project configurations.

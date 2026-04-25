@@ -4,7 +4,7 @@
 **Input**: Feature specification from `/specs/001-crichere-auction-platform/spec.md`
 
 ## Status (Updated 2026-04-25)
-Frontend architectural refinements, bug fixes, and Flutter Web support (Wasm SQLite) applied. SSE state sync improved and Android build issues resolved.
+Frontend architectural refinements, bug fixes, Flutter Web support (Wasm SQLite), and iOS (CocoaPods) support applied. SSE state sync improved and build issues resolved.
 
 ## Summary
 Build "Crichere", an India-first cricket league auction SaaS platform. The implementation involves a Spring Boot (Kotlin) backend and a Flutter frontend. The platform features real-time verbal auction recording by an auctioneer, SSE-based live updates, strict phone-OTP authentication, and comprehensive league management including fees and waiting lists.
