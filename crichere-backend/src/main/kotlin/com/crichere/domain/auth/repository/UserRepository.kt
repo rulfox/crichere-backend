@@ -8,4 +8,7 @@ interface UserRepository : JpaRepository<User, UUID> {
     fun findByPhone(phone: String): User?
     fun findByEmail(email: String): User?
     fun existsByPhone(phone: String): Boolean
+    
+    fun findByProfileStatus(profileStatus: com.crichere.domain.auth.enums.ProfileStatus, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<User>
+    fun findByNameContainingIgnoreCaseOrPhoneContaining(name: String, phone: String, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<User>
 }

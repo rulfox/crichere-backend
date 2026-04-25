@@ -15,7 +15,10 @@ import java.util.*
 @RestController
 @RequestMapping("/auctions")
 @Tag(name = "Auction Management")
-class AuctionController(private val auctionService: AuctionService) {
+class AuctionController(
+    private val auctionService: AuctionService,
+    private val exportService: com.crichere.domain.auction.service.ExportService
+) {
 
     @PostMapping("/leagues/{leagueId}")
     @PreAuthorize("hasRole('LEAGUE_ADMIN')")
@@ -238,7 +241,62 @@ class AuctionController(private val auctionService: AuctionService) {
 
     @GetMapping("/{id}/summary")
     fun getAuctionSummary(@PathVariable id: UUID): ApiResponse<AuctionSummaryResponse> {
-        return ResponseHelper.success(data = auctionService.getAuctionSummary(id))
+        return ResponseHelper.success(data = auctionService.getDetailedAuctionSummary(id))
+    }
+
+    @GetMapping("/{id}/summary/franchises/{franchiseId}")
+    fun getFranchiseSummary(
+        @PathVariable id: UUID,
+        @PathVariable franchiseId: UUID
+    ): ApiResponse<FranchiseDetailedSummaryResponse> {
+        return ResponseHelper.success(data = auctionService.getFranchiseDetailedSummary(id, franchiseId))
+    }
+
+    @GetMapping("/{id}/summary/unsold")
+    fun getUnsoldPlayers(
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ApiResponse<UnsoldPlayersResponse> {
+        return ResponseHelper.success(data = auctionService.getUnsoldPlayers(id, org.springframework.data.domain.PageRequest.of(page, size)))
+    }
+
+    @GetMapping("/{id}/summary/export/pdf", produces = ["application/pdf"])
+    @PreAuthorize("hasAnyRole('LEAGUE_ADMIN', 'AUCTIONEER')")
+    fun exportSummaryPdf(
+        @PathVariable id: UUID,
+        @AuthenticationPrincipal user: UserDetails
+    ): org.springframework.http.ResponseEntity<ByteArray> {
+        val pdf = exportService.exportAuctionSummaryPdf(id)
+        return org.springframework.http.ResponseEntity.ok()
+            .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"auction-summary.pdf\"")
+            .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+            .body(pdf)
+    }
+
+    @GetMapping("/{id}/summary/franchises/{franchiseId}/export/pdf", produces = ["application/pdf"])
+    fun exportFranchisePdf(
+        @PathVariable id: UUID,
+        @PathVariable franchiseId: UUID
+    ): org.springframework.http.ResponseEntity<ByteArray> {
+        // Dummy implementation for now, using the same export logic or similar
+        val pdf = exportService.exportAuctionSummaryPdf(id) 
+        return org.springframework.http.ResponseEntity.ok()
+            .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"franchise-squad.pdf\"")
+            .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+            .body(pdf)
+    }
+
+    @GetMapping("/{id}/summary/franchises/{franchiseId}/export/image", produces = ["image/png"])
+    fun exportFranchiseImage(
+        @PathVariable id: UUID,
+        @PathVariable franchiseId: UUID
+    ): org.springframework.http.ResponseEntity<ByteArray> {
+        val image = exportService.exportFranchiseSquadImage(id, franchiseId)
+        return org.springframework.http.ResponseEntity.ok()
+            .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"franchise-squad.png\"")
+            .contentType(org.springframework.http.MediaType.IMAGE_PNG)
+            .body(image)
     }
 
     @DeleteMapping("/{id}")

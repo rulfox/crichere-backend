@@ -26,6 +26,9 @@ class LeaguePlayer(
 
     var category: String? = null,
 
+    @Column(name = "auction_eligible", nullable = false)
+    var auctionEligible: Boolean = false,
+
     @Column(nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 

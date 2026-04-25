@@ -49,6 +49,12 @@ class User(
     val createdBy: UUID? = null,
     var claimedAt: Instant? = null,
 
+    @Column(nullable = false)
+    var suspended: Boolean = false,
+
+    @Column(name = "suspension_reason")
+    var suspensionReason: String? = null,
+
     @Column(nullable = false, updatable = false)
     val createdAt: Instant = Instant.now()
 )

@@ -24,6 +24,21 @@ class League(
     @Column(nullable = false)
     val createdBy: UUID,
 
+    @Column(name = "waiting_list_mode", nullable = false)
+    var waitingListMode: String = "ADMIN_PICKS", // AUTO_PROMOTE, ADMIN_PICKS
+
+    @Column(name = "plan_type")
+    var planType: String? = null,
+
+    @Column(name = "plan_expires_at")
+    var planExpiresAt: Instant? = null,
+
+    @Column(nullable = false)
+    var suspended: Boolean = false,
+
+    @Column(name = "suspension_reason")
+    var suspensionReason: String? = null,
+
     @Column(nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 

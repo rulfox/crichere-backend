@@ -62,6 +62,9 @@ dependencies {
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 
+    // PDF Generation
+    implementation("org.apache.pdfbox:pdfbox:3.0.1")
+
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

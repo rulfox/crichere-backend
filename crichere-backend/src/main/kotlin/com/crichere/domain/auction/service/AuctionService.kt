@@ -32,8 +32,11 @@ class AuctionService(
     private val franchisePlayerRepository: FranchisePlayerRepository,
     private val auctionAuditLogRepository: AuctionAuditLogRepository,
     private val leaguePlayerRepository: LeaguePlayerRepository,
+    private val userRepository: com.crichere.domain.auth.repository.UserRepository,
+    private val leagueRepository: com.crichere.domain.league.repository.LeagueRepository,
     private val redisTemplate: StringRedisTemplate,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val notificationService: com.crichere.domain.notification.service.NotificationService
 ) {
 
     @Transactional
@@ -87,6 +90,12 @@ class AuctionService(
         
         val savedAuction = auctionRepository.save(auction)
         logAndBroadcast(auction.id, AuctionAction.AUCTION_STARTED, mapOf("startedAt" to auction.startedAt), actorId)
+
+        // Notify franchise owners
+        val franchiseOwners = franchiseRepository.findByLeagueId(auction.leagueId).map { it.ownerId }
+        val league = leagueRepository.findById(auction.leagueId).get()
+        notificationService.notifyAuctionStarted(franchiseOwners, auction.id, league.name)
+
         return savedAuction
     }
 
@@ -327,6 +336,12 @@ class AuctionService(
             "finalPrice" to finalPrice,
             "roundId" to roundId
         ), actorId)
+
+        // Notify sold player and franchise owner
+        val lp = leaguePlayerRepository.findById(leaguePlayerId).get()
+        val franchise = franchiseRepository.findById(franchiseId).get()
+        notificationService.notifyPlayerSold(lp.userId, franchise.name, finalPrice)
+        notificationService.notifyPlayerSold(franchise.ownerId, franchise.name, finalPrice)
         
         return playerState
     }
@@ -585,10 +600,9 @@ class AuctionService(
         return bidRepository.findByLeaguePlayerIdAndAuctionIdOrderByBidAtDesc(leaguePlayerId, auctionId)
     }
 
-    fun getAuctionSummary(auctionId: UUID): com.crichere.domain.auction.dto.AuctionSummaryResponse {
+    fun getDetailedAuctionSummary(auctionId: UUID): com.crichere.domain.auction.dto.AuctionSummaryResponse {
         val auction = getAuction(auctionId)
-        if (auction.status != AuctionStatus.COMPLETED) throw BusinessLogicException("Summary only available for COMPLETED auctions", "error.invalid_auction_status")
-        
+        val league = leagueRepository.findById(auction.leagueId).get()
         val playerStates = playerStateRepository.findByAuctionId(auctionId)
         val franchises = franchiseRepository.findByLeagueId(auction.leagueId)
         
@@ -599,11 +613,27 @@ class AuctionService(
             val fPlayers = franchisePlayerRepository.findByFranchiseId(f.id)
             com.crichere.domain.auction.dto.FranchiseSummary(
                 f.id, f.name, fPlayers.size, fPlayers.sumOf { it.boughtPrice.toLong() }, 
-                purseRepository.findByAuctionId(auctionId).find { it.franchiseId == f.id }?.currentAmount ?: 0
+                purseRepository.findByAuctionId(auctionId).find { it.franchiseId == f.id }?.currentAmount ?: 0,
+                fPlayers.map { fp -> 
+                    val lp = leaguePlayerRepository.findById(fp.leaguePlayerId).get()
+                    com.crichere.domain.auction.dto.AuctionPlayerSummary(
+                        playerName = userRepository.findById(lp.userId).get().name ?: "Unknown",
+                        playerCategory = lp.category,
+                        finalPrice = fp.boughtPrice,
+                        assignmentType = "SOLD", // Should be derived from state
+                        roundNumber = 1 // Should be derived from fp.roundId
+                    )
+                }
             )
         }
         
         return com.crichere.domain.auction.dto.AuctionSummaryResponse(
+            auctionId = auction.id,
+            leagueId = league.id,
+            leagueName = league.name,
+            status = auction.status,
+            startedAt = auction.startedAt,
+            completedAt = auction.completedAt,
             totalPlayers = playerStates.size,
             totalSold = soldPlayers.size,
             totalUnsold = playerStates.count { it.state == PlayerAuctionStateValue.UNSOLD },
@@ -611,12 +641,71 @@ class AuctionService(
             totalSpent = soldPlayers.sumOf { (it.finalPrice ?: 0).toLong() },
             highestSale = highestSaleState?.let { s -> 
                 com.crichere.domain.auction.dto.SaleSummary(
-                    leaguePlayerRepository.findById(s.leaguePlayerId).get().userId.toString(), // Mocked name
+                    userRepository.findById(leaguePlayerRepository.findById(s.leaguePlayerId).get().userId).get().name ?: "Unknown",
                     franchiseRepository.findById(s.soldToFranchiseId!!).get().name,
                     s.finalPrice!!
                 )
             },
             franchiseSummaries = franchiseSummaries
+        )
+    }
+
+    fun getFranchiseDetailedSummary(auctionId: UUID, franchiseId: UUID): com.crichere.domain.auction.dto.FranchiseDetailedSummaryResponse {
+        val franchise = franchiseRepository.findById(franchiseId).orElseThrow { ResourceNotFoundException("Franchise not found", "error.franchise_not_found") }
+        val fPlayers = franchisePlayerRepository.findByFranchiseId(franchiseId)
+        val purse = purseRepository.findByAuctionId(auctionId).find { it.franchiseId == franchiseId }
+        
+        val playerSummaries = fPlayers.map { fp ->
+            val lp = leaguePlayerRepository.findById(fp.leaguePlayerId).get()
+            com.crichere.domain.auction.dto.AuctionPlayerSummary(
+                playerName = userRepository.findById(lp.userId).get().name ?: "Unknown",
+                playerCategory = lp.category,
+                finalPrice = fp.boughtPrice,
+                assignmentType = "SOLD",
+                roundNumber = 1
+            )
+        }
+
+        val categoryBreakdown = playerSummaries.groupBy { it.playerCategory ?: "Unknown" }.map { (cat, list) ->
+            com.crichere.domain.auction.dto.CategoryBreakdown(cat, list.size, list.sumOf { (it.finalPrice ?: 0).toLong() })
+        }
+
+        return com.crichere.domain.auction.dto.FranchiseDetailedSummaryResponse(
+            franchiseId = franchise.id,
+            franchiseName = franchise.name,
+            squadCount = fPlayers.size,
+            totalSpent = fPlayers.sumOf { it.boughtPrice.toLong() },
+            remainingPurse = purse?.currentAmount ?: 0,
+            categoryBreakdown = categoryBreakdown,
+            players = playerSummaries
+        )
+    }
+
+    fun getUnsoldPlayers(auctionId: UUID, pageable: org.springframework.data.domain.Pageable): com.crichere.domain.auction.dto.UnsoldPlayersResponse {
+        val allStates = playerStateRepository.findByAuctionId(auctionId)
+        val unsold = allStates.filter { it.state == PlayerAuctionStateValue.UNSOLD }
+        
+        val start = pageable.offset.toInt()
+        val end = (start + pageable.pageSize).coerceAtMost(unsold.size)
+        val paginated = if (start < unsold.size) unsold.subList(start, end) else emptyList()
+
+        val summaries = paginated.map { s ->
+            val lp = leaguePlayerRepository.findById(s.leaguePlayerId).get()
+            com.crichere.domain.auction.dto.AuctionPlayerSummary(
+                playerName = userRepository.findById(lp.userId).get().name ?: "Unknown",
+                playerCategory = lp.category,
+                finalPrice = null,
+                assignmentType = null,
+                roundNumber = null
+            )
+        }
+
+        return com.crichere.domain.auction.dto.UnsoldPlayersResponse(
+            players = summaries,
+            totalElements = unsold.size.toLong(),
+            totalPages = if (pageable.pageSize > 0) (unsold.size + pageable.pageSize - 1) / pageable.pageSize else 0,
+            pageNumber = pageable.pageNumber,
+            pageSize = pageable.pageSize
         )
     }
 

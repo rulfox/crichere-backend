@@ -116,6 +116,12 @@ data class AuditLogResponse(
 )
 
 data class AuctionSummaryResponse(
+    val auctionId: UUID,
+    val leagueId: UUID,
+    val leagueName: String,
+    val status: AuctionStatus,
+    val startedAt: Instant?,
+    val completedAt: Instant?,
     val totalPlayers: Int,
     val totalSold: Int,
     val totalUnsold: Int,
@@ -136,5 +142,39 @@ data class FranchiseSummary(
     val franchiseName: String,
     val squadCount: Int,
     val totalSpent: Long,
-    val remainingPurse: Int
+    val remainingPurse: Int,
+    val players: List<AuctionPlayerSummary> = emptyList()
+)
+
+data class AuctionPlayerSummary(
+    val playerName: String,
+    val playerCategory: String?,
+    val playerTag: String? = null,
+    val finalPrice: Int?,
+    val assignmentType: String?, // SOLD, FORCE_ASSIGNED, PRE_ASSIGNED
+    val roundNumber: Int?
+)
+
+data class FranchiseDetailedSummaryResponse(
+    val franchiseId: UUID,
+    val franchiseName: String,
+    val squadCount: Int,
+    val totalSpent: Long,
+    val remainingPurse: Int,
+    val categoryBreakdown: List<CategoryBreakdown>,
+    val players: List<AuctionPlayerSummary>
+)
+
+data class CategoryBreakdown(
+    val category: String,
+    val count: Int,
+    val totalSpent: Long
+)
+
+data class UnsoldPlayersResponse(
+    val players: List<AuctionPlayerSummary>,
+    val totalElements: Long,
+    val totalPages: Int,
+    val pageNumber: Int,
+    val pageSize: Int
 )

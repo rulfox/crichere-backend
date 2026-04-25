@@ -1,0 +1,88 @@
+package com.crichere.domain.admin.controller
+
+import com.crichere.common.response.ApiResponse
+import com.crichere.common.response.ResponseHelper
+import com.crichere.domain.admin.service.PlatformAdminService
+import com.crichere.domain.auth.dto.UserResponse
+import com.crichere.domain.auth.enums.ProfileStatus
+import com.crichere.domain.league.dto.LeagueResponse
+import com.crichere.domain.league.enums.LeagueStatus
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.data.domain.PageRequest
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.web.bind.annotation.*
+import java.util.*
+
+@RestController
+@RequestMapping("/admin")
+@Tag(name = "Platform Admin")
+@PreAuthorize("hasRole('PLATFORM_ADMIN')")
+class PlatformAdminController(private val adminService: PlatformAdminService) {
+
+    @GetMapping("/users")
+    fun getUsers(
+        @RequestParam(required = false) profileStatus: ProfileStatus?,
+        @RequestParam(required = false) search: String?,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ApiResponse<Any> {
+        val result = adminService.getUsers(profileStatus, search, PageRequest.of(page, size))
+        // Map to response... (simplified)
+        return ResponseHelper.success(data = result)
+    }
+
+    @PatchMapping("/users/{id}/roles")
+    fun updateRole(
+        @PathVariable id: UUID,
+        @RequestBody request: Map<String, String>,
+        @AuthenticationPrincipal admin: UserDetails
+    ): ApiResponse<Any> {
+        val action = request["action"] ?: throw com.crichere.common.exception.BusinessLogicException("Action is required", "error.action_required")
+        val result = adminService.updateRole(id, action, UUID.fromString(admin.username))
+        return ResponseHelper.success(data = result)
+    }
+
+    @PatchMapping("/users/{id}/suspend")
+    fun suspendUser(
+        @PathVariable id: UUID,
+        @RequestBody request: Map<String, Any>
+    ): ApiResponse<Any> {
+        val suspended = request["suspended"] as Boolean
+        val reason = request["reason"] as? String
+        val result = adminService.suspendUser(id, suspended, reason)
+        return ResponseHelper.success(data = result)
+    }
+
+    @GetMapping("/leagues")
+    fun getLeagues(
+        @RequestParam(required = false) status: LeagueStatus?,
+        @RequestParam(required = false) search: String?,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ApiResponse<Any> {
+        val result = adminService.getLeagues(status, search, PageRequest.of(page, size))
+        return ResponseHelper.success(data = result)
+    }
+
+    @PatchMapping("/leagues/{id}/suspend")
+    fun suspendLeague(
+        @PathVariable id: UUID,
+        @RequestBody request: Map<String, Any>
+    ): ApiResponse<Any> {
+        val suspended = request["suspended"] as Boolean
+        val reason = request["reason"] as? String
+        val result = adminService.suspendLeague(id, suspended, reason)
+        return ResponseHelper.success(data = result)
+    }
+
+    @GetMapping("/subscriptions")
+    fun getSubscriptions(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ApiResponse<Any> {
+        val result = adminService.getSubscriptions(PageRequest.of(page, size))
+        return ResponseHelper.success(data = result)
+    }
+}
