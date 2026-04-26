@@ -2,5 +2,21 @@ spring:
   jpa:
     show-sql: false
   datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
       maximum-pool-size: 20
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+
+crichere:
+  jwt:
+    secret: ${JWT_SECRET}
+  s3:
+    bucket: ${S3_BUCKET}
+  sms:
+    msg91-auth-key: ${MSG91_AUTH_KEY}
+    msg91-template-id: ${MSG91_TEMPLATE_ID}
