@@ -1,40 +1,20 @@
 package com.crichere.config
 
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.binder.MeterBinder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class MetricsConfig {
 
+    // Pre-registers counters at startup so they appear in /actuator/prometheus at 0
+    // before any event fires. Services obtain the same instances via meterRegistry.counter().
     @Bean
-    fun otpSentCounter(registry: MeterRegistry): Counter =
-        Counter.builder("crichere.otp.sent")
-            .description("Total OTPs sent")
-            .register(registry)
-
-    @Bean
-    fun otpVerifiedCounter(registry: MeterRegistry): Counter =
-        Counter.builder("crichere.otp.verified")
-            .description("Total OTPs successfully verified")
-            .register(registry)
-
-    @Bean
-    fun bidPlacedCounter(registry: MeterRegistry): Counter =
-        Counter.builder("crichere.auction.bids.placed")
-            .description("Total auction bids placed")
-            .register(registry)
-
-    @Bean
-    fun auctionStartedCounter(registry: MeterRegistry): Counter =
-        Counter.builder("crichere.auction.started")
-            .description("Total auctions started")
-            .register(registry)
-
-    @Bean
-    fun playerSoldCounter(registry: MeterRegistry): Counter =
-        Counter.builder("crichere.auction.players.sold")
-            .description("Total players sold in auctions")
-            .register(registry)
+    fun crichereMetrics(): MeterBinder = MeterBinder { registry ->
+        registry.counter("crichere.otp.sent")
+        registry.counter("crichere.otp.verified")
+        registry.counter("crichere.auction.started")
+        registry.counter("crichere.auction.bids.placed")
+        registry.counter("crichere.auction.players.sold")
+    }
 }

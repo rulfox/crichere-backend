@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.micrometer.core.instrument.MeterRegistry
 import java.time.Instant
 import java.util.*
 
@@ -37,8 +38,12 @@ class AuctionService(
     private val redisTemplate: StringRedisTemplate,
     private val objectMapper: ObjectMapper,
     private val notificationService: com.crichere.domain.notification.service.NotificationService,
-    private val leagueService: com.crichere.domain.league.service.LeagueService
+    private val leagueService: com.crichere.domain.league.service.LeagueService,
+    private val meterRegistry: MeterRegistry
 ) {
+    private val auctionStartedCounter = meterRegistry.counter("crichere.auction.started")
+    private val bidPlacedCounter = meterRegistry.counter("crichere.auction.bids.placed")
+    private val playerSoldCounter = meterRegistry.counter("crichere.auction.players.sold")
 
     @Transactional
     fun createAuction(leagueId: UUID, auctioneerId: UUID, rounds: List<com.crichere.domain.auction.dto.RoundConfigDto>): Auction {
@@ -90,6 +95,7 @@ class AuctionService(
         }
         
         val savedAuction = auctionRepository.save(auction)
+        auctionStartedCounter.increment()
         logAndBroadcast(auction.id, AuctionAction.AUCTION_STARTED, mapOf("startedAt" to auction.startedAt), actorId)
 
         // Notify franchise owners
@@ -274,6 +280,7 @@ class AuctionService(
             bidAmount = bidAmount,
             recordedBy = actorId
         ))
+        bidPlacedCounter.increment()
         
         val prevBid = playerState.currentHighestBid
         val prevBidder = playerState.currentHighestBidderId
@@ -344,6 +351,7 @@ class AuctionService(
         playerState.finalPrice = finalPrice
         playerState.soldToFranchiseId = franchiseId
         playerStateRepository.save(playerState)
+        playerSoldCounter.increment()
         
         purse.currentAmount -= finalPrice
         purseRepository.save(purse)

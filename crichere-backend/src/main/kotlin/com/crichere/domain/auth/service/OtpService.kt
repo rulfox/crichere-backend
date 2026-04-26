@@ -5,6 +5,7 @@ import com.crichere.common.exception.InvalidOtpException
 import com.crichere.common.provider.SmsProvider
 import com.crichere.domain.auth.entity.Otp
 import com.crichere.domain.auth.repository.OtpRepository
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -14,8 +15,11 @@ import kotlin.random.Random
 @Service
 class OtpService(
     private val otpRepository: OtpRepository,
-    private val smsProvider: SmsProvider
+    private val smsProvider: SmsProvider,
+    private val meterRegistry: MeterRegistry
 ) {
+    private val otpSentCounter = meterRegistry.counter("crichere.otp.sent")
+    private val otpVerifiedCounter = meterRegistry.counter("crichere.otp.verified")
 
     @Transactional
     fun generateAndSendOtp(phone: String) {
@@ -39,6 +43,7 @@ class OtpService(
 
         otpRepository.save(Otp(phone = phone, code = code, expiresAt = expiresAt))
         smsProvider.sendOtp(phone, code)
+        otpSentCounter.increment()
     }
 
     @Transactional
@@ -66,6 +71,7 @@ class OtpService(
 
         otp.isVerified = true
         otpRepository.save(otp)
+        otpVerifiedCounter.increment()
         return true
     }
 }
