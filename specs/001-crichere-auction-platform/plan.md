@@ -3,7 +3,8 @@
 **Branch**: `001-crichere-auction-platform` | **Date**: 2026-04-24 | **Spec**: [specs/001-crichere-auction-platform/spec.md](spec.md)
 **Input**: Feature specification from `/specs/001-crichere-auction-platform/spec.md`
 
-## Status (Updated 2026-04-25)
+## Status (Updated 2026-04-26)
+Backend dependency upgrades applied (Spring Boot 3.5.9, Kotlin 2.3.21, and various libraries). Previous: 
 Frontend architectural refinements, bug fixes, Flutter Web support (Wasm SQLite), and iOS (CocoaPods) support applied. SSE state sync improved and build issues resolved.
 
 ## Summary
@@ -11,9 +12,9 @@ Build "Crichere", an India-first cricket league auction SaaS platform. The imple
 
 ## Technical Context
 
-**Language/Version**: Kotlin 2.0.21 (Backend), Dart (Flutter Stable)  
+**Language/Version**: Kotlin 2.3.21 (Backend), Dart (Flutter Stable)  
 **Primary Dependencies**: 
-- **Backend**: Spring Boot 3.4.0, Spring Security, Spring Data JPA, Spring Data Redis (SSE pub/sub), AWS SDK v2 (S3), MSG91 (SMS), FCM (Push), ShedLock, Flyway, JJWT.
+- **Backend**: Spring Boot 3.5.9, Spring Security, Spring Data JPA, Spring Data Redis (SSE pub/sub), AWS SDK v2 (S3), MSG91 (SMS), FCM (Push), ShedLock, Flyway, JJWT.
 - **Frontend**: Riverpod (State Management), Dio + Retrofit (API), Drift (Local DB), auto_route (Navigation), Freezed (Serialization), eventsource (SSE).
 **Storage**: PostgreSQL 16 (RDS/Managed), Redis (ElastiCache/Managed), AWS S3 (ap-south-1 Mumbai region).  
 **Testing**: JUnit 5, MockK, Testcontainers (PostgreSQL).  

@@ -1,4 +1,4 @@
 plugins {
-    kotlin("jvm") version "2.0.21" apply false
-    id("org.springframework.boot") version "3.4.0" apply false
+    kotlin("jvm") version "2.3.21" apply false
+    id("org.springframework.boot") version "3.5.9" apply false
 }
