@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'api_endpoints.dart';
 
@@ -55,7 +56,9 @@ class DioClient {
       },
     ));
     
-    _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    if (kDebugMode) {
+      _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    }
   }
 
   Dio get dio => _dio;

@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Environment config (prod/staging only — dev.json and example.json are committed)
+config/prod.json
+config/staging.json
+# Secrets / local overrides
+*.env
+.env*

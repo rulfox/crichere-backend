@@ -1,5 +1,7 @@
+import '../config/app_config.dart';
+
 class ApiEndpoints {
-  static const String baseUrl = 'http://localhost:8080/api/v1'; // TODO: Update for production
+  static const String baseUrl = AppConfig.baseUrl;
   
   static const String authLogin = '/auth/login';
   static const String authVerify = '/auth/verify';

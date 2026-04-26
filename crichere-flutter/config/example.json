@@ -1,0 +1,4 @@
+{
+  "API_BASE_URL": "https://api.crichere.com/api/v1",
+  "ENV": "prod"
+}
