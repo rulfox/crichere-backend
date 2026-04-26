@@ -107,3 +107,4 @@
 - [x] T065 [P] Update IPHONEOS_DEPLOYMENT_TARGET to 15.0 in project.pbxproj.
 - [x] T066 [P] Integrate Pods framework into Xcode workspace and project configurations.
 \n## Backend Dependency Maintenance (2026-04-26)\n\n- [x] T067 Upgrade backend dependencies (Spring Boot 3.5.9, Kotlin 2.3.21, JJWT 0.13.0, etc.)
+- [x] T068 Externalize production settings to environment variables and add .env.example
