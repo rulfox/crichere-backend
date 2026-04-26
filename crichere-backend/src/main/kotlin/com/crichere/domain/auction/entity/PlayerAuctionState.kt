@@ -27,7 +27,10 @@ class PlayerAuctionState(
     var soldToFranchiseId: UUID? = null,
 
     @Column(nullable = false)
-    var updatedAt: Instant = Instant.now()
+    var updatedAt: Instant = Instant.now(),
+
+    @Version
+    var version: Long = 0
 ) {
     @PreUpdate
     fun preUpdate() {

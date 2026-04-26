@@ -2,10 +2,12 @@ package com.crichere.domain.notification.dto
 
 import com.crichere.domain.notification.enums.NotificationType
 import com.crichere.domain.notification.enums.Platform
+import jakarta.validation.constraints.*
 import java.time.Instant
 import java.util.UUID
 
 data class DeviceTokenRequest(
+    @field:NotBlank
     val token: String,
     val platform: Platform
 )

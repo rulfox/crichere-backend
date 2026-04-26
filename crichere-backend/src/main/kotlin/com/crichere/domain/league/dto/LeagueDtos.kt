@@ -1,16 +1,27 @@
 package com.crichere.domain.league.dto
 
 import com.crichere.domain.league.enums.LeagueStatus
+import jakarta.validation.constraints.*
 import java.util.UUID
 
 data class LeagueCreateRequest(
+    @field:NotBlank
+    @field:Size(max = 100)
     val name: String,
+
+    @field:Size(max = 50)
     val format: String? = null,
+
+    @field:Size(max = 512)
     val rulesUrl: String? = null,
     val mustSellAll: Boolean = false,
     val playerOrderMode: com.crichere.domain.league.enums.PlayerOrderMode = com.crichere.domain.league.enums.PlayerOrderMode.RANDOM,
     val waitingListMode: com.crichere.domain.league.enums.WaitingListMode = com.crichere.domain.league.enums.WaitingListMode.ADMIN_PICKS,
+
+    @field:Size(max = 512)
     val logoUrl: String? = null,
+
+    @field:Size(max = 512)
     val bannerUrl: String? = null
 )
 
@@ -33,10 +44,21 @@ data class LeagueStatusUpdateRequest(
 )
 
 data class PlayerImportRequest(
+    @field:NotBlank
+    @field:Pattern(regexp = "^[6-9]\\d{9}$", message = "must be a valid 10-digit Indian mobile number")
     val phone: String,
+
+    @field:NotBlank
+    @field:Size(max = 100)
     val name: String,
+
+    @field:Size(max = 50)
     val category: String? = null,
+
+    @field:Size(max = 50)
     val tag: String? = null,
+
+    @field:Positive
     val basePrice: Int? = null
 )
 

@@ -1,0 +1,11 @@
+crichere-flutter/
+.git/
+.github/
+.gradle/
+crichere-backend/build/
+crichere-backend/.gradle/
+**/*.md
+.env
+.env.*
+!.env.example
+.DS_Store

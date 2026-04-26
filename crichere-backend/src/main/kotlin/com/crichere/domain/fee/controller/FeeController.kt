@@ -7,6 +7,7 @@ import com.crichere.domain.fee.enums.FeeStatus
 import com.crichere.domain.fee.enums.FeeType
 import com.crichere.domain.fee.service.FeeService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -23,7 +24,7 @@ class FeeController(private val feeService: FeeService) {
     @PreAuthorize("hasRole('LEAGUE_ADMIN')")
     fun createObligation(
         @PathVariable leagueId: UUID,
-        @RequestBody request: FeeObligationCreateRequest
+        @Valid @RequestBody request: FeeObligationCreateRequest
     ): ApiResponse<FeeObligationResponse> {
         return ResponseHelper.success(data = feeService.createObligation(leagueId, request))
     }
@@ -33,7 +34,7 @@ class FeeController(private val feeService: FeeService) {
     fun recordPayment(
         @PathVariable leagueId: UUID,
         @PathVariable obligationId: UUID,
-        @RequestBody request: FeePaymentRequest,
+        @Valid @RequestBody request: FeePaymentRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<FeeObligationResponse> {
         return ResponseHelper.success(data = feeService.recordPayment(leagueId, obligationId, request, UUID.fromString(user.username)))

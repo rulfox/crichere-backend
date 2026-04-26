@@ -3,6 +3,7 @@ package com.crichere.domain.fee.dto
 import com.crichere.domain.fee.enums.FeeStatus
 import com.crichere.domain.fee.enums.FeeType
 import com.crichere.domain.fee.enums.PaymentMode
+import jakarta.validation.constraints.*
 import java.time.Instant
 import java.util.UUID
 
@@ -10,13 +11,20 @@ data class FeeObligationCreateRequest(
     val userId: UUID,
     val feeType: FeeType,
     val franchiseId: UUID? = null,
+
+    @field:Positive
     val totalAmount: Int,
+
+    @field:PositiveOrZero
     val minimumToRegister: Int? = null
 )
 
 data class FeePaymentRequest(
+    @field:Positive
     val amount: Int,
     val paymentMode: PaymentMode,
+
+    @field:Size(max = 500)
     val notes: String? = null
 )
 

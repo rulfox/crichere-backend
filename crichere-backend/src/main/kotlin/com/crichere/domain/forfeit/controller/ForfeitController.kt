@@ -7,6 +7,7 @@ import com.crichere.domain.forfeit.enums.ForfeitStatus
 import com.crichere.domain.forfeit.enums.ForfeitType
 import com.crichere.domain.forfeit.service.ForfeitService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -22,7 +23,7 @@ class ForfeitController(private val forfeitService: ForfeitService) {
     @PostMapping("/forfeit")
     fun createRequest(
         @PathVariable leagueId: UUID,
-        @RequestBody request: ForfeitRequestCreateRequest,
+        @Valid @RequestBody request: ForfeitRequestCreateRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<ForfeitRequestResponse> {
         return ResponseHelper.success(data = forfeitService.createRequest(leagueId, UUID.fromString(user.username), request))
@@ -52,7 +53,7 @@ class ForfeitController(private val forfeitService: ForfeitService) {
     fun approveRequest(
         @PathVariable leagueId: UUID,
         @PathVariable requestId: UUID,
-        @RequestBody request: ForfeitApproveRequest,
+        @Valid @RequestBody request: ForfeitApproveRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<ForfeitRequestResponse> {
         return ResponseHelper.success(data = forfeitService.approveRequest(leagueId, requestId, request, UUID.fromString(user.username)))

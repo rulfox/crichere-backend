@@ -6,6 +6,7 @@ import com.crichere.domain.player.dto.*
 import com.crichere.domain.player.entity.LeaguePlayer
 import com.crichere.domain.player.service.PlayerService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -17,7 +18,7 @@ class PlayerController(
 ) {
 
     @PostMapping("/register")
-    fun registerPlayer(@RequestBody request: PlayerRegisterRequest): ApiResponse<LeaguePlayerResponse> {
+    fun registerPlayer(@Valid @RequestBody request: PlayerRegisterRequest): ApiResponse<LeaguePlayerResponse> {
         val player = playerService.registerPlayer(
             LeaguePlayer(
                 leagueId = request.leagueId,

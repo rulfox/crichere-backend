@@ -65,6 +65,9 @@ dependencies {
     // PDF Generation
     implementation("org.apache.pdfbox:pdfbox:3.0.7")
 
+    // Metrics
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")

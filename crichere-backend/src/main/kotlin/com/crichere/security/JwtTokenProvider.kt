@@ -5,6 +5,7 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
+import java.time.Instant
 import java.util.*
 import javax.crypto.SecretKey
 
@@ -34,6 +35,16 @@ class JwtTokenProvider(
             .parseSignedClaims(token)
             .payload
             .subject
+    }
+
+    fun getExpiration(token: String): Instant {
+        return Jwts.parser()
+            .verifyWith(secretKey)
+            .build()
+            .parseSignedClaims(token)
+            .payload
+            .expiration
+            .toInstant()
     }
 
     fun validateToken(token: String): Boolean {

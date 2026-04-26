@@ -6,6 +6,7 @@ import com.crichere.domain.franchise.dto.*
 import com.crichere.domain.franchise.entity.Franchise
 import com.crichere.domain.franchise.service.FranchiseService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -17,7 +18,7 @@ class FranchiseController(
 ) {
 
     @PostMapping
-    fun createFranchise(@RequestBody request: FranchiseCreateRequest): ApiResponse<FranchiseResponse> {
+    fun createFranchise(@Valid @RequestBody request: FranchiseCreateRequest): ApiResponse<FranchiseResponse> {
         val franchise = franchiseService.createFranchise(
             Franchise(
                 leagueId = request.leagueId,
@@ -58,7 +59,7 @@ class FranchiseController(
     @PostMapping("/{id}/invites")
     fun createInvite(
         @PathVariable id: UUID,
-        @RequestBody request: FranchiseInviteRequest
+        @Valid @RequestBody request: FranchiseInviteRequest
     ): ApiResponse<FranchiseInviteResponse> {
         val invite = franchiseService.createInvite(id, request.email)
         val response = FranchiseInviteResponse(

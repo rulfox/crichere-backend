@@ -4,6 +4,7 @@
 **Input**: Feature specification from `/specs/001-crichere-auction-platform/spec.md`
 
 ## Status (Updated 2026-04-26)
+Optimistic locking, token blacklisting, standard response filtering, metrics, and Dockerization applied. 
 Production settings externalized to environment variables and .env.example added. 
 Backend dependency upgrades applied (Spring Boot 3.5.9, Kotlin 2.3.21, and various libraries). Previous: 
 Frontend architectural refinements, bug fixes, Flutter Web support (Wasm SQLite), and iOS (CocoaPods) support applied. SSE state sync improved and build issues resolved.

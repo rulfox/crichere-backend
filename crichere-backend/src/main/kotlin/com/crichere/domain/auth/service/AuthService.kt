@@ -10,6 +10,7 @@ import com.crichere.domain.auth.enums.ProfileStatus
 import com.crichere.domain.auth.repository.RefreshTokenRepository
 import com.crichere.domain.auth.repository.UserRepository
 import com.crichere.security.JwtTokenProvider
+import com.crichere.security.TokenBlacklistService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,6 +24,7 @@ class AuthService(
     private val userRepository: UserRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtTokenProvider: JwtTokenProvider,
+    private val tokenBlacklistService: TokenBlacklistService,
     @Value("\${crichere.jwt.refresh-expiration-days}") private val refreshExpirationDays: Long
 ) {
 
@@ -78,10 +80,14 @@ class AuthService(
     }
 
     @Transactional
-    fun logout(userId: UUID) {
+    fun logout(userId: UUID, accessToken: String?) {
         val tokens = refreshTokenRepository.findAllByUserIdAndRevokedFalse(userId)
         tokens.forEach { it.revoked = true }
         refreshTokenRepository.saveAll(tokens)
+
+        if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+            tokenBlacklistService.blacklist(accessToken, jwtTokenProvider.getExpiration(accessToken))
+        }
     }
 
     @Transactional

@@ -1,13 +1,20 @@
 package com.crichere.domain.player.dto
 
 import com.crichere.domain.player.enums.LeaguePlayerStatus
+import jakarta.validation.constraints.*
 import java.util.UUID
 
 data class PlayerRegisterRequest(
     val leagueId: UUID,
     val userId: UUID,
+
+    @field:Positive
     val basePrice: Int? = null,
+
+    @field:Size(max = 50)
     val category: String? = null,
+
+    @field:Size(max = 50)
     val tag: String? = null
 )
 

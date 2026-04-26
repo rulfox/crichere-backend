@@ -6,6 +6,7 @@ import com.crichere.domain.auction.dto.*
 import com.crichere.domain.auction.service.AuctionService
 import com.crichere.domain.league.entity.Auction
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
@@ -24,7 +25,7 @@ class AuctionController(
     @PreAuthorize("hasRole('LEAGUE_ADMIN')")
     fun createAuction(
         @PathVariable leagueId: UUID,
-        @RequestBody request: AuctionCreateRequest
+        @Valid @RequestBody request: AuctionCreateRequest
     ): ApiResponse<AuctionResponse> {
         val auction = auctionService.createAuction(leagueId, request.auctioneerId, request.rounds)
         return ResponseHelper.success(data = mapToResponse(auction))
@@ -101,7 +102,7 @@ class AuctionController(
     @PostMapping("/{id}/bid")
     fun placeBid(
         @PathVariable id: UUID,
-        @RequestBody request: BidRequest,
+        @Valid @RequestBody request: BidRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<BidResponse> {
         val bid = auctionService.placeBid(id, request.franchiseId, request.bidAmount, UUID.fromString(user.username))
@@ -123,7 +124,7 @@ class AuctionController(
     @PostMapping("/{id}/player/sold")
     fun sellPlayer(
         @PathVariable id: UUID,
-        @RequestBody request: PlayerSoldRequest,
+        @Valid @RequestBody request: PlayerSoldRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
         val state = auctionService.sellPlayer(id, request.leaguePlayerId, request.franchiseId, request.finalPrice, UUID.fromString(user.username))
@@ -133,7 +134,7 @@ class AuctionController(
     @PatchMapping("/{id}/player/undo-sold")
     fun undoSold(
         @PathVariable id: UUID,
-        @RequestBody request: UndoSoldRequest,
+        @Valid @RequestBody request: UndoSoldRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
         val state = auctionService.undoSold(id, request.leaguePlayerId, request.reason, UUID.fromString(user.username))
@@ -144,7 +145,7 @@ class AuctionController(
     @PreAuthorize("hasRole('LEAGUE_ADMIN')")
     fun preAssign(
         @PathVariable id: UUID,
-        @RequestBody request: PreAssignRequest,
+        @Valid @RequestBody request: PreAssignRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
         val state = auctionService.preAssign(
@@ -168,7 +169,7 @@ class AuctionController(
     @PreAuthorize("hasRole('LEAGUE_ADMIN')")
     fun forceAssign(
         @PathVariable id: UUID,
-        @RequestBody request: ForceAssignRequest,
+        @Valid @RequestBody request: ForceAssignRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
         val state = auctionService.forceAssign(id, request.leaguePlayerId, request.franchiseId, request.price, UUID.fromString(user.username))
@@ -190,7 +191,7 @@ class AuctionController(
     @PreAuthorize("hasRole('LEAGUE_ADMIN')")
     fun addRound(
         @PathVariable id: UUID,
-        @RequestBody request: RoundConfigDto
+        @Valid @RequestBody request: RoundConfigDto
     ): ApiResponse<Nothing> {
         auctionService.addRound(id, request)
         return ResponseHelper.success(message = "Round added")
@@ -201,7 +202,7 @@ class AuctionController(
     fun updateRound(
         @PathVariable id: UUID,
         @PathVariable roundId: UUID,
-        @RequestBody request: RoundConfigDto
+        @Valid @RequestBody request: RoundConfigDto
     ): ApiResponse<Nothing> {
         auctionService.updateRound(roundId, request)
         return ResponseHelper.success(message = "Round updated")

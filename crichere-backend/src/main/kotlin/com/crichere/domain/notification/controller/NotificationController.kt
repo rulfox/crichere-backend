@@ -7,6 +7,7 @@ import com.crichere.domain.notification.dto.NotificationListResponse
 import com.crichere.domain.notification.dto.NotificationResponse
 import com.crichere.domain.notification.service.NotificationService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
@@ -20,7 +21,7 @@ class NotificationController(private val notificationService: NotificationServic
 
     @PostMapping("/device-token")
     fun registerToken(
-        @RequestBody request: DeviceTokenRequest,
+        @Valid @RequestBody request: DeviceTokenRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<Nothing> {
         notificationService.registerDeviceToken(UUID.fromString(user.username), request.token, request.platform)

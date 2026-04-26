@@ -2,16 +2,24 @@ package com.crichere.domain.auction.dto
 
 import com.crichere.domain.auction.enums.*
 import com.crichere.domain.league.enums.AuctionStatus
+import jakarta.validation.Valid
+import jakarta.validation.constraints.*
 import java.time.Instant
 import java.util.UUID
 
 data class AuctionCreateRequest(
     val auctioneerId: UUID,
+
+    @field:NotEmpty
+    @field:Valid
     val rounds: List<RoundConfigDto>
 )
 
 data class RoundConfigDto(
+    @field:Positive
     val roundNumber: Int,
+
+    @field:Size(max = 100)
     val name: String?,
     val currencyType: CurrencyType,
     val purseAmount: Int?,
@@ -20,12 +28,18 @@ data class RoundConfigDto(
     val playerPoolSource: PlayerPoolSource,
     val franchiseEligibilityRule: FranchiseEligibilityRule,
     val completionTrigger: CompletionTrigger,
+
+    @field:NotEmpty
+    @field:Valid
     val bidIncrementSlabs: List<BidIncrementSlabDto>
 )
 
 data class BidIncrementSlabDto(
+    @field:PositiveOrZero
     val fromAmount: Int,
     val toAmount: Int?,
+
+    @field:Positive
     val incrementBy: Int
 )
 
@@ -73,6 +87,8 @@ data class FranchisePurseStateResponse(
 
 data class BidRequest(
     val franchiseId: UUID,
+
+    @field:Positive
     val bidAmount: Int
 )
 
@@ -91,24 +107,36 @@ data class BidResponse(
 data class PlayerSoldRequest(
     val leaguePlayerId: UUID,
     val franchiseId: UUID,
+
+    @field:Positive
     val finalPrice: Int
 )
 
 data class UndoSoldRequest(
     val leaguePlayerId: UUID,
+
+    @field:NotBlank
+    @field:Size(max = 500)
     val reason: String
 )
 
 data class PreAssignRequest(
     val leaguePlayerId: UUID,
     val franchiseId: UUID,
-    val assignmentType: String, // CAPTAIN, ICON
+
+    @field:NotBlank
+    @field:Pattern(regexp = "CAPTAIN|ICON", message = "must be CAPTAIN or ICON")
+    val assignmentType: String,
+
+    @field:PositiveOrZero
     val price: Int = 0
 )
 
 data class ForceAssignRequest(
     val leaguePlayerId: UUID,
     val franchiseId: UUID,
+
+    @field:PositiveOrZero
     val price: Int = 0
 )
 
@@ -158,7 +186,7 @@ data class AuctionPlayerSummary(
     val playerCategory: String?,
     val playerTag: String? = null,
     val finalPrice: Int?,
-    val assignmentType: String?, // SOLD, FORCE_ASSIGNED, PRE_ASSIGNED
+    val assignmentType: String?,
     val roundNumber: Int?
 )
 

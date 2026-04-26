@@ -3,18 +3,26 @@ package com.crichere.domain.forfeit.dto
 import com.crichere.domain.forfeit.enums.FeeRefundDecision
 import com.crichere.domain.forfeit.enums.ForfeitStatus
 import com.crichere.domain.forfeit.enums.ForfeitType
+import jakarta.validation.constraints.*
 import java.time.Instant
 import java.util.UUID
 
 data class ForfeitRequestCreateRequest(
     val type: ForfeitType,
     val franchiseId: UUID? = null,
+
+    @field:NotBlank
+    @field:Size(max = 500)
     val reason: String
 )
 
 data class ForfeitApproveRequest(
     val feeRefundDecision: FeeRefundDecision,
+
+    @field:PositiveOrZero
     val feeRefundAmount: Int? = null,
+
+    @field:Size(max = 500)
     val adminNotes: String? = null
 )
 

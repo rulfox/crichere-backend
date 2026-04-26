@@ -108,3 +108,4 @@
 - [x] T066 [P] Integrate Pods framework into Xcode workspace and project configurations.
 \n## Backend Dependency Maintenance (2026-04-26)\n\n- [x] T067 Upgrade backend dependencies (Spring Boot 3.5.9, Kotlin 2.3.21, JJWT 0.13.0, etc.)
 - [x] T068 Externalize production settings to environment variables and add .env.example
+- [x] T069 Implement Optimistic Locking for Auction and Franchise state (V015)\n- [x] T070 Add JWT Token Blacklisting for secure logout\n- [x] T071 Implement Standard Response Filtering and global exception refinements\n- [x] T072 Configure Micrometer metrics and Prometheus endpoint\n- [x] T073 Add Dockerization and GitHub Actions CI workflow

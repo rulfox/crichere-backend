@@ -7,6 +7,7 @@ import com.crichere.domain.league.entity.League
 import com.crichere.domain.league.service.BulkImportService
 import com.crichere.domain.league.service.LeagueService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
@@ -24,7 +25,7 @@ class LeagueController(
     @PostMapping
     fun createLeague(
         @AuthenticationPrincipal userDetails: UserDetails,
-        @RequestBody request: LeagueCreateRequest
+        @Valid @RequestBody request: LeagueCreateRequest
     ): ApiResponse<LeagueResponse> {
         val league = leagueService.createLeague(
             League(
@@ -61,7 +62,7 @@ class LeagueController(
     @PreAuthorize("hasRole('LEAGUE_ADMIN')")
     fun bulkImportPlayers(
         @PathVariable id: UUID,
-        @RequestBody request: List<PlayerImportRequest>
+        @Valid @RequestBody request: List<@Valid PlayerImportRequest>
     ): ApiResponse<BulkImportResponse> {
         val result = bulkImportService.importPlayers(id, request)
         return ResponseHelper.success(data = result, message = "Bulk import completed", messageKey = "success.bulk_import_completed")

@@ -13,7 +13,8 @@ import jakarta.servlet.http.HttpServletResponse
 @Component
 class JwtAuthenticationFilter(
     private val jwtTokenProvider: JwtTokenProvider,
-    private val userDetailsService: UserDetailsService
+    private val userDetailsService: UserDetailsService,
+    private val tokenBlacklistService: TokenBlacklistService
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(
@@ -24,7 +25,7 @@ class JwtAuthenticationFilter(
         val authHeader = request.getHeader("Authorization")
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             val token = authHeader.substring(7)
-            if (jwtTokenProvider.validateToken(token)) {
+            if (jwtTokenProvider.validateToken(token) && !tokenBlacklistService.isBlacklisted(token)) {
                 val userId = jwtTokenProvider.getUserIdFromToken(token)
                 val userDetails = userDetailsService.loadUserByUsername(userId)
                 

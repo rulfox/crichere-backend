@@ -5,6 +5,7 @@ import com.crichere.common.response.ResponseHelper
 import com.crichere.domain.auth.dto.*
 import com.crichere.domain.auth.service.UserService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
@@ -43,7 +44,7 @@ class UserController(private val userService: UserService) {
     @PutMapping("/{id}/basic")
     fun updateBasicInfo(
         @PathVariable id: UUID,
-        @RequestBody request: UserBasicInfoRequest
+        @Valid @RequestBody request: UserBasicInfoRequest
     ): ApiResponse<Nothing> {
         userService.updateBasicInfo(id, request.name, request.email)
         return ResponseHelper.success(message = "Basic info updated", messageKey = "success.user_updated")
@@ -52,7 +53,7 @@ class UserController(private val userService: UserService) {
     @PutMapping("/{id}/cricket-profile")
     fun updateCricketProfile(
         @PathVariable id: UUID,
-        @RequestBody request: CricketProfileRequest
+        @Valid @RequestBody request: CricketProfileRequest
     ): ApiResponse<Nothing> {
         userService.updateCricketProfile(id, request)
         return ResponseHelper.success(message = "Cricket profile updated", messageKey = "success.profile_updated")
@@ -97,7 +98,7 @@ class UserController(private val userService: UserService) {
     @PostMapping("/ghost")
     @ResponseStatus(HttpStatus.CREATED)
     fun createGhost(
-        @RequestBody request: GhostPlayerRequest,
+        @Valid @RequestBody request: GhostPlayerRequest,
         @AuthenticationPrincipal admin: UserDetails
     ): ApiResponse<UUID> {
         val user = userService.createGhostPlayer(request.phone, request.name, UUID.fromString(admin.username))

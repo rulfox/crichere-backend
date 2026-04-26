@@ -1,13 +1,21 @@
 package com.crichere.domain.franchise.dto
 
 import com.crichere.domain.franchise.enums.FranchiseInviteStatus
+import jakarta.validation.constraints.*
 import java.util.UUID
 
 data class FranchiseCreateRequest(
     val leagueId: UUID,
+
+    @field:NotBlank
+    @field:Size(max = 100)
     val name: String,
+
+    @field:Size(max = 512)
     val logoUrl: String? = null,
     val ownerId: UUID,
+
+    @field:Positive
     val totalPurse: Int
 )
 
@@ -22,6 +30,8 @@ data class FranchiseResponse(
 )
 
 data class FranchiseInviteRequest(
+    @field:NotBlank
+    @field:Email
     val email: String
 )
 

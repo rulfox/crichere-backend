@@ -6,6 +6,8 @@ import com.crichere.domain.auth.dto.*
 import com.crichere.domain.auth.service.AuthService
 import com.crichere.domain.auth.service.UserService
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
@@ -21,13 +23,13 @@ class AuthController(
 ) {
 
     @PostMapping("/otp/send")
-    fun sendOtp(@RequestBody request: OtpSendRequest): ApiResponse<Nothing> {
+    fun sendOtp(@Valid @RequestBody request: OtpSendRequest): ApiResponse<Nothing> {
         authService.sendOtp(request.phone)
         return ResponseHelper.success(message = "OTP sent successfully", messageKey = "success.otp_sent")
     }
 
     @PostMapping("/otp/verify")
-    fun verifyOtp(@RequestBody request: OtpVerifyRequest): ApiResponse<Map<String, Any>> {
+    fun verifyOtp(@Valid @RequestBody request: OtpVerifyRequest): ApiResponse<Map<String, Any>> {
         val result = authService.verifyOtpAndLogin(request.phone, request.code)
         return ResponseHelper.success(data = result, message = "Login successful", messageKey = "success.login")
     }
@@ -35,21 +37,25 @@ class AuthController(
     @PostMapping("/claim-profile")
     fun claimProfile(
         @AuthenticationPrincipal userDetails: UserDetails,
-        @RequestBody request: ClaimProfileRequest
+        @Valid @RequestBody request: ClaimProfileRequest
     ): ApiResponse<Nothing> {
         authService.claimProfile(UUID.fromString(userDetails.username), request)
         return ResponseHelper.success(message = "Profile claimed successfully", messageKey = "success.profile_claimed")
     }
 
     @PostMapping("/token/refresh")
-    fun refreshToken(@RequestBody request: TokenRefreshRequest): ApiResponse<Map<String, String>> {
+    fun refreshToken(@Valid @RequestBody request: TokenRefreshRequest): ApiResponse<Map<String, String>> {
         val result = authService.refreshAccessToken(request.refreshToken)
         return ResponseHelper.success(data = result)
     }
 
     @PostMapping("/logout")
-    fun logout(@AuthenticationPrincipal userDetails: UserDetails): ApiResponse<Nothing> {
-        authService.logout(UUID.fromString(userDetails.username))
+    fun logout(
+        @AuthenticationPrincipal userDetails: UserDetails,
+        httpRequest: HttpServletRequest
+    ): ApiResponse<Nothing> {
+        val token = httpRequest.getHeader("Authorization")?.removePrefix("Bearer ")
+        authService.logout(UUID.fromString(userDetails.username), token)
         return ResponseHelper.success(message = "Logged out successfully", messageKey = "success.logout")
     }
 
