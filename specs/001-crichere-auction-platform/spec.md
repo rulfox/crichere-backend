@@ -170,7 +170,7 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **Local Storage**: Drift (SQLite) for offline READ caching (leagues, players, notifications); no bidirectional sync. Independent cache per device/tab. Invalidate on league `AUCTION_LIVE` or foreground resume.
 - **Navigation**: `auto_route` with `AutoRouteGuard` for role-based access and deep linking.
 - **Architecture**: Feature-first hybrid Clean Architecture (`core/`, `features/`, etc.).
-- **Security**: `flutter_secure_storage` for JWTs; never expose AWS credentials to the client.
+- **Security**: `flutter_secure_storage` for JWTs; never expose AWS credentials to the client. All environment-specific values (API base URL, environment name) are injected at build time via `--dart-define-from-file=config/<env>.json` and read through `AppConfig` (`String.fromEnvironment`). `config/prod.json` and `config/staging.json` are gitignored and must be injected by CI/CD; `config/dev.json` (localhost) is committed. `LogInterceptor` is gated on `kDebugMode` to prevent token and request body leakage in production builds.
 - **Real-time**: SSE via `eventsource` feeding into Riverpod `StreamProvider`. Redis channels MUST be partitioned per auctionId. SseEmitter pings sent every 15 seconds. Gzip compression MUST be disabled for SSE streams.
 - **Assets**: Direct-to-S3 upload (Presigned URL) with no AWS SDK on the client.
 - **Notifications**: FCM HIGH priority for auction events (PLAYER_SOLD, etc.). Background: system notification + deep link. Foreground: in-app banner/SnackBar only.
@@ -202,5 +202,6 @@ As a League Admin, I want to manage fee obligations and player forfeits so that 
 - **Infrastructure**: Deployment will be in the AWS Mumbai (`ap-south-1`) region; Redis used for SSE broadcasting.
 - **Payment Scope**: V1 implementation handles cash/offline fee tracking only; Razorpay is V2.
 - **Auction Environment**: High-speed internet is assumed for the Auctioneer's device to ensure real-time command delivery.
+- **Build Config**: All Flutter builds MUST pass `--dart-define-from-file=config/<env>.json`. Keys: `API_BASE_URL` (full base URL including `/api/v1`), `ENV` (`dev` | `staging` | `prod`). The `config/example.json` in the repo serves as the canonical key reference for CI/CD secret setup.
 
 
