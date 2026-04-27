@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$League {
 
- String get id; String get name; String? get logoUrl; String get status; DateTime? get auctionDate;
+ String get id; String get name; String? get format; String? get rulesUrl; bool get mustSellAll; String get playerOrderMode; String get waitingListMode; String? get logoUrl; String? get bannerUrl; String get status; DateTime? get auctionDate; String get createdBy;
 /// Create a copy of League
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $LeagueCopyWith<League> get copyWith => _$LeagueCopyWithImpl<League>(this as Lea
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is League&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.status, status) || other.status == status)&&(identical(other.auctionDate, auctionDate) || other.auctionDate == auctionDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is League&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.format, format) || other.format == format)&&(identical(other.rulesUrl, rulesUrl) || other.rulesUrl == rulesUrl)&&(identical(other.mustSellAll, mustSellAll) || other.mustSellAll == mustSellAll)&&(identical(other.playerOrderMode, playerOrderMode) || other.playerOrderMode == playerOrderMode)&&(identical(other.waitingListMode, waitingListMode) || other.waitingListMode == waitingListMode)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.status, status) || other.status == status)&&(identical(other.auctionDate, auctionDate) || other.auctionDate == auctionDate)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,logoUrl,status,auctionDate);
+int get hashCode => Object.hash(runtimeType,id,name,format,rulesUrl,mustSellAll,playerOrderMode,waitingListMode,logoUrl,bannerUrl,status,auctionDate,createdBy);
 
 @override
 String toString() {
-  return 'League(id: $id, name: $name, logoUrl: $logoUrl, status: $status, auctionDate: $auctionDate)';
+  return 'League(id: $id, name: $name, format: $format, rulesUrl: $rulesUrl, mustSellAll: $mustSellAll, playerOrderMode: $playerOrderMode, waitingListMode: $waitingListMode, logoUrl: $logoUrl, bannerUrl: $bannerUrl, status: $status, auctionDate: $auctionDate, createdBy: $createdBy)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $LeagueCopyWith<$Res>  {
   factory $LeagueCopyWith(League value, $Res Function(League) _then) = _$LeagueCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? logoUrl, String status, DateTime? auctionDate
+ String id, String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String status, DateTime? auctionDate, String createdBy
 });
 
 
@@ -65,14 +65,21 @@ class _$LeagueCopyWithImpl<$Res>
 
 /// Create a copy of League
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? logoUrl = freezed,Object? status = null,Object? auctionDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? format = freezed,Object? rulesUrl = freezed,Object? mustSellAll = null,Object? playerOrderMode = null,Object? waitingListMode = null,Object? logoUrl = freezed,Object? bannerUrl = freezed,Object? status = null,Object? auctionDate = freezed,Object? createdBy = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,format: freezed == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
+as String?,rulesUrl: freezed == rulesUrl ? _self.rulesUrl : rulesUrl // ignore: cast_nullable_to_non_nullable
+as String?,mustSellAll: null == mustSellAll ? _self.mustSellAll : mustSellAll // ignore: cast_nullable_to_non_nullable
+as bool,playerOrderMode: null == playerOrderMode ? _self.playerOrderMode : playerOrderMode // ignore: cast_nullable_to_non_nullable
+as String,waitingListMode: null == waitingListMode ? _self.waitingListMode : waitingListMode // ignore: cast_nullable_to_non_nullable
 as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
+as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,auctionDate: freezed == auctionDate ? _self.auctionDate : auctionDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,createdBy: null == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -157,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? logoUrl,  String status,  DateTime? auctionDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status,  DateTime? auctionDate,  String createdBy)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _League() when $default != null:
-return $default(_that.id,_that.name,_that.logoUrl,_that.status,_that.auctionDate);case _:
+return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.status,_that.auctionDate,_that.createdBy);case _:
   return orElse();
 
 }
@@ -178,10 +185,10 @@ return $default(_that.id,_that.name,_that.logoUrl,_that.status,_that.auctionDate
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? logoUrl,  String status,  DateTime? auctionDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status,  DateTime? auctionDate,  String createdBy)  $default,) {final _that = this;
 switch (_that) {
 case _League():
-return $default(_that.id,_that.name,_that.logoUrl,_that.status,_that.auctionDate);case _:
+return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.status,_that.auctionDate,_that.createdBy);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +205,10 @@ return $default(_that.id,_that.name,_that.logoUrl,_that.status,_that.auctionDate
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? logoUrl,  String status,  DateTime? auctionDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status,  DateTime? auctionDate,  String createdBy)?  $default,) {final _that = this;
 switch (_that) {
 case _League() when $default != null:
-return $default(_that.id,_that.name,_that.logoUrl,_that.status,_that.auctionDate);case _:
+return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.status,_that.auctionDate,_that.createdBy);case _:
   return null;
 
 }
@@ -213,14 +220,21 @@ return $default(_that.id,_that.name,_that.logoUrl,_that.status,_that.auctionDate
 @JsonSerializable()
 
 class _League extends League {
-  const _League({required this.id, required this.name, this.logoUrl, required this.status, this.auctionDate}): super._();
+  const _League({required this.id, required this.name, this.format, this.rulesUrl, this.mustSellAll = false, this.playerOrderMode = 'RANDOM', this.waitingListMode = 'ADMIN_PICKS', this.logoUrl, this.bannerUrl, required this.status, this.auctionDate, required this.createdBy}): super._();
   factory _League.fromJson(Map<String, dynamic> json) => _$LeagueFromJson(json);
 
 @override final  String id;
 @override final  String name;
+@override final  String? format;
+@override final  String? rulesUrl;
+@override@JsonKey() final  bool mustSellAll;
+@override@JsonKey() final  String playerOrderMode;
+@override@JsonKey() final  String waitingListMode;
 @override final  String? logoUrl;
+@override final  String? bannerUrl;
 @override final  String status;
 @override final  DateTime? auctionDate;
+@override final  String createdBy;
 
 /// Create a copy of League
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _League&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.status, status) || other.status == status)&&(identical(other.auctionDate, auctionDate) || other.auctionDate == auctionDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _League&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.format, format) || other.format == format)&&(identical(other.rulesUrl, rulesUrl) || other.rulesUrl == rulesUrl)&&(identical(other.mustSellAll, mustSellAll) || other.mustSellAll == mustSellAll)&&(identical(other.playerOrderMode, playerOrderMode) || other.playerOrderMode == playerOrderMode)&&(identical(other.waitingListMode, waitingListMode) || other.waitingListMode == waitingListMode)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.status, status) || other.status == status)&&(identical(other.auctionDate, auctionDate) || other.auctionDate == auctionDate)&&(identical(other.createdBy, createdBy) || other.createdBy == createdBy));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,logoUrl,status,auctionDate);
+int get hashCode => Object.hash(runtimeType,id,name,format,rulesUrl,mustSellAll,playerOrderMode,waitingListMode,logoUrl,bannerUrl,status,auctionDate,createdBy);
 
 @override
 String toString() {
-  return 'League(id: $id, name: $name, logoUrl: $logoUrl, status: $status, auctionDate: $auctionDate)';
+  return 'League(id: $id, name: $name, format: $format, rulesUrl: $rulesUrl, mustSellAll: $mustSellAll, playerOrderMode: $playerOrderMode, waitingListMode: $waitingListMode, logoUrl: $logoUrl, bannerUrl: $bannerUrl, status: $status, auctionDate: $auctionDate, createdBy: $createdBy)';
 }
 
 
@@ -255,7 +269,7 @@ abstract mixin class _$LeagueCopyWith<$Res> implements $LeagueCopyWith<$Res> {
   factory _$LeagueCopyWith(_League value, $Res Function(_League) _then) = __$LeagueCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? logoUrl, String status, DateTime? auctionDate
+ String id, String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String status, DateTime? auctionDate, String createdBy
 });
 
 
@@ -272,14 +286,21 @@ class __$LeagueCopyWithImpl<$Res>
 
 /// Create a copy of League
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? logoUrl = freezed,Object? status = null,Object? auctionDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? format = freezed,Object? rulesUrl = freezed,Object? mustSellAll = null,Object? playerOrderMode = null,Object? waitingListMode = null,Object? logoUrl = freezed,Object? bannerUrl = freezed,Object? status = null,Object? auctionDate = freezed,Object? createdBy = null,}) {
   return _then(_League(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,format: freezed == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
+as String?,rulesUrl: freezed == rulesUrl ? _self.rulesUrl : rulesUrl // ignore: cast_nullable_to_non_nullable
+as String?,mustSellAll: null == mustSellAll ? _self.mustSellAll : mustSellAll // ignore: cast_nullable_to_non_nullable
+as bool,playerOrderMode: null == playerOrderMode ? _self.playerOrderMode : playerOrderMode // ignore: cast_nullable_to_non_nullable
+as String,waitingListMode: null == waitingListMode ? _self.waitingListMode : waitingListMode // ignore: cast_nullable_to_non_nullable
 as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
+as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,auctionDate: freezed == auctionDate ? _self.auctionDate : auctionDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,createdBy: null == createdBy ? _self.createdBy : createdBy // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

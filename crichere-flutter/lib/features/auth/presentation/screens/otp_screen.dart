@@ -105,7 +105,7 @@ class OtpScreen extends HookConsumerWidget {
                           
                           if (!context.mounted) return;
                           
-                          if (response.profileStatus == ProfileStatus.GHOST) {
+                          if (response.profileStatus == ProfileStatus.ghost) {
                             context.router.replaceAll([
                               ClaimProfileRoute(
                                 profileId: response.userId ?? '',

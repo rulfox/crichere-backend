@@ -19,7 +19,7 @@ class ClaimProfileScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nameController = useTextEditingController(text: suggestedName);
-    final selectedRole = useState<PlayingRole>(PlayingRole.BATTER);
+    final selectedRole = useState<PlayingRole>(PlayingRole.batter);
     final isLoading = useState(false);
 
     return Scaffold(
@@ -53,7 +53,7 @@ class ClaimProfileScreen extends HookConsumerWidget {
             const Text('Select Your Primary Playing Role:'),
             const SizedBox(height: 8),
             DropdownButtonFormField<PlayingRole>(
-              value: selectedRole.value,
+              initialValue: selectedRole.value,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
               ),

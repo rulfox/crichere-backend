@@ -38,32 +38,32 @@ class ProfileSetupScreen extends HookConsumerWidget {
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<PlayingRole>(
-              value: role.value,
+              initialValue: role.value,
               decoration: const InputDecoration(
                 labelText: 'Playing Role',
                 border: OutlineInputBorder(),
               ),
-              items: PlayingRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.name))).toList(),
+              items: PlayingRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.name.toUpperCase()))).toList(),
               onChanged: (v) => role.value = v,
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<BattingStyle>(
-              value: battingStyle.value,
+              initialValue: battingStyle.value,
               decoration: const InputDecoration(
                 labelText: 'Batting Style',
                 border: OutlineInputBorder(),
               ),
-              items: BattingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name))).toList(),
+              items: BattingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name.toUpperCase()))).toList(),
               onChanged: (v) => battingStyle.value = v,
             ),
             const SizedBox(height: 20),
             DropdownButtonFormField<BowlingStyle>(
-              value: bowlingStyle.value,
+              initialValue: bowlingStyle.value,
               decoration: const InputDecoration(
                 labelText: 'Bowling Style',
                 border: OutlineInputBorder(),
               ),
-              items: BowlingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name))).toList(),
+              items: BowlingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name.toUpperCase()))).toList(),
               onChanged: (v) => bowlingStyle.value = v,
             ),
             const SizedBox(height: 32),

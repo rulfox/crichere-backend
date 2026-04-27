@@ -1,27 +1,46 @@
+import 'package:json_annotation/json_annotation.dart';
+
 enum ProfileStatus {
-  GHOST, CLAIMED, ACTIVE
+  @JsonValue('GHOST') ghost,
+  @JsonValue('CLAIMED') claimed,
+  @JsonValue('ACTIVE') active
 }
 
 enum PlayingRole {
-  BATTER, BOWLER, ALL_ROUNDER, WICKET_KEEPER
+  @JsonValue('BATTER') batter,
+  @JsonValue('BOWLER') bowler,
+  @JsonValue('ALL_ROUNDER') allRounder,
+  @JsonValue('WICKET_KEEPER') wicketKeeper
 }
 
 enum BattingStyle {
-  RIGHT_HAND, LEFT_HAND
+  @JsonValue('RIGHT_HAND') rightHand,
+  @JsonValue('LEFT_HAND') leftHand
 }
 
 enum BowlingStyle {
-  RIGHT_ARM, LEFT_ARM
+  @JsonValue('RIGHT_ARM') rightArm,
+  @JsonValue('LEFT_ARM') leftArm
 }
 
 enum BowlingType {
-  FAST, MEDIUM_FAST, MEDIUM, OFF_SPIN, LEG_SPIN, SLOW_LEFT_ARM, SLOW_LEFT_ARM_ORTHODOX
+  @JsonValue('FAST') fast,
+  @JsonValue('MEDIUM_FAST') mediumFast,
+  @JsonValue('MEDIUM') medium,
+  @JsonValue('OFF_SPIN') offSpin,
+  @JsonValue('LEG_SPIN') legSpin,
+  @JsonValue('SLOW_LEFT_ARM') slowLeftArm,
+  @JsonValue('SLOW_LEFT_ARM_ORTHODOX') slowLeftArmOrthodox
 }
 
 enum ExperienceLevel {
-  LOCAL, DISTRICT, STATE, NATIONAL
+  @JsonValue('LOCAL') local,
+  @JsonValue('DISTRICT') district,
+  @JsonValue('STATE') state,
+  @JsonValue('NATIONAL') national
 }
 
 enum LeagueRole {
-  LEAGUE_ADMIN, AUCTIONEER
+  @JsonValue('LEAGUE_ADMIN') leagueAdmin,
+  @JsonValue('AUCTIONEER') auctioneer
 }

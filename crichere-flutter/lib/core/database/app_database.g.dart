@@ -26,12 +26,82 @@ class $LeaguesTable extends Leagues with TableInfo<$LeaguesTable, League> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _formatMeta = const VerificationMeta('format');
+  @override
+  late final GeneratedColumn<String> format = GeneratedColumn<String>(
+    'format',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _rulesUrlMeta = const VerificationMeta(
+    'rulesUrl',
+  );
+  @override
+  late final GeneratedColumn<String> rulesUrl = GeneratedColumn<String>(
+    'rules_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _mustSellAllMeta = const VerificationMeta(
+    'mustSellAll',
+  );
+  @override
+  late final GeneratedColumn<bool> mustSellAll = GeneratedColumn<bool>(
+    'must_sell_all',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("must_sell_all" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _playerOrderModeMeta = const VerificationMeta(
+    'playerOrderMode',
+  );
+  @override
+  late final GeneratedColumn<String> playerOrderMode = GeneratedColumn<String>(
+    'player_order_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('RANDOM'),
+  );
+  static const VerificationMeta _waitingListModeMeta = const VerificationMeta(
+    'waitingListMode',
+  );
+  @override
+  late final GeneratedColumn<String> waitingListMode = GeneratedColumn<String>(
+    'waiting_list_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('ADMIN_PICKS'),
+  );
   static const VerificationMeta _logoUrlMeta = const VerificationMeta(
     'logoUrl',
   );
   @override
   late final GeneratedColumn<String> logoUrl = GeneratedColumn<String>(
     'logo_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bannerUrlMeta = const VerificationMeta(
+    'bannerUrl',
+  );
+  @override
+  late final GeneratedColumn<String> bannerUrl = GeneratedColumn<String>(
+    'banner_url',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -57,13 +127,31 @@ class $LeaguesTable extends Leagues with TableInfo<$LeaguesTable, League> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _createdByMeta = const VerificationMeta(
+    'createdBy',
+  );
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+    'created_by',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     name,
+    format,
+    rulesUrl,
+    mustSellAll,
+    playerOrderMode,
+    waitingListMode,
     logoUrl,
+    bannerUrl,
     status,
     auctionDate,
+    createdBy,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -90,10 +178,55 @@ class $LeaguesTable extends Leagues with TableInfo<$LeaguesTable, League> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('format')) {
+      context.handle(
+        _formatMeta,
+        format.isAcceptableOrUnknown(data['format']!, _formatMeta),
+      );
+    }
+    if (data.containsKey('rules_url')) {
+      context.handle(
+        _rulesUrlMeta,
+        rulesUrl.isAcceptableOrUnknown(data['rules_url']!, _rulesUrlMeta),
+      );
+    }
+    if (data.containsKey('must_sell_all')) {
+      context.handle(
+        _mustSellAllMeta,
+        mustSellAll.isAcceptableOrUnknown(
+          data['must_sell_all']!,
+          _mustSellAllMeta,
+        ),
+      );
+    }
+    if (data.containsKey('player_order_mode')) {
+      context.handle(
+        _playerOrderModeMeta,
+        playerOrderMode.isAcceptableOrUnknown(
+          data['player_order_mode']!,
+          _playerOrderModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('waiting_list_mode')) {
+      context.handle(
+        _waitingListModeMeta,
+        waitingListMode.isAcceptableOrUnknown(
+          data['waiting_list_mode']!,
+          _waitingListModeMeta,
+        ),
+      );
+    }
     if (data.containsKey('logo_url')) {
       context.handle(
         _logoUrlMeta,
         logoUrl.isAcceptableOrUnknown(data['logo_url']!, _logoUrlMeta),
+      );
+    }
+    if (data.containsKey('banner_url')) {
+      context.handle(
+        _bannerUrlMeta,
+        bannerUrl.isAcceptableOrUnknown(data['banner_url']!, _bannerUrlMeta),
       );
     }
     if (data.containsKey('status')) {
@@ -113,6 +246,14 @@ class $LeaguesTable extends Leagues with TableInfo<$LeaguesTable, League> {
         ),
       );
     }
+    if (data.containsKey('created_by')) {
+      context.handle(
+        _createdByMeta,
+        createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdByMeta);
+    }
     return context;
   }
 
@@ -130,9 +271,33 @@ class $LeaguesTable extends Leagues with TableInfo<$LeaguesTable, League> {
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      format: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}format'],
+      ),
+      rulesUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rules_url'],
+      ),
+      mustSellAll: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}must_sell_all'],
+      )!,
+      playerOrderMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}player_order_mode'],
+      )!,
+      waitingListMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}waiting_list_mode'],
+      )!,
       logoUrl: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}logo_url'],
+      ),
+      bannerUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}banner_url'],
       ),
       status: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -142,6 +307,10 @@ class $LeaguesTable extends Leagues with TableInfo<$LeaguesTable, League> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}auction_date'],
       ),
+      createdBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_by'],
+      )!,
     );
   }
 
@@ -154,28 +323,55 @@ class $LeaguesTable extends Leagues with TableInfo<$LeaguesTable, League> {
 class League extends DataClass implements Insertable<League> {
   final String id;
   final String name;
+  final String? format;
+  final String? rulesUrl;
+  final bool mustSellAll;
+  final String playerOrderMode;
+  final String waitingListMode;
   final String? logoUrl;
+  final String? bannerUrl;
   final String status;
   final DateTime? auctionDate;
+  final String createdBy;
   const League({
     required this.id,
     required this.name,
+    this.format,
+    this.rulesUrl,
+    required this.mustSellAll,
+    required this.playerOrderMode,
+    required this.waitingListMode,
     this.logoUrl,
+    this.bannerUrl,
     required this.status,
     this.auctionDate,
+    required this.createdBy,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || format != null) {
+      map['format'] = Variable<String>(format);
+    }
+    if (!nullToAbsent || rulesUrl != null) {
+      map['rules_url'] = Variable<String>(rulesUrl);
+    }
+    map['must_sell_all'] = Variable<bool>(mustSellAll);
+    map['player_order_mode'] = Variable<String>(playerOrderMode);
+    map['waiting_list_mode'] = Variable<String>(waitingListMode);
     if (!nullToAbsent || logoUrl != null) {
       map['logo_url'] = Variable<String>(logoUrl);
+    }
+    if (!nullToAbsent || bannerUrl != null) {
+      map['banner_url'] = Variable<String>(bannerUrl);
     }
     map['status'] = Variable<String>(status);
     if (!nullToAbsent || auctionDate != null) {
       map['auction_date'] = Variable<DateTime>(auctionDate);
     }
+    map['created_by'] = Variable<String>(createdBy);
     return map;
   }
 
@@ -183,13 +379,26 @@ class League extends DataClass implements Insertable<League> {
     return LeaguesCompanion(
       id: Value(id),
       name: Value(name),
+      format: format == null && nullToAbsent
+          ? const Value.absent()
+          : Value(format),
+      rulesUrl: rulesUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rulesUrl),
+      mustSellAll: Value(mustSellAll),
+      playerOrderMode: Value(playerOrderMode),
+      waitingListMode: Value(waitingListMode),
       logoUrl: logoUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(logoUrl),
+      bannerUrl: bannerUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bannerUrl),
       status: Value(status),
       auctionDate: auctionDate == null && nullToAbsent
           ? const Value.absent()
           : Value(auctionDate),
+      createdBy: Value(createdBy),
     );
   }
 
@@ -201,9 +410,16 @@ class League extends DataClass implements Insertable<League> {
     return League(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      format: serializer.fromJson<String?>(json['format']),
+      rulesUrl: serializer.fromJson<String?>(json['rulesUrl']),
+      mustSellAll: serializer.fromJson<bool>(json['mustSellAll']),
+      playerOrderMode: serializer.fromJson<String>(json['playerOrderMode']),
+      waitingListMode: serializer.fromJson<String>(json['waitingListMode']),
       logoUrl: serializer.fromJson<String?>(json['logoUrl']),
+      bannerUrl: serializer.fromJson<String?>(json['bannerUrl']),
       status: serializer.fromJson<String>(json['status']),
       auctionDate: serializer.fromJson<DateTime?>(json['auctionDate']),
+      createdBy: serializer.fromJson<String>(json['createdBy']),
     );
   }
   @override
@@ -212,34 +428,68 @@ class League extends DataClass implements Insertable<League> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
+      'format': serializer.toJson<String?>(format),
+      'rulesUrl': serializer.toJson<String?>(rulesUrl),
+      'mustSellAll': serializer.toJson<bool>(mustSellAll),
+      'playerOrderMode': serializer.toJson<String>(playerOrderMode),
+      'waitingListMode': serializer.toJson<String>(waitingListMode),
       'logoUrl': serializer.toJson<String?>(logoUrl),
+      'bannerUrl': serializer.toJson<String?>(bannerUrl),
       'status': serializer.toJson<String>(status),
       'auctionDate': serializer.toJson<DateTime?>(auctionDate),
+      'createdBy': serializer.toJson<String>(createdBy),
     };
   }
 
   League copyWith({
     String? id,
     String? name,
+    Value<String?> format = const Value.absent(),
+    Value<String?> rulesUrl = const Value.absent(),
+    bool? mustSellAll,
+    String? playerOrderMode,
+    String? waitingListMode,
     Value<String?> logoUrl = const Value.absent(),
+    Value<String?> bannerUrl = const Value.absent(),
     String? status,
     Value<DateTime?> auctionDate = const Value.absent(),
+    String? createdBy,
   }) => League(
     id: id ?? this.id,
     name: name ?? this.name,
+    format: format.present ? format.value : this.format,
+    rulesUrl: rulesUrl.present ? rulesUrl.value : this.rulesUrl,
+    mustSellAll: mustSellAll ?? this.mustSellAll,
+    playerOrderMode: playerOrderMode ?? this.playerOrderMode,
+    waitingListMode: waitingListMode ?? this.waitingListMode,
     logoUrl: logoUrl.present ? logoUrl.value : this.logoUrl,
+    bannerUrl: bannerUrl.present ? bannerUrl.value : this.bannerUrl,
     status: status ?? this.status,
     auctionDate: auctionDate.present ? auctionDate.value : this.auctionDate,
+    createdBy: createdBy ?? this.createdBy,
   );
   League copyWithCompanion(LeaguesCompanion data) {
     return League(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
+      format: data.format.present ? data.format.value : this.format,
+      rulesUrl: data.rulesUrl.present ? data.rulesUrl.value : this.rulesUrl,
+      mustSellAll: data.mustSellAll.present
+          ? data.mustSellAll.value
+          : this.mustSellAll,
+      playerOrderMode: data.playerOrderMode.present
+          ? data.playerOrderMode.value
+          : this.playerOrderMode,
+      waitingListMode: data.waitingListMode.present
+          ? data.waitingListMode.value
+          : this.waitingListMode,
       logoUrl: data.logoUrl.present ? data.logoUrl.value : this.logoUrl,
+      bannerUrl: data.bannerUrl.present ? data.bannerUrl.value : this.bannerUrl,
       status: data.status.present ? data.status.value : this.status,
       auctionDate: data.auctionDate.present
           ? data.auctionDate.value
           : this.auctionDate,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
     );
   }
 
@@ -248,65 +498,128 @@ class League extends DataClass implements Insertable<League> {
     return (StringBuffer('League(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('format: $format, ')
+          ..write('rulesUrl: $rulesUrl, ')
+          ..write('mustSellAll: $mustSellAll, ')
+          ..write('playerOrderMode: $playerOrderMode, ')
+          ..write('waitingListMode: $waitingListMode, ')
           ..write('logoUrl: $logoUrl, ')
+          ..write('bannerUrl: $bannerUrl, ')
           ..write('status: $status, ')
-          ..write('auctionDate: $auctionDate')
+          ..write('auctionDate: $auctionDate, ')
+          ..write('createdBy: $createdBy')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, logoUrl, status, auctionDate);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    format,
+    rulesUrl,
+    mustSellAll,
+    playerOrderMode,
+    waitingListMode,
+    logoUrl,
+    bannerUrl,
+    status,
+    auctionDate,
+    createdBy,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is League &&
           other.id == this.id &&
           other.name == this.name &&
+          other.format == this.format &&
+          other.rulesUrl == this.rulesUrl &&
+          other.mustSellAll == this.mustSellAll &&
+          other.playerOrderMode == this.playerOrderMode &&
+          other.waitingListMode == this.waitingListMode &&
           other.logoUrl == this.logoUrl &&
+          other.bannerUrl == this.bannerUrl &&
           other.status == this.status &&
-          other.auctionDate == this.auctionDate);
+          other.auctionDate == this.auctionDate &&
+          other.createdBy == this.createdBy);
 }
 
 class LeaguesCompanion extends UpdateCompanion<League> {
   final Value<String> id;
   final Value<String> name;
+  final Value<String?> format;
+  final Value<String?> rulesUrl;
+  final Value<bool> mustSellAll;
+  final Value<String> playerOrderMode;
+  final Value<String> waitingListMode;
   final Value<String?> logoUrl;
+  final Value<String?> bannerUrl;
   final Value<String> status;
   final Value<DateTime?> auctionDate;
+  final Value<String> createdBy;
   final Value<int> rowid;
   const LeaguesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.format = const Value.absent(),
+    this.rulesUrl = const Value.absent(),
+    this.mustSellAll = const Value.absent(),
+    this.playerOrderMode = const Value.absent(),
+    this.waitingListMode = const Value.absent(),
     this.logoUrl = const Value.absent(),
+    this.bannerUrl = const Value.absent(),
     this.status = const Value.absent(),
     this.auctionDate = const Value.absent(),
+    this.createdBy = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LeaguesCompanion.insert({
     required String id,
     required String name,
+    this.format = const Value.absent(),
+    this.rulesUrl = const Value.absent(),
+    this.mustSellAll = const Value.absent(),
+    this.playerOrderMode = const Value.absent(),
+    this.waitingListMode = const Value.absent(),
     this.logoUrl = const Value.absent(),
+    this.bannerUrl = const Value.absent(),
     required String status,
     this.auctionDate = const Value.absent(),
+    required String createdBy,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name),
-       status = Value(status);
+       status = Value(status),
+       createdBy = Value(createdBy);
   static Insertable<League> custom({
     Expression<String>? id,
     Expression<String>? name,
+    Expression<String>? format,
+    Expression<String>? rulesUrl,
+    Expression<bool>? mustSellAll,
+    Expression<String>? playerOrderMode,
+    Expression<String>? waitingListMode,
     Expression<String>? logoUrl,
+    Expression<String>? bannerUrl,
     Expression<String>? status,
     Expression<DateTime>? auctionDate,
+    Expression<String>? createdBy,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (format != null) 'format': format,
+      if (rulesUrl != null) 'rules_url': rulesUrl,
+      if (mustSellAll != null) 'must_sell_all': mustSellAll,
+      if (playerOrderMode != null) 'player_order_mode': playerOrderMode,
+      if (waitingListMode != null) 'waiting_list_mode': waitingListMode,
       if (logoUrl != null) 'logo_url': logoUrl,
+      if (bannerUrl != null) 'banner_url': bannerUrl,
       if (status != null) 'status': status,
       if (auctionDate != null) 'auction_date': auctionDate,
+      if (createdBy != null) 'created_by': createdBy,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -314,17 +627,31 @@ class LeaguesCompanion extends UpdateCompanion<League> {
   LeaguesCompanion copyWith({
     Value<String>? id,
     Value<String>? name,
+    Value<String?>? format,
+    Value<String?>? rulesUrl,
+    Value<bool>? mustSellAll,
+    Value<String>? playerOrderMode,
+    Value<String>? waitingListMode,
     Value<String?>? logoUrl,
+    Value<String?>? bannerUrl,
     Value<String>? status,
     Value<DateTime?>? auctionDate,
+    Value<String>? createdBy,
     Value<int>? rowid,
   }) {
     return LeaguesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      format: format ?? this.format,
+      rulesUrl: rulesUrl ?? this.rulesUrl,
+      mustSellAll: mustSellAll ?? this.mustSellAll,
+      playerOrderMode: playerOrderMode ?? this.playerOrderMode,
+      waitingListMode: waitingListMode ?? this.waitingListMode,
       logoUrl: logoUrl ?? this.logoUrl,
+      bannerUrl: bannerUrl ?? this.bannerUrl,
       status: status ?? this.status,
       auctionDate: auctionDate ?? this.auctionDate,
+      createdBy: createdBy ?? this.createdBy,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -338,14 +665,35 @@ class LeaguesCompanion extends UpdateCompanion<League> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (format.present) {
+      map['format'] = Variable<String>(format.value);
+    }
+    if (rulesUrl.present) {
+      map['rules_url'] = Variable<String>(rulesUrl.value);
+    }
+    if (mustSellAll.present) {
+      map['must_sell_all'] = Variable<bool>(mustSellAll.value);
+    }
+    if (playerOrderMode.present) {
+      map['player_order_mode'] = Variable<String>(playerOrderMode.value);
+    }
+    if (waitingListMode.present) {
+      map['waiting_list_mode'] = Variable<String>(waitingListMode.value);
+    }
     if (logoUrl.present) {
       map['logo_url'] = Variable<String>(logoUrl.value);
+    }
+    if (bannerUrl.present) {
+      map['banner_url'] = Variable<String>(bannerUrl.value);
     }
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
     if (auctionDate.present) {
       map['auction_date'] = Variable<DateTime>(auctionDate.value);
+    }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -358,9 +706,16 @@ class LeaguesCompanion extends UpdateCompanion<League> {
     return (StringBuffer('LeaguesCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('format: $format, ')
+          ..write('rulesUrl: $rulesUrl, ')
+          ..write('mustSellAll: $mustSellAll, ')
+          ..write('playerOrderMode: $playerOrderMode, ')
+          ..write('waitingListMode: $waitingListMode, ')
           ..write('logoUrl: $logoUrl, ')
+          ..write('bannerUrl: $bannerUrl, ')
           ..write('status: $status, ')
           ..write('auctionDate: $auctionDate, ')
+          ..write('createdBy: $createdBy, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1211,18 +1566,32 @@ typedef $$LeaguesTableCreateCompanionBuilder =
     LeaguesCompanion Function({
       required String id,
       required String name,
+      Value<String?> format,
+      Value<String?> rulesUrl,
+      Value<bool> mustSellAll,
+      Value<String> playerOrderMode,
+      Value<String> waitingListMode,
       Value<String?> logoUrl,
+      Value<String?> bannerUrl,
       required String status,
       Value<DateTime?> auctionDate,
+      required String createdBy,
       Value<int> rowid,
     });
 typedef $$LeaguesTableUpdateCompanionBuilder =
     LeaguesCompanion Function({
       Value<String> id,
       Value<String> name,
+      Value<String?> format,
+      Value<String?> rulesUrl,
+      Value<bool> mustSellAll,
+      Value<String> playerOrderMode,
+      Value<String> waitingListMode,
       Value<String?> logoUrl,
+      Value<String?> bannerUrl,
       Value<String> status,
       Value<DateTime?> auctionDate,
+      Value<String> createdBy,
       Value<int> rowid,
     });
 
@@ -1245,8 +1614,38 @@ class $$LeaguesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get format => $composableBuilder(
+    column: $table.format,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rulesUrl => $composableBuilder(
+    column: $table.rulesUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get mustSellAll => $composableBuilder(
+    column: $table.mustSellAll,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get playerOrderMode => $composableBuilder(
+    column: $table.playerOrderMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get waitingListMode => $composableBuilder(
+    column: $table.waitingListMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get logoUrl => $composableBuilder(
     column: $table.logoUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bannerUrl => $composableBuilder(
+    column: $table.bannerUrl,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1257,6 +1656,11 @@ class $$LeaguesTableFilterComposer
 
   ColumnFilters<DateTime> get auctionDate => $composableBuilder(
     column: $table.auctionDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1280,8 +1684,38 @@ class $$LeaguesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get format => $composableBuilder(
+    column: $table.format,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rulesUrl => $composableBuilder(
+    column: $table.rulesUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get mustSellAll => $composableBuilder(
+    column: $table.mustSellAll,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get playerOrderMode => $composableBuilder(
+    column: $table.playerOrderMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get waitingListMode => $composableBuilder(
+    column: $table.waitingListMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get logoUrl => $composableBuilder(
     column: $table.logoUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bannerUrl => $composableBuilder(
+    column: $table.bannerUrl,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1292,6 +1726,11 @@ class $$LeaguesTableOrderingComposer
 
   ColumnOrderings<DateTime> get auctionDate => $composableBuilder(
     column: $table.auctionDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -1311,8 +1750,32 @@ class $$LeaguesTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
+  GeneratedColumn<String> get format =>
+      $composableBuilder(column: $table.format, builder: (column) => column);
+
+  GeneratedColumn<String> get rulesUrl =>
+      $composableBuilder(column: $table.rulesUrl, builder: (column) => column);
+
+  GeneratedColumn<bool> get mustSellAll => $composableBuilder(
+    column: $table.mustSellAll,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get playerOrderMode => $composableBuilder(
+    column: $table.playerOrderMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get waitingListMode => $composableBuilder(
+    column: $table.waitingListMode,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get logoUrl =>
       $composableBuilder(column: $table.logoUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get bannerUrl =>
+      $composableBuilder(column: $table.bannerUrl, builder: (column) => column);
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
@@ -1321,6 +1784,9 @@ class $$LeaguesTableAnnotationComposer
     column: $table.auctionDate,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get createdBy =>
+      $composableBuilder(column: $table.createdBy, builder: (column) => column);
 }
 
 class $$LeaguesTableTableManager
@@ -1353,32 +1819,60 @@ class $$LeaguesTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<String?> format = const Value.absent(),
+                Value<String?> rulesUrl = const Value.absent(),
+                Value<bool> mustSellAll = const Value.absent(),
+                Value<String> playerOrderMode = const Value.absent(),
+                Value<String> waitingListMode = const Value.absent(),
                 Value<String?> logoUrl = const Value.absent(),
+                Value<String?> bannerUrl = const Value.absent(),
                 Value<String> status = const Value.absent(),
                 Value<DateTime?> auctionDate = const Value.absent(),
+                Value<String> createdBy = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LeaguesCompanion(
                 id: id,
                 name: name,
+                format: format,
+                rulesUrl: rulesUrl,
+                mustSellAll: mustSellAll,
+                playerOrderMode: playerOrderMode,
+                waitingListMode: waitingListMode,
                 logoUrl: logoUrl,
+                bannerUrl: bannerUrl,
                 status: status,
                 auctionDate: auctionDate,
+                createdBy: createdBy,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
                 required String name,
+                Value<String?> format = const Value.absent(),
+                Value<String?> rulesUrl = const Value.absent(),
+                Value<bool> mustSellAll = const Value.absent(),
+                Value<String> playerOrderMode = const Value.absent(),
+                Value<String> waitingListMode = const Value.absent(),
                 Value<String?> logoUrl = const Value.absent(),
+                Value<String?> bannerUrl = const Value.absent(),
                 required String status,
                 Value<DateTime?> auctionDate = const Value.absent(),
+                required String createdBy,
                 Value<int> rowid = const Value.absent(),
               }) => LeaguesCompanion.insert(
                 id: id,
                 name: name,
+                format: format,
+                rulesUrl: rulesUrl,
+                mustSellAll: mustSellAll,
+                playerOrderMode: playerOrderMode,
+                waitingListMode: waitingListMode,
                 logoUrl: logoUrl,
+                bannerUrl: bannerUrl,
                 status: status,
                 auctionDate: auctionDate,
+                createdBy: createdBy,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

@@ -30,7 +30,7 @@ Map<String, dynamic> _$AuthResponseToJson(_AuthResponse instance) =>
     };
 
 const _$ProfileStatusEnumMap = {
-  ProfileStatus.GHOST: 'GHOST',
-  ProfileStatus.CLAIMED: 'CLAIMED',
-  ProfileStatus.ACTIVE: 'ACTIVE',
+  ProfileStatus.ghost: 'GHOST',
+  ProfileStatus.claimed: 'CLAIMED',
+  ProfileStatus.active: 'ACTIVE',
 };

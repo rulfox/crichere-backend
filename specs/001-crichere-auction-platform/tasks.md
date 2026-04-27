@@ -121,3 +121,4 @@
 
 - [x] T078 [US1] Implement `GET /api/v1/leagues` endpoint and sync Flutter entities/database.
 - [x] T079 [P] Add Flyway migration V016 to add `auction_date` to `leagues` table.
+- [x] T080 [P] Fix Flutter compilation errors, update enum naming, and resolve deprecated warnings.
