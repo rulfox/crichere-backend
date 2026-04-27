@@ -120,3 +120,4 @@
 ## League Listing & Sync (2026-04-27)
 
 - [x] T078 [US1] Implement `GET /api/v1/leagues` endpoint and sync Flutter entities/database.
+- [x] T079 [P] Add Flyway migration V016 to add `auction_date` to `leagues` table.
