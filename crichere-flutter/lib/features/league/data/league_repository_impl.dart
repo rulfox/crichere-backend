@@ -20,9 +20,16 @@ class LeagueRepositoryImpl implements LeagueRepository {
         return cached.map((e) => domain.League(
           id: e.id,
           name: e.name,
+          format: e.format,
+          rulesUrl: e.rulesUrl,
+          mustSellAll: e.mustSellAll,
+          playerOrderMode: e.playerOrderMode,
+          waitingListMode: e.waitingListMode,
           logoUrl: e.logoUrl,
+          bannerUrl: e.bannerUrl,
           status: e.status,
           auctionDate: e.auctionDate,
+          createdBy: e.createdBy,
         )).toList();
       }
     }
@@ -34,9 +41,16 @@ class LeagueRepositoryImpl implements LeagueRepository {
       batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
         id: e.id,
         name: e.name,
+        format: Value(e.format),
+        rulesUrl: Value(e.rulesUrl),
+        mustSellAll: Value(e.mustSellAll),
+        playerOrderMode: Value(e.playerOrderMode),
+        waitingListMode: Value(e.waitingListMode),
         logoUrl: Value(e.logoUrl),
+        bannerUrl: Value(e.bannerUrl),
         status: e.status,
         auctionDate: Value(e.auctionDate),
+        createdBy: e.createdBy,
       )).toList());
     });
 

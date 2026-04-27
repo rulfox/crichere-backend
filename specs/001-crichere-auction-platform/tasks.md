@@ -116,3 +116,7 @@
 - [x] T075 [P] Correct relative import paths in auth_request.dart.
 - [x] T076 [P] Update PlayingRole selection and fix positional argument error in ClaimProfileScreen.
 - [x] T077 [P] Standardize auth_enums.dart to follow lowerCamelCase naming convention.
+
+## League Listing & Sync (2026-04-27)
+
+- [x] T078 [US1] Implement `GET /api/v1/leagues` endpoint and sync Flutter entities/database.

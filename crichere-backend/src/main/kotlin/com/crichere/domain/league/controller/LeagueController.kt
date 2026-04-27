@@ -37,10 +37,17 @@ class LeagueController(
                 waitingListMode = request.waitingListMode,
                 logoUrl = request.logoUrl,
                 bannerUrl = request.bannerUrl,
+                auctionDate = request.auctionDate,
                 createdBy = UUID.fromString(userDetails.username)
             )
         )
         return ResponseHelper.success(data = toResponse(league), message = "League created successfully", messageKey = "success.league_created")
+    }
+
+    @GetMapping
+    fun getLeagues(): ApiResponse<List<LeagueResponse>> {
+        val leagues = leagueService.getLeagues()
+        return ResponseHelper.success(data = leagues.map { toResponse(it) })
     }
 
     @GetMapping("/{id}")
@@ -79,6 +86,7 @@ class LeagueController(
         logoUrl = league.logoUrl,
         bannerUrl = league.bannerUrl,
         status = league.status,
+        auctionDate = league.auctionDate,
         createdBy = league.createdBy
     )
 }

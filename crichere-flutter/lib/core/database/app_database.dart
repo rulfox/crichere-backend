@@ -8,9 +8,16 @@ part 'app_database.g.dart';
 class Leagues extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
+  TextColumn get format => text().nullable()();
+  TextColumn get rulesUrl => text().nullable()();
+  BoolColumn get mustSellAll => boolean().withDefault(const Constant(false))();
+  TextColumn get playerOrderMode => text().withDefault(const Constant('RANDOM'))();
+  TextColumn get waitingListMode => text().withDefault(const Constant('ADMIN_PICKS'))();
   TextColumn get logoUrl => text().nullable()();
+  TextColumn get bannerUrl => text().nullable()();
   TextColumn get status => text()();
   DateTimeColumn get auctionDate => dateTime().nullable()();
+  TextColumn get createdBy => text()();
   
   @override
   Set<Column> get primaryKey => {id};

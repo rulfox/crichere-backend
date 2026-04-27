@@ -36,6 +36,7 @@
 - `GET /api/v1/players/league/{leagueId}`: Get players in a specific league.
 
 ### Leagues (`/leagues`)
+- `GET /api/v1/leagues`: List all leagues.
 - `POST /api/v1/leagues`: Create a new league.
 - `GET /api/v1/leagues/{id}`: Get league details.
 - `PATCH /api/v1/leagues/{id}/status`: Update league status (DRAFT, LIVE, etc.).

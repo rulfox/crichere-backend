@@ -35,6 +35,10 @@ class LeagueService(
         return leagueRepository.save(league)
     }
 
+    fun getLeagues(): List<League> {
+        return leagueRepository.findAll()
+    }
+
     fun getLeague(id: UUID): League {
         return leagueRepository.findById(id).orElseThrow {
             ResourceNotFoundException("League not found with id: $id")

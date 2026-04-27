@@ -34,6 +34,9 @@ class League(
     @Column(nullable = false)
     var status: LeagueStatus = LeagueStatus.DRAFT,
 
+    @Column(name = "auction_date")
+    var auctionDate: Instant? = null,
+
     @Column(nullable = false)
     val createdBy: UUID,
 
