@@ -50,7 +50,7 @@ class PhoneEntryScreen extends HookConsumerWidget {
                     : () async {
                         isLoading.value = true;
                         try {
-                          await ref.read(authRepositoryProvider).login(phoneController.text);
+                          await ref.read(sendOtpUseCaseProvider).call(phoneController.text);
                           if (!context.mounted) return;
                           context.router.push(OtpRoute(phone: phoneController.text));
                         } catch (e) {

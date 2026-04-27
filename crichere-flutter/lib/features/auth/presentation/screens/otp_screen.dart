@@ -97,7 +97,7 @@ class OtpScreen extends HookConsumerWidget {
                       
                       isLoading.value = true;
                       try {
-                        final response = await ref.read(authRepositoryProvider).verify(phone, otp);
+                        final response = await ref.read(verifyOtpUseCaseProvider).call(phone, otp);
                         if (response.accessToken != null) {
                            ref.read(authStateProvider.notifier).setAuthenticated();
                            // Navigation handled by router based on auth state

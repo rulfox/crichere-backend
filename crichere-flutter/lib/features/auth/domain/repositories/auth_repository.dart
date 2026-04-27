@@ -1,8 +1,11 @@
 import '../../data/models/auth_response.dart';
+import '../entities/auth_enums.dart';
 
 abstract class AuthRepository {
-  Future<AuthResponse> login(String phone);
-  Future<AuthResponse> verify(String phone, String otp);
-  Future<void> claimProfile(String profileId);
+  Future<void> sendOtp(String phone);
+  Future<AuthResponse> verifyOtp(String phone, String code);
+  Future<void> claimProfile(String name, PlayingRole playingRole);
   Future<void> logout();
+  Future<AuthResponse> getCurrentUser();
+  Future<AuthResponse> refreshToken(String token);
 }
