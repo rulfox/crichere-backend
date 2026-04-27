@@ -91,46 +91,92 @@ final class AuthRepositoryProvider
 
 String _$authRepositoryHash() => r'93ebba2c09a00e1ad166869d298dd824d8943600';
 
-@ProviderFor(loginUseCase)
-final loginUseCaseProvider = LoginUseCaseProvider._();
+@ProviderFor(sendOtpUseCase)
+final sendOtpUseCaseProvider = SendOtpUseCaseProvider._();
 
-final class LoginUseCaseProvider
-    extends $FunctionalProvider<LoginUseCase, LoginUseCase, LoginUseCase>
-    with $Provider<LoginUseCase> {
-  LoginUseCaseProvider._()
+final class SendOtpUseCaseProvider
+    extends $FunctionalProvider<SendOtpUseCase, SendOtpUseCase, SendOtpUseCase>
+    with $Provider<SendOtpUseCase> {
+  SendOtpUseCaseProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'loginUseCaseProvider',
+        name: r'sendOtpUseCaseProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$loginUseCaseHash();
+  String debugGetCreateSourceHash() => _$sendOtpUseCaseHash();
 
   @$internal
   @override
-  $ProviderElement<LoginUseCase> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<SendOtpUseCase> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  LoginUseCase create(Ref ref) {
-    return loginUseCase(ref);
+  SendOtpUseCase create(Ref ref) {
+    return sendOtpUseCase(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(LoginUseCase value) {
+  Override overrideWithValue(SendOtpUseCase value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<LoginUseCase>(value),
+      providerOverride: $SyncValueProvider<SendOtpUseCase>(value),
     );
   }
 }
 
-String _$loginUseCaseHash() => r'5a95b111ff086652f0c947b88bcfe26ea7ce95be';
+String _$sendOtpUseCaseHash() => r'd95adad92b96eedb8b19433fb83380a86d7242b7';
+
+@ProviderFor(verifyOtpUseCase)
+final verifyOtpUseCaseProvider = VerifyOtpUseCaseProvider._();
+
+final class VerifyOtpUseCaseProvider
+    extends
+        $FunctionalProvider<
+          VerifyOtpUseCase,
+          VerifyOtpUseCase,
+          VerifyOtpUseCase
+        >
+    with $Provider<VerifyOtpUseCase> {
+  VerifyOtpUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'verifyOtpUseCaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$verifyOtpUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<VerifyOtpUseCase> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  VerifyOtpUseCase create(Ref ref) {
+    return verifyOtpUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(VerifyOtpUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<VerifyOtpUseCase>(value),
+    );
+  }
+}
+
+String _$verifyOtpUseCaseHash() => r'b12452af9519aceb5eb14a67ec29352415e7426a';
 
 @ProviderFor(claimProfileUseCase)
 final claimProfileUseCaseProvider = ClaimProfileUseCaseProvider._();

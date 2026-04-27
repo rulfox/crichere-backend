@@ -1,11 +1,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../domain/entities/auth_enums.dart';
+import '../../domain/entities/auth_enums.dart';
 
 part 'auth_request.freezed.dart';
 part 'auth_request.g.dart';
 
 @freezed
-class LoginRequest with _$LoginRequest {
+abstract class LoginRequest with _$LoginRequest {
   const factory LoginRequest({
     required String phone,
   }) = _LoginRequest;
@@ -14,7 +14,7 @@ class LoginRequest with _$LoginRequest {
 }
 
 @freezed
-class VerifyRequest with _$VerifyRequest {
+abstract class VerifyRequest with _$VerifyRequest {
   const factory VerifyRequest({
     required String phone,
     required String code,
@@ -24,7 +24,7 @@ class VerifyRequest with _$VerifyRequest {
 }
 
 @freezed
-class RefreshRequest with _$RefreshRequest {
+abstract class RefreshRequest with _$RefreshRequest {
   const factory RefreshRequest({
     required String refreshToken,
   }) = _RefreshRequest;
@@ -33,7 +33,7 @@ class RefreshRequest with _$RefreshRequest {
 }
 
 @freezed
-class ClaimRequest with _$ClaimRequest {
+abstract class ClaimRequest with _$ClaimRequest {
   const factory ClaimRequest({
     required String name,
     required PlayingRole playingRole,
@@ -43,7 +43,7 @@ class ClaimRequest with _$ClaimRequest {
 }
 
 @freezed
-class UserBasicInfoRequest with _$UserBasicInfoRequest {
+abstract class UserBasicInfoRequest with _$UserBasicInfoRequest {
   const factory UserBasicInfoRequest({
     String? name,
     String? email,
@@ -53,7 +53,7 @@ class UserBasicInfoRequest with _$UserBasicInfoRequest {
 }
 
 @freezed
-class CricketProfileRequest with _$CricketProfileRequest {
+abstract class CricketProfileRequest with _$CricketProfileRequest {
   const factory CricketProfileRequest({
     PlayingRole? playingRole,
     BattingStyle? battingStyle,

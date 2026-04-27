@@ -8,7 +8,7 @@ abstract class AuctionApi {
   factory AuctionApi(Dio dio, {String baseUrl}) = _AuctionApi;
 
   @GET("/auctions/{id}/state")
-  Future<Map<String, dynamic>> getAuctionState(@Path("id") String auctionId);
+  Future<dynamic> getAuctionState(@Path("id") String auctionId);
 
   @POST('/auctions/{id}/players/next')
   Future<void> putRandomPlayer(@Path('id') String auctionId);

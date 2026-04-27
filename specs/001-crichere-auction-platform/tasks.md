@@ -109,3 +109,10 @@
 \n## Backend Dependency Maintenance (2026-04-26)\n\n- [x] T067 Upgrade backend dependencies (Spring Boot 3.5.9, Kotlin 2.3.21, JJWT 0.13.0, etc.)
 - [x] T068 Externalize production settings to environment variables and add .env.example
 - [x] T069 Implement Optimistic Locking for Auction and Franchise state (V015)\n- [x] T070 Add JWT Token Blacklisting for secure logout\n- [x] T071 Implement Standard Response Filtering and global exception refinements\n- [x] T072 Configure Micrometer metrics and Prometheus endpoint\n- [x] T073 Add Dockerization and GitHub Actions CI workflow
+
+## Frontend Fixes and Refinements (2026-04-27)
+
+- [x] T074 [P] Fix Retrofit generation error in AuctionApi by changing return type to Future<dynamic>.
+- [x] T075 [P] Correct relative import paths in auth_request.dart.
+- [x] T076 [P] Update PlayingRole selection and fix positional argument error in ClaimProfileScreen.
+- [x] T077 [P] Standardize auth_enums.dart to follow lowerCamelCase naming convention.

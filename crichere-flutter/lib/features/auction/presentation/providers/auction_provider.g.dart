@@ -64,7 +64,7 @@ final class AuctionEventsProvider
   }
 }
 
-String _$auctionEventsHash() => r'aebebb693f2c9f2f6beebb2c31f7d0ebef9d76ff';
+String _$auctionEventsHash() => r'839d76971907b08e731d1d46ec541a62e4005bd1';
 
 final class AuctionEventsFamily extends $Family
     with $FunctionalFamilyOverride<Stream<AuctionEvent>, String> {
