@@ -3,11 +3,9 @@
 **Branch**: `001-crichere-auction-platform` | **Date**: 2026-04-24 | **Spec**: [specs/001-crichere-auction-platform/spec.md](spec.md)
 **Input**: Feature specification from `/specs/001-crichere-auction-platform/spec.md`
 
-## Status (Updated 2026-04-26)
-Optimistic locking, token blacklisting, standard response filtering, metrics, and Dockerization applied. 
-Production settings externalized to environment variables and .env.example added. 
-Backend dependency upgrades applied (Spring Boot 3.5.9, Kotlin 2.3.21, and various libraries). Previous: 
-Frontend architectural refinements, bug fixes, Flutter Web support (Wasm SQLite), and iOS (CocoaPods) support applied. SSE state sync improved and build issues resolved.
+## Status (Updated 2026-04-27)
+Aligned Auth flow with backend API: separate OTP send/verify endpoints, updated AuthRepository, and expanded request models. Expanded API contract documentation in api.md.
+Previous: Optimistic locking, token blacklisting, standard response filtering, metrics, and Dockerization applied (2026-04-26). Frontend architectural refinements and platform support (Web/iOS) applied (2026-04-25).
 
 ## Summary
 Build "Crichere", an India-first cricket league auction SaaS platform. The implementation involves a Spring Boot (Kotlin) backend and a Flutter frontend. The platform features real-time verbal auction recording by an auctioneer, SSE-based live updates, strict phone-OTP authentication, and comprehensive league management including fees and waiting lists.

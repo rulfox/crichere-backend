@@ -5,6 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'dart:async';
 import '../providers/auth_repository_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/router/app_router.gr.dart';
+import '../../domain/entities/auth_enums.dart';
 
 @RoutePage()
 class OtpScreen extends HookConsumerWidget {
@@ -99,8 +101,20 @@ class OtpScreen extends HookConsumerWidget {
                       try {
                         final response = await ref.read(verifyOtpUseCaseProvider).call(phone, otp);
                         if (response.accessToken != null) {
-                           ref.read(authStateProvider.notifier).setAuthenticated();
-                           // Navigation handled by router based on auth state
+                          ref.read(authStateProvider.notifier).setAuthenticated();
+                          
+                          if (!context.mounted) return;
+                          
+                          if (response.profileStatus == ProfileStatus.GHOST) {
+                            context.router.replaceAll([
+                              ClaimProfileRoute(
+                                profileId: response.userId ?? '',
+                                suggestedName: '',
+                              )
+                            ]);
+                          } else {
+                            context.router.replaceAll([const HomeRoute()]);
+                          }
                         }
                       } catch (e) {
                         if (!context.mounted) return;

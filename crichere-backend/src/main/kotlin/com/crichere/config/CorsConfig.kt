@@ -17,7 +17,7 @@ class CorsConfig(
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
         config.allowCredentials = true
-        allowedOrigins.split(",").map { it.trim() }.forEach { config.addAllowedOrigin(it) }
+        allowedOrigins.split(",").map { it.trim() }.forEach { config.addAllowedOriginPattern(it) }
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
         source.registerCorsConfiguration("/**", config)

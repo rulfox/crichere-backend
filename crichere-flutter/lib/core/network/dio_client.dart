@@ -24,6 +24,15 @@ class DioClient {
         }
         return handler.next(options);
       },
+      onResponse: (response, handler) {
+        if (response.data is Map<String, dynamic>) {
+          final map = response.data as Map<String, dynamic>;
+          if (map.containsKey('data')) {
+            response.data = map['data'];
+          }
+        }
+        return handler.next(response);
+      },
       onError: (DioException e, handler) async {
         if (e.response?.statusCode == 401) {
           final refreshToken = await _storage.read(key: 'refreshToken');

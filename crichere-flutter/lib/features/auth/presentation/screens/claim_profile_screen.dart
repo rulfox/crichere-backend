@@ -19,7 +19,7 @@ class ClaimProfileScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nameController = useTextEditingController(text: suggestedName);
-    final selectedRole = useState<PlayingRole>(PlayingRole.batter);
+    final selectedRole = useState<PlayingRole>(PlayingRole.BATTER);
     final isLoading = useState(false);
 
     return Scaffold(

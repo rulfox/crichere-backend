@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../../core/router/app_router.gr.dart';
+import '../../domain/entities/auth_enums.dart';
 
 @RoutePage()
 class ProfileSetupScreen extends HookConsumerWidget {
@@ -11,14 +12,10 @@ class ProfileSetupScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nameController = useTextEditingController();
-    final role = useState<String?>(null);
-    final battingStyle = useState<String?>(null);
-    final bowlingStyle = useState<String?>(null);
+    final role = useState<PlayingRole?>(null);
+    final battingStyle = useState<BattingStyle?>(null);
+    final bowlingStyle = useState<BowlingStyle?>(null);
     final isLoading = useState(false);
-
-    final roles = ['BATSMAN', 'BOWLER', 'ALL_ROUNDER', 'WICKET_KEEPER'];
-    final battingStyles = ['RIGHT_HAND', 'LEFT_HAND'];
-    final bowlingStyles = ['RIGHT_ARM_FAST', 'RIGHT_ARM_SPIN', 'LEFT_ARM_FAST', 'LEFT_ARM_SPIN', 'NONE'];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Complete Your Profile')),
@@ -40,33 +37,33 @@ class ProfileSetupScreen extends HookConsumerWidget {
               ),
             ),
             const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              initialValue: role.value,
+            DropdownButtonFormField<PlayingRole>(
+              value: role.value,
               decoration: const InputDecoration(
                 labelText: 'Playing Role',
                 border: OutlineInputBorder(),
               ),
-              items: roles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+              items: PlayingRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.name))).toList(),
               onChanged: (v) => role.value = v,
             ),
             const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              initialValue: battingStyle.value,
+            DropdownButtonFormField<BattingStyle>(
+              value: battingStyle.value,
               decoration: const InputDecoration(
                 labelText: 'Batting Style',
                 border: OutlineInputBorder(),
               ),
-              items: battingStyles.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              items: BattingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name))).toList(),
               onChanged: (v) => battingStyle.value = v,
             ),
             const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              initialValue: bowlingStyle.value,
+            DropdownButtonFormField<BowlingStyle>(
+              value: bowlingStyle.value,
               decoration: const InputDecoration(
                 labelText: 'Bowling Style',
                 border: OutlineInputBorder(),
               ),
-              items: bowlingStyles.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              items: BowlingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name))).toList(),
               onChanged: (v) => bowlingStyle.value = v,
             ),
             const SizedBox(height: 32),

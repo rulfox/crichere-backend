@@ -40,10 +40,10 @@ Map<String, dynamic> _$ClaimRequestToJson(_ClaimRequest instance) =>
     };
 
 const _$PlayingRoleEnumMap = {
-  PlayingRole.batter: 'batter',
-  PlayingRole.bowler: 'bowler',
-  PlayingRole.allRounder: 'allRounder',
-  PlayingRole.wicketKeeper: 'wicketKeeper',
+  PlayingRole.BATTER: 'BATTER',
+  PlayingRole.BOWLER: 'BOWLER',
+  PlayingRole.ALL_ROUNDER: 'ALL_ROUNDER',
+  PlayingRole.WICKET_KEEPER: 'WICKET_KEEPER',
 };
 
 _UserBasicInfoRequest _$UserBasicInfoRequestFromJson(
@@ -97,28 +97,28 @@ Map<String, dynamic> _$CricketProfileRequestToJson(
 };
 
 const _$BattingStyleEnumMap = {
-  BattingStyle.rightHand: 'rightHand',
-  BattingStyle.leftHand: 'leftHand',
+  BattingStyle.RIGHT_HAND: 'RIGHT_HAND',
+  BattingStyle.LEFT_HAND: 'LEFT_HAND',
 };
 
 const _$BowlingStyleEnumMap = {
-  BowlingStyle.rightArm: 'rightArm',
-  BowlingStyle.leftArm: 'leftArm',
+  BowlingStyle.RIGHT_ARM: 'RIGHT_ARM',
+  BowlingStyle.LEFT_ARM: 'LEFT_ARM',
 };
 
 const _$BowlingTypeEnumMap = {
-  BowlingType.fast: 'fast',
-  BowlingType.mediumFast: 'mediumFast',
-  BowlingType.medium: 'medium',
-  BowlingType.offSpin: 'offSpin',
-  BowlingType.legSpin: 'legSpin',
-  BowlingType.slowLeftArm: 'slowLeftArm',
-  BowlingType.slowLeftArmOrthodox: 'slowLeftArmOrthodox',
+  BowlingType.FAST: 'FAST',
+  BowlingType.MEDIUM_FAST: 'MEDIUM_FAST',
+  BowlingType.MEDIUM: 'MEDIUM',
+  BowlingType.OFF_SPIN: 'OFF_SPIN',
+  BowlingType.LEG_SPIN: 'LEG_SPIN',
+  BowlingType.SLOW_LEFT_ARM: 'SLOW_LEFT_ARM',
+  BowlingType.SLOW_LEFT_ARM_ORTHODOX: 'SLOW_LEFT_ARM_ORTHODOX',
 };
 
 const _$ExperienceLevelEnumMap = {
-  ExperienceLevel.local: 'local',
-  ExperienceLevel.district: 'district',
-  ExperienceLevel.state: 'state',
-  ExperienceLevel.national: 'national',
+  ExperienceLevel.LOCAL: 'LOCAL',
+  ExperienceLevel.DISTRICT: 'DISTRICT',
+  ExperienceLevel.STATE: 'STATE',
+  ExperienceLevel.NATIONAL: 'NATIONAL',
 };

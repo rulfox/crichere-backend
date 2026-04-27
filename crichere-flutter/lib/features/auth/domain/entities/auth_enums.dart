@@ -1,27 +1,27 @@
 enum ProfileStatus {
-  ghost, claimed, active
+  GHOST, CLAIMED, ACTIVE
 }
 
 enum PlayingRole {
-  batter, bowler, allRounder, wicketKeeper
+  BATTER, BOWLER, ALL_ROUNDER, WICKET_KEEPER
 }
 
 enum BattingStyle {
-  rightHand, leftHand
+  RIGHT_HAND, LEFT_HAND
 }
 
 enum BowlingStyle {
-  rightArm, leftArm
+  RIGHT_ARM, LEFT_ARM
 }
 
 enum BowlingType {
-  fast, mediumFast, medium, offSpin, legSpin, slowLeftArm, slowLeftArmOrthodox
+  FAST, MEDIUM_FAST, MEDIUM, OFF_SPIN, LEG_SPIN, SLOW_LEFT_ARM, SLOW_LEFT_ARM_ORTHODOX
 }
 
 enum ExperienceLevel {
-  local, district, state, national
+  LOCAL, DISTRICT, STATE, NATIONAL
 }
 
 enum LeagueRole {
-  leagueAdmin, auctioneer
+  LEAGUE_ADMIN, AUCTIONEER
 }

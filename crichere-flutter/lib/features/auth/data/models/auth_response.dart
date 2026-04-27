@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../domain/entities/auth_enums.dart';
 
 part 'auth_response.freezed.dart';
 part 'auth_response.g.dart';
@@ -10,7 +11,9 @@ abstract class AuthResponse with _$AuthResponse {
   const factory AuthResponse({
     String? accessToken,
     String? refreshToken,
-    required bool isNewUser,
+    String? userId,
+    ProfileStatus? profileStatus,
+    @Default(false) bool isNewUser,
     String? profileId,
   }) = _AuthResponse;
 
