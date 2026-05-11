@@ -16,6 +16,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -30,8 +31,16 @@ class FeeServiceTest {
     @MockK lateinit var leaguePlayerRepository: LeaguePlayerRepository
     @MockK lateinit var notificationService: NotificationService
 
-    @InjectMockKs
     lateinit var feeService: FeeService
+
+    @BeforeEach
+    fun setUp() {
+        MockKAnnotations.init(this)
+        feeService = FeeService(
+            feeObligationRepository, feePaymentRepository,
+            leaguePlayerRepository, notificationService
+        )
+    }
 
     private val leagueId = UUID.randomUUID()
     private val userId = UUID.randomUUID()

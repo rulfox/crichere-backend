@@ -103,6 +103,10 @@ class LeagueService(
         )
     }
 
+    /**
+     * Updates category-based base prices for a league. 
+     * Only allowed in DRAFT or OPEN status.
+     */
     @Transactional
     fun updateCategoryPrices(leagueId: UUID, prices: List<com.crichere.domain.league.dto.CategoryPriceRequest>): List<com.crichere.domain.league.entity.LeagueCategoryBasePrice> {
         val league = getLeague(leagueId)
@@ -123,10 +127,17 @@ class LeagueService(
         return leagueCategoryBasePriceRepository.saveAll(newPrices)
     }
 
+    /**
+     * Retrieves all category-based base prices for a league.
+     */
     fun getCategoryPrices(leagueId: UUID): List<com.crichere.domain.league.entity.LeagueCategoryBasePrice> {
         return leagueCategoryBasePriceRepository.findByLeagueId(leagueId)
     }
 
+    /**
+     * Updates tag-based base prices for a league.
+     * Only allowed in DRAFT or OPEN status.
+     */
     @Transactional
     fun updateTagPrices(leagueId: UUID, prices: List<com.crichere.domain.league.dto.TagPriceRequest>): List<com.crichere.domain.league.entity.LeagueTagBasePrice> {
         val league = getLeague(leagueId)
@@ -147,6 +158,9 @@ class LeagueService(
         return leagueTagBasePriceRepository.saveAll(newPrices)
     }
 
+    /**
+     * Retrieves all tag-based base prices for a league.
+     */
     fun getTagPrices(leagueId: UUID): List<com.crichere.domain.league.entity.LeagueTagBasePrice> {
         return leagueTagBasePriceRepository.findByLeagueId(leagueId)
     }

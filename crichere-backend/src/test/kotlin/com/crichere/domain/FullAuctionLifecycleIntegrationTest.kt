@@ -95,8 +95,8 @@ class FullAuctionLifecycleIntegrationTest {
     @Order(1)
     @DisplayName("1. Setup Users and Tokens")
     fun setupUsers() {
-        val admin = userRepository.save(User(phone = "9000000001", profileStatus = ProfileStatus.ACTIVE, name = "Admin"))
-        val owner = userRepository.save(User(phone = "9000000002", profileStatus = ProfileStatus.ACTIVE, name = "Owner"))
+        val admin = userRepository.save(User(phone = "8000000001", profileStatus = ProfileStatus.ACTIVE, name = "Admin"))
+        val owner = userRepository.save(User(phone = "8000000002", profileStatus = ProfileStatus.ACTIVE, name = "Owner"))
         
         adminId = admin.id
         ownerId = owner.id
@@ -197,17 +197,14 @@ class FullAuctionLifecycleIntegrationTest {
         val roundStartRes = restTemplate.exchange("/auctions/$auctionId/rounds/$roundId/start", HttpMethod.PATCH, HttpEntity(null, getHeaders(adminToken)), Map::class.java)
         assertEquals(HttpStatus.OK, roundStartRes.statusCode)
 
-        val playerReq = listOf(PlayerImportRequest(phone = "8000000000", name = "Test Player", category = "BATTER"))
+        val playerReq = listOf(PlayerImportRequest(phone = "8999999999", name = "Test Player", category = "BATTER"))
         restTemplate.exchange("/leagues/$leagueId/players/bulk-import", HttpMethod.POST, HttpEntity(playerReq, getHeaders(adminToken)), Map::class.java)
         
-        val player = userRepository.findByPhone("8000000000")!!
-        // We need the leaguePlayerId. In integration test, we can query it.
-        // Actually, just fetching the pool might be easier.
-        val poolRes = restTemplate.exchange("/auctions/$auctionId/rounds/$roundId/player-pool", HttpMethod.GET, HttpEntity(null, getHeaders(adminToken)), List::class.java)
-        val pool = poolRes.body as List<Map<String, Any>>
-        val leaguePlayerId = pool.first()["leaguePlayerId"] as String
+        // Use repo to find player since we need leaguePlayerId
+        val leaguePlayerRepo = org.springframework.test.context.TestContextManager(this.javaClass).testContext.applicationContext.getBean(com.crichere.domain.player.repository.LeaguePlayerRepository::class.java)
+        val player = leaguePlayerRepo.findAll().find { it.leagueId == leagueId }!!
         
-        val putReq = mapOf("leaguePlayerId" to leaguePlayerId)
+        val putReq = mapOf("leaguePlayerId" to player.id)
         val putRes = restTemplate.exchange("/auctions/$auctionId/player/put", HttpMethod.POST, HttpEntity(putReq, getHeaders(adminToken)), Map::class.java)
         assertEquals(HttpStatus.OK, putRes.statusCode)
 

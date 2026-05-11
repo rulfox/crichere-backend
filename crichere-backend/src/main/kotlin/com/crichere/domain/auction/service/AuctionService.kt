@@ -324,6 +324,10 @@ class AuctionService(
         return bid
     }
 
+    /**
+     * Starts the bid countdown timer for the current player.
+     * Broadcasts TIMER_STARTED event to all clients.
+     */
     @Transactional
     fun startTimer(auctionId: UUID, durationOverride: Int?, actorId: UUID): TimerStateResponse {
         val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
@@ -347,6 +351,9 @@ class AuctionService(
         return getTimerState(auction)
     }
 
+    /**
+     * Stops the running bid timer.
+     */
     @Transactional
     fun stopTimer(auctionId: UUID, actorId: UUID) {
         val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
@@ -357,11 +364,18 @@ class AuctionService(
         logAndBroadcast(auctionId, AuctionAction.TIMER_STOPPED, emptyMap(), actorId)
     }
 
+    /**
+     * Calculates the current timer state including remaining seconds.
+     */
     fun getTimerState(auctionId: UUID): TimerStateResponse {
         val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         return getTimerState(auction)
     }
 
+    /**
+     * Resolves the minimum bid increment for a player based on their tag or category.
+     * Falls back to round-level slab config if no specific increment is found.
+     */
     private fun resolveBidIncrement(roundId: UUID, player: com.crichere.domain.player.entity.LeaguePlayer, currentBid: Int = 0): Int {
         val categoryIncrements = categoryIncrementRepository.findByRoundId(roundId)
         
@@ -383,6 +397,9 @@ class AuctionService(
         return slab?.incrementBy ?: 500
     }
 
+    /**
+     * Updates category/tag specific bid increments for a round. Only allowed for PENDING rounds.
+     */
     @Transactional
     fun updateCategoryIncrements(roundId: UUID, increments: List<com.crichere.domain.auction.dto.CategoryIncrementRequest>): List<com.crichere.domain.auction.entity.AuctionRoundCategoryIncrement> {
         val round = roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
@@ -402,6 +419,9 @@ class AuctionService(
         return categoryIncrementRepository.saveAll(newIncrements)
     }
 
+    /**
+     * Retrieves all category-specific bid increments for a round.
+     */
     fun getCategoryIncrements(roundId: UUID): List<com.crichere.domain.auction.entity.AuctionRoundCategoryIncrement> {
         return categoryIncrementRepository.findByRoundId(roundId)
     }

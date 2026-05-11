@@ -10,6 +10,7 @@ import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -22,9 +23,18 @@ class OtpServiceTest {
 
     @MockK lateinit var otpRepository: OtpRepository
     @MockK lateinit var smsProvider: SmsProvider
+    @MockK lateinit var meterRegistry: io.micrometer.core.instrument.MeterRegistry
 
-    @InjectMockKs
     lateinit var otpService: OtpService
+
+    @BeforeEach
+    fun setUp() {
+        MockKAnnotations.init(this)
+        val counter = mockk<io.micrometer.core.instrument.Counter>(relaxed = true)
+        every { meterRegistry.counter(any()) } returns counter
+        
+        otpService = OtpService(otpRepository, smsProvider, meterRegistry)
+    }
 
     private val phone = "9876543210"
 

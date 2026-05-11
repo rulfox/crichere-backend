@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import java.util.*
 
+/**
+ * Controller for public, no-auth auction views.
+ * Provides a projector-friendly HTML page and mirrored LIVE-only state/event endpoints.
+ */
 @RestController
 @RequestMapping("/public/auctions")
 class DisplayController(
@@ -22,6 +26,10 @@ class DisplayController(
     private val objectMapper: ObjectMapper
 ) {
 
+    /**
+     * Serves a self-contained HTML page for big-screen projector displays.
+     * Connects to SSE events for real-time updates.
+     */
     @GetMapping("/{id}/display", produces = [MediaType.TEXT_HTML_VALUE])
     fun getDisplayPage(@PathVariable id: UUID): ResponseEntity<String> {
         val auction = auctionService.getAuction(id)
@@ -31,6 +39,9 @@ class DisplayController(
             .body(html)
     }
 
+    /**
+     * Public access to auction state. Only allowed if the auction is LIVE.
+     */
     @GetMapping("/{id}/state")
     fun getPublicAuctionState(@PathVariable id: UUID): ApiResponse<AuctionStateSnapshot> {
         val snapshot = auctionService.getStateSnapshot(id)
@@ -40,6 +51,9 @@ class DisplayController(
         return ResponseHelper.success(data = snapshot)
     }
 
+    /**
+     * Public access to SSE event stream. Only allowed if the auction is LIVE.
+     */
     @GetMapping("/{id}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun streamPublicEvents(
         @PathVariable id: UUID,
@@ -71,6 +85,9 @@ class DisplayController(
         return emitter
     }
 
+    /**
+     * Token-based access to the auction viewer. Used for shareable public links.
+     */
     @GetMapping("/view/{token}")
     fun getPublicAuctionView(@PathVariable token: String): ApiResponse<AuctionStateSnapshot> {
         val auction = auctionService.getAuctionByToken(token)
@@ -80,6 +97,9 @@ class DisplayController(
         return ResponseHelper.success(data = auctionService.getStateSnapshot(auction.id))
     }
 
+    /**
+     * Token-based access to SSE events for public viewer clients.
+     */
     @GetMapping("/view/{token}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun streamPublicViewEvents(
         @PathVariable token: String,
@@ -92,6 +112,9 @@ class DisplayController(
         return streamPublicEvents(auction.id, lastEventId)
     }
 
+    /**
+     * Generates a self-contained HTML display page with embedded CSS and JavaScript.
+     */
     private fun buildDisplayPageHtml(auctionId: UUID, leagueId: UUID): String {
         return """
             <!DOCTYPE html>

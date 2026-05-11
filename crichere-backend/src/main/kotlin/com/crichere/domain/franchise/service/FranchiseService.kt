@@ -49,6 +49,10 @@ class FranchiseService(
         return franchiseInviteRepository.findByToken(token) ?: throw ResourceNotFoundException("Invite not found")
     }
 
+    /**
+     * Validates a franchise invite token.
+     * Checks for expiration and usage limits.
+     */
     fun validateInvite(token: UUID): com.crichere.domain.franchise.dto.InviteValidationResponse {
         val invite = getInviteByToken(token)
         if (invite.expiresAt.isBefore(Instant.now())) {
@@ -72,6 +76,10 @@ class FranchiseService(
         )
     }
 
+    /**
+     * Processes an invite acceptance.
+     * Creates a franchise membership for the user and updates the invite status.
+     */
     @Transactional
     fun acceptInvite(token: UUID, userId: UUID): Franchise {
         val invite = getInviteByToken(token)
@@ -101,6 +109,9 @@ class FranchiseService(
         return franchise
     }
 
+    /**
+     * Generates the public validation URL for an invite.
+     */
     fun getInviteUrl(token: UUID): String {
         return "$baseUrl/api/v1/public/invites/validate?token=$token"
     }

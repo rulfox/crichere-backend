@@ -10,15 +10,13 @@ import com.crichere.domain.league.enums.LeagueStatus
 import com.crichere.domain.league.repository.*
 import com.crichere.domain.player.entity.LeaguePlayer
 import com.crichere.domain.player.repository.LeaguePlayerRepository
-import io.mockk.every
-import io.mockk.just
-import io.mockk.runs
+import io.mockk.*
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -35,9 +33,20 @@ class LeagueServiceTest {
     @MockK lateinit var leagueCategoryBasePriceRepository: LeagueCategoryBasePriceRepository
     @MockK lateinit var leagueTagBasePriceRepository: LeagueTagBasePriceRepository
     @MockK lateinit var leaguePlayerRepository: LeaguePlayerRepository
+    @MockK lateinit var userLeagueMembershipRepository: com.crichere.domain.auth.repository.UserLeagueMembershipRepository
 
-    @InjectMockKs
     lateinit var leagueService: LeagueService
+
+    @BeforeEach
+    fun setUp() {
+        MockKAnnotations.init(this)
+        leagueService = LeagueService(
+            leagueRepository, auctionRepository, franchiseRepository,
+            franchisePurseStateRepository, leagueCategoryBasePriceRepository,
+            leagueTagBasePriceRepository, leaguePlayerRepository,
+            userLeagueMembershipRepository
+        )
+    }
 
     @Test
     @DisplayName("resolveBasePrice - priority: override > tag > category")

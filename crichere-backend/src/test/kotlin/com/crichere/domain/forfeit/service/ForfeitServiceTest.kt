@@ -25,6 +25,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -42,8 +43,17 @@ class ForfeitServiceTest {
     @MockK lateinit var waitingListService: WaitingListService
     @MockK lateinit var notificationService: NotificationService
 
-    @InjectMockKs
     lateinit var forfeitService: ForfeitService
+
+    @BeforeEach
+    fun setUp() {
+        MockKAnnotations.init(this)
+        forfeitService = ForfeitService(
+            forfeitRequestRepository, feeService, feeObligationRepository,
+            leaguePlayerRepository, leagueRepository, waitingListService,
+            notificationService
+        )
+    }
 
     private val leagueId = UUID.randomUUID()
     private val userId = UUID.randomUUID()
