@@ -53,8 +53,9 @@ class AuctionServiceTest {
     @MockK lateinit var objectMapper: ObjectMapper
     @MockK lateinit var notificationService: NotificationService
     @MockK lateinit var leagueService: LeagueService
+    @MockK lateinit var categoryIncrementRepository: AuctionRoundCategoryIncrementRepository
+    @MockK lateinit var meterRegistry: io.micrometer.core.instrument.MeterRegistry
 
-    @InjectMockKs
     lateinit var auctionService: AuctionService
 
     private val auctionId = UUID.randomUUID()
@@ -65,11 +66,27 @@ class AuctionServiceTest {
 
     @BeforeEach
     fun setUp() {
+        MockKAnnotations.init(this)
+
+        // Mock MeterRegistry counters
+        val counter = mockk<io.micrometer.core.instrument.Counter>(relaxed = true)
+        every { meterRegistry.counter(any()) } returns counter
+
         // Default mocks for logAndBroadcast which is called in almost every method
         every { auctionAuditLogRepository.findMaxSequenceNumberByAuctionId(any()) } returns 0L
         every { auctionAuditLogRepository.save(any()) } answers { firstArg() }
         every { redisTemplate.convertAndSend(any(), any()) } returns 1L
         every { objectMapper.writeValueAsString(any()) } returns "{}"
+        every { categoryIncrementRepository.findByRoundId(any()) } returns emptyList()
+        every { slabRepository.findByRoundIdOrderByFromAmountAsc(any()) } returns emptyList()
+
+        auctionService = AuctionService(
+            auctionRepository, roundConfigRepository, slabRepository, categoryIncrementRepository,
+            bidRepository, playerStateRepository, purseRepository, franchiseRepository,
+            franchisePlayerRepository, auctionAuditLogRepository, leaguePlayerRepository,
+            userRepository, leagueRepository, redisTemplate, objectMapper,
+            notificationService, leagueService, meterRegistry
+        )
     }
 
     @Test

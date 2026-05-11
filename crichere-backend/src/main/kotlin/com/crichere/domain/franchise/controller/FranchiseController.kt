@@ -68,8 +68,29 @@ class FranchiseController(
             email = invite.email,
             token = invite.token,
             status = invite.status,
-            expiresAt = invite.expiresAt
+            expiresAt = invite.expiresAt,
+            inviteUrl = franchiseService.getInviteUrl(invite.token)
         )
-        return ResponseHelper.success(data = response, message = "Invite sent successfully", messageKey = "success.invite_sent")
+        return ResponseHelper.success(data = response, message = "Invite created successfully", messageKey = "success.invite_created")
     }
+
+    @PostMapping("/accept")
+    fun acceptInvite(
+        @Valid @RequestBody request: InviteAcceptRequest,
+        @org.springframework.security.core.annotation.AuthenticationPrincipal userDetails: org.springframework.security.core.userdetails.UserDetails
+    ): ApiResponse<FranchiseResponse> {
+        val userId = UUID.fromString(userDetails.username)
+        val franchise = franchiseService.acceptInvite(request.token, userId)
+        return ResponseHelper.success(data = mapToResponse(franchise), message = "Invite accepted successfully", messageKey = "success.invite_accepted")
+    }
+
+    private fun mapToResponse(f: Franchise) = FranchiseResponse(
+        id = f.id,
+        leagueId = f.leagueId,
+        name = f.name,
+        logoUrl = f.logoUrl,
+        ownerId = f.ownerId,
+        totalPurse = f.totalPurse,
+        remainingPurse = f.remainingPurse
+    )
 }

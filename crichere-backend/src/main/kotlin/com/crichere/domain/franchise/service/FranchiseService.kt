@@ -14,7 +14,12 @@ import java.util.UUID
 @Service
 class FranchiseService(
     private val franchiseRepository: FranchiseRepository,
-    private val franchiseInviteRepository: FranchiseInviteRepository
+    private val franchiseInviteRepository: FranchiseInviteRepository,
+    private val userRepository: com.crichere.domain.auth.repository.UserRepository,
+    private val leagueRepository: com.crichere.domain.league.repository.LeagueRepository,
+    private val membershipRepository: com.crichere.domain.auth.repository.UserFranchiseMembershipRepository,
+    @org.springframework.beans.factory.annotation.Value("\${app.base-url:http://localhost:8080}")
+    private val baseUrl: String
 ) {
 
     @Transactional
@@ -42,5 +47,61 @@ class FranchiseService(
 
     fun getInviteByToken(token: UUID): FranchiseInvite {
         return franchiseInviteRepository.findByToken(token) ?: throw ResourceNotFoundException("Invite not found")
+    }
+
+    fun validateInvite(token: UUID): com.crichere.domain.franchise.dto.InviteValidationResponse {
+        val invite = getInviteByToken(token)
+        if (invite.expiresAt.isBefore(Instant.now())) {
+            throw com.crichere.common.exception.BusinessLogicException("Invite expired", "error.invite_expired")
+        }
+        if (invite.useCount >= invite.maxUses) {
+            throw com.crichere.common.exception.BusinessLogicException("Invite already used", "error.invite_already_used")
+        }
+
+        val franchise = getFranchise(invite.franchiseId)
+        val league = leagueRepository.findById(franchise.leagueId).get()
+        val owner = userRepository.findById(franchise.ownerId).get()
+
+        return com.crichere.domain.franchise.dto.InviteValidationResponse(
+            valid = true,
+            token = token,
+            franchiseName = franchise.name,
+            leagueName = league.name,
+            invitedBy = owner.name ?: "Admin",
+            expiresAt = invite.expiresAt
+        )
+    }
+
+    @Transactional
+    fun acceptInvite(token: UUID, userId: UUID): Franchise {
+        val invite = getInviteByToken(token)
+        if (invite.expiresAt.isBefore(Instant.now())) {
+            throw com.crichere.common.exception.BusinessLogicException("Invite expired", "error.invite_expired")
+        }
+        if (invite.useCount >= invite.maxUses) {
+            throw com.crichere.common.exception.BusinessLogicException("Invite already used", "error.invite_already_used")
+        }
+
+        val franchise = getFranchise(invite.franchiseId)
+        
+        // Add membership
+        membershipRepository.save(com.crichere.domain.auth.entity.UserFranchiseMembership(
+            userId = userId,
+            franchiseId = franchise.id
+        ))
+
+        invite.useCount++
+        invite.acceptedByUserId = userId
+        invite.acceptedAt = Instant.now()
+        if (invite.useCount >= invite.maxUses) {
+            invite.status = com.crichere.domain.franchise.enums.FranchiseInviteStatus.ACCEPTED
+        }
+        franchiseInviteRepository.save(invite)
+
+        return franchise
+    }
+
+    fun getInviteUrl(token: UUID): String {
+        return "$baseUrl/api/v1/public/invites/validate?token=$token"
     }
 }

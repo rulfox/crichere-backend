@@ -75,6 +75,38 @@ class LeagueController(
         return ResponseHelper.success(data = result, message = "Bulk import completed", messageKey = "success.bulk_import_completed")
     }
 
+    @PostMapping("/{id}/category-prices")
+    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    fun updateCategoryPrices(
+        @PathVariable id: UUID,
+        @RequestBody request: List<CategoryPriceRequest>
+    ): ApiResponse<List<CategoryPriceResponse>> {
+        val prices = leagueService.updateCategoryPrices(id, request)
+        return ResponseHelper.success(data = prices.map { CategoryPriceResponse(it.id, it.category, it.price) })
+    }
+
+    @GetMapping("/{id}/category-prices")
+    fun getCategoryPrices(@PathVariable id: UUID): ApiResponse<List<CategoryPriceResponse>> {
+        val prices = leagueService.getCategoryPrices(id)
+        return ResponseHelper.success(data = prices.map { CategoryPriceResponse(it.id, it.category, it.price) })
+    }
+
+    @PostMapping("/{id}/tag-prices")
+    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    fun updateTagPrices(
+        @PathVariable id: UUID,
+        @RequestBody request: List<TagPriceRequest>
+    ): ApiResponse<List<TagPriceResponse>> {
+        val prices = leagueService.updateTagPrices(id, request)
+        return ResponseHelper.success(data = prices.map { TagPriceResponse(it.id, it.tag, it.price) })
+    }
+
+    @GetMapping("/{id}/tag-prices")
+    fun getTagPrices(@PathVariable id: UUID): ApiResponse<List<TagPriceResponse>> {
+        val prices = leagueService.getTagPrices(id)
+        return ResponseHelper.success(data = prices.map { TagPriceResponse(it.id, it.tag, it.price) })
+    }
+
     private fun toResponse(league: League) = LeagueResponse(
         id = league.id,
         name = league.name,

@@ -41,5 +41,19 @@ data class FranchiseInviteResponse(
     val email: String,
     val token: UUID,
     val status: FranchiseInviteStatus,
+    val expiresAt: java.time.Instant,
+    val inviteUrl: String? = null
+)
+
+data class InviteValidationResponse(
+    val valid: Boolean,
+    val token: UUID,
+    val franchiseName: String,
+    val leagueName: String,
+    val invitedBy: String,
     val expiresAt: java.time.Instant
+)
+
+data class InviteAcceptRequest(
+    val token: UUID
 )

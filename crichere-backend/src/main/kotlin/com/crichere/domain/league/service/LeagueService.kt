@@ -2,7 +2,9 @@ package com.crichere.domain.league.service
 
 import com.crichere.common.exception.BusinessLogicException
 import com.crichere.common.exception.ResourceNotFoundException
-import com.crichere.domain.franchise.entity.FranchisePurseState
+import com.crichere.domain.auth.entity.UserLeagueMembership
+import com.crichere.domain.auth.enums.LeagueRole
+import com.crichere.domain.auth.repository.UserLeagueMembershipRepository
 import com.crichere.domain.franchise.repository.FranchisePurseStateRepository
 import com.crichere.domain.franchise.repository.FranchiseRepository
 import com.crichere.domain.league.entity.Auction
@@ -27,12 +29,22 @@ class LeagueService(
     private val franchisePurseStateRepository: FranchisePurseStateRepository,
     private val leagueCategoryBasePriceRepository: LeagueCategoryBasePriceRepository,
     private val leagueTagBasePriceRepository: LeagueTagBasePriceRepository,
-    private val leaguePlayerRepository: LeaguePlayerRepository
+    private val leaguePlayerRepository: LeaguePlayerRepository,
+    private val userLeagueMembershipRepository: UserLeagueMembershipRepository
 ) {
 
     @Transactional
     fun createLeague(league: League): League {
-        return leagueRepository.save(league)
+        val savedLeague = leagueRepository.save(league)
+        userLeagueMembershipRepository.save(
+            UserLeagueMembership(
+                userId = league.createdBy,
+                leagueId = savedLeague.id,
+                role = LeagueRole.LEAGUE_ADMIN,
+                isPrimary = true
+            )
+        )
+        return savedLeague
     }
 
     fun getLeagues(): List<League> {
@@ -89,6 +101,54 @@ class LeagueService(
                 status = AuctionStatus.DRAFT
             )
         )
+    }
+
+    @Transactional
+    fun updateCategoryPrices(leagueId: UUID, prices: List<com.crichere.domain.league.dto.CategoryPriceRequest>): List<com.crichere.domain.league.entity.LeagueCategoryBasePrice> {
+        val league = getLeague(leagueId)
+        if (league.status != LeagueStatus.DRAFT && league.status != LeagueStatus.OPEN) {
+            throw BusinessLogicException("Cannot update prices after auction initialization", "error.invalid_league_status")
+        }
+
+        val existing = leagueCategoryBasePriceRepository.findByLeagueId(leagueId)
+        leagueCategoryBasePriceRepository.deleteAll(existing)
+
+        val newPrices = prices.map { 
+            com.crichere.domain.league.entity.LeagueCategoryBasePrice(
+                leagueId = leagueId,
+                category = it.category,
+                price = it.price
+            )
+        }
+        return leagueCategoryBasePriceRepository.saveAll(newPrices)
+    }
+
+    fun getCategoryPrices(leagueId: UUID): List<com.crichere.domain.league.entity.LeagueCategoryBasePrice> {
+        return leagueCategoryBasePriceRepository.findByLeagueId(leagueId)
+    }
+
+    @Transactional
+    fun updateTagPrices(leagueId: UUID, prices: List<com.crichere.domain.league.dto.TagPriceRequest>): List<com.crichere.domain.league.entity.LeagueTagBasePrice> {
+        val league = getLeague(leagueId)
+        if (league.status != LeagueStatus.DRAFT && league.status != LeagueStatus.OPEN) {
+            throw BusinessLogicException("Cannot update prices after auction initialization", "error.invalid_league_status")
+        }
+
+        val existing = leagueTagBasePriceRepository.findByLeagueId(leagueId)
+        leagueTagBasePriceRepository.deleteAll(existing)
+
+        val newPrices = prices.map { 
+            com.crichere.domain.league.entity.LeagueTagBasePrice(
+                leagueId = leagueId,
+                tag = it.tag,
+                price = it.price
+            )
+        }
+        return leagueTagBasePriceRepository.saveAll(newPrices)
+    }
+
+    fun getTagPrices(leagueId: UUID): List<com.crichere.domain.league.entity.LeagueTagBasePrice> {
+        return leagueTagBasePriceRepository.findByLeagueId(leagueId)
     }
 
     @Transactional(readOnly = true)

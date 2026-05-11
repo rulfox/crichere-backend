@@ -7,8 +7,10 @@ import java.util.UUID
 
 interface LeagueCategoryBasePriceRepository : JpaRepository<LeagueCategoryBasePrice, UUID> {
     fun findByLeagueIdAndCategory(leagueId: UUID, category: String): LeagueCategoryBasePrice?
+    fun findByLeagueId(leagueId: UUID): List<LeagueCategoryBasePrice>
 }
 
 interface LeagueTagBasePriceRepository : JpaRepository<LeagueTagBasePrice, UUID> {
     fun findByLeagueIdAndTag(leagueId: UUID, tag: String): LeagueTagBasePrice?
+    fun findByLeagueId(leagueId: UUID): List<LeagueTagBasePrice>
 }

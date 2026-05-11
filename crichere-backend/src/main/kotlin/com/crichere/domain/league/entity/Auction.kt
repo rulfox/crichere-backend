@@ -30,6 +30,12 @@ class Auction(
     var startedAt: Instant? = null,
     var completedAt: Instant? = null,
 
+    var timerStartedAt: Instant? = null,
+    var timerDurationSeconds: Int? = null,
+
+    @Column(nullable = false, unique = true)
+    var publicViewToken: String = generateSecureToken(),
+
     @Column(nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 
@@ -42,5 +48,13 @@ class Auction(
     @PreUpdate
     fun preUpdate() {
         updatedAt = Instant.now()
+    }
+
+    companion object {
+        fun generateSecureToken(): String {
+            val bytes = ByteArray(32)
+            java.security.SecureRandom().nextBytes(bytes)
+            return java.util.HexFormat.of().formatHex(bytes)
+        }
     }
 }

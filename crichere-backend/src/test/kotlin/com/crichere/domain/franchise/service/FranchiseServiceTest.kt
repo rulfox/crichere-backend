@@ -1,0 +1,148 @@
+package com.crichere.domain.franchise.service
+
+import com.crichere.common.exception.BusinessLogicException
+import com.crichere.common.exception.ResourceNotFoundException
+import com.crichere.domain.auth.entity.User
+import com.crichere.domain.auth.entity.UserFranchiseMembership
+import com.crichere.domain.auth.repository.UserFranchiseMembershipRepository
+import com.crichere.domain.auth.repository.UserRepository
+import com.crichere.domain.franchise.entity.Franchise
+import com.crichere.domain.franchise.entity.FranchiseInvite
+import com.crichere.domain.franchise.enums.FranchiseInviteStatus
+import com.crichere.domain.franchise.repository.FranchiseInviteRepository
+import com.crichere.domain.franchise.repository.FranchiseRepository
+import com.crichere.domain.league.entity.League
+import com.crichere.domain.league.repository.LeagueRepository
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.*
+
+@ExtendWith(MockKExtension::class)
+@DisplayName("FranchiseService Unit Tests")
+class FranchiseServiceTest {
+
+    @MockK lateinit var franchiseRepository: FranchiseRepository
+    @MockK lateinit var franchiseInviteRepository: FranchiseInviteRepository
+    @MockK lateinit var userRepository: UserRepository
+    @MockK lateinit var leagueRepository: LeagueRepository
+    @MockK lateinit var membershipRepository: UserFranchiseMembershipRepository
+
+    private lateinit var franchiseService: FranchiseService
+
+    private val franchiseId = UUID.randomUUID()
+    private val leagueId = UUID.randomUUID()
+    private val ownerId = UUID.randomUUID()
+    private val token = UUID.randomUUID()
+
+    @BeforeEach
+    fun setUp() {
+        franchiseService = FranchiseService(
+            franchiseRepository,
+            franchiseInviteRepository,
+            userRepository,
+            leagueRepository,
+            membershipRepository,
+            "http://localhost:8080"
+        )
+    }
+
+    @Test
+    @DisplayName("validateInvite - success")
+    fun validateInviteSuccess() {
+        val invite = FranchiseInvite(
+            franchiseId = franchiseId,
+            email = "test@example.com",
+            token = token,
+            expiresAt = Instant.now().plus(1, ChronoUnit.DAYS),
+            maxUses = 1,
+            useCount = 0
+        )
+        val franchise = Franchise(id = franchiseId, leagueId = leagueId, name = "Strikers", ownerId = ownerId, totalPurse = 1000)
+        val league = League(id = leagueId, name = "CPL", createdBy = UUID.randomUUID(), status = com.crichere.domain.league.enums.LeagueStatus.DRAFT)
+        val owner = User(id = ownerId, phone = "9999999999", profileStatus = com.crichere.domain.auth.enums.ProfileStatus.ACTIVE, name = "Admin")
+
+        every { franchiseInviteRepository.findByToken(token) } returns invite
+        every { franchiseRepository.findById(franchiseId) } returns Optional.of(franchise)
+        every { leagueRepository.findById(leagueId) } returns Optional.of(league)
+        every { userRepository.findById(ownerId) } returns Optional.of(owner)
+
+        val result = franchiseService.validateInvite(token)
+
+        assertTrue(result.valid)
+        assertEquals("Strikers", result.franchiseName)
+        assertEquals("CPL", result.leagueName)
+        assertEquals("Admin", result.invitedBy)
+    }
+
+    @Test
+    @DisplayName("validateInvite - expired")
+    fun validateInviteExpired() {
+        val invite = FranchiseInvite(
+            franchiseId = franchiseId,
+            email = "test@example.com",
+            token = token,
+            expiresAt = Instant.now().minus(1, ChronoUnit.DAYS)
+        )
+
+        every { franchiseInviteRepository.findByToken(token) } returns invite
+
+        val exception = assertThrows(BusinessLogicException::class.java) {
+            franchiseService.validateInvite(token)
+        }
+        assertEquals("error.invite_expired", exception.messageKey)
+    }
+
+    @Test
+    @DisplayName("validateInvite - fully used")
+    fun validateInviteUsed() {
+        val invite = FranchiseInvite(
+            franchiseId = franchiseId,
+            email = "test@example.com",
+            token = token,
+            expiresAt = Instant.now().plus(1, ChronoUnit.DAYS),
+            maxUses = 1,
+            useCount = 1
+        )
+
+        every { franchiseInviteRepository.findByToken(token) } returns invite
+
+        val exception = assertThrows(BusinessLogicException::class.java) {
+            franchiseService.validateInvite(token)
+        }
+        assertEquals("error.invite_already_used", exception.messageKey)
+    }
+
+    @Test
+    @DisplayName("acceptInvite - success")
+    fun acceptInviteSuccess() {
+        val invite = FranchiseInvite(
+            franchiseId = franchiseId,
+            email = "test@example.com",
+            token = token,
+            expiresAt = Instant.now().plus(1, ChronoUnit.DAYS),
+            maxUses = 2,
+            useCount = 0
+        )
+        val franchise = Franchise(id = franchiseId, leagueId = leagueId, name = "Strikers", ownerId = ownerId, totalPurse = 1000)
+        val newUserId = UUID.randomUUID()
+
+        every { franchiseInviteRepository.findByToken(token) } returns invite
+        every { franchiseRepository.findById(franchiseId) } returns Optional.of(franchise)
+        every { membershipRepository.save(any()) } answers { firstArg() }
+        every { franchiseInviteRepository.save(any()) } answers { firstArg() }
+
+        franchiseService.acceptInvite(token, newUserId)
+
+        assertEquals(1, invite.useCount)
+        assertEquals(newUserId, invite.acceptedByUserId)
+        assertEquals(FranchiseInviteStatus.SENT, invite.status)
+    }
+}

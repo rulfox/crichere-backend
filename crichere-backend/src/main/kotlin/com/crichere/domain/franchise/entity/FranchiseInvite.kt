@@ -24,6 +24,17 @@ class FranchiseInvite(
     @Column(nullable = false)
     var status: FranchiseInviteStatus = FranchiseInviteStatus.SENT,
 
+    @Column(name = "accepted_by_user_id")
+    var acceptedByUserId: UUID? = null,
+
+    var acceptedAt: Instant? = null,
+
+    @Column(nullable = false)
+    var maxUses: Int = 1,
+
+    @Column(nullable = false)
+    var useCount: Int = 0,
+
     @Column(nullable = false)
     val expiresAt: Instant,
 

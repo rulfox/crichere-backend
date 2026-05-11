@@ -64,6 +64,28 @@ data class PlayerImportRequest(
     val basePrice: Int? = null
 )
 
+data class CategoryPriceRequest(
+    val category: String,
+    val price: Int
+)
+
+data class TagPriceRequest(
+    val tag: String,
+    val price: Int
+)
+
+data class CategoryPriceResponse(
+    val id: UUID,
+    val category: String,
+    val price: Int
+)
+
+data class TagPriceResponse(
+    val id: UUID,
+    val tag: String,
+    val price: Int
+)
+
 data class BulkImportResponse(
     val added: Int,
     val skipped: Int,

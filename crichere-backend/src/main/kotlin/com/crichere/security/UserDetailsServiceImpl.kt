@@ -2,7 +2,10 @@ package com.crichere.security
 
 import com.crichere.common.exception.ResourceNotFoundException
 import com.crichere.domain.auth.enums.ProfileStatus
+import com.crichere.domain.auth.repository.UserLeagueMembershipRepository
+import com.crichere.domain.auth.repository.UserPlatformMembershipRepository
 import com.crichere.domain.auth.repository.UserRepository
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -10,7 +13,11 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class UserDetailsServiceImpl(private val userRepository: UserRepository) : UserDetailsService {
+class UserDetailsServiceImpl(
+    private val userRepository: UserRepository,
+    private val userLeagueMembershipRepository: UserLeagueMembershipRepository,
+    private val userPlatformMembershipRepository: UserPlatformMembershipRepository
+) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
         val userId = try {
@@ -23,11 +30,23 @@ class UserDetailsServiceImpl(private val userRepository: UserRepository) : UserD
             ResourceNotFoundException("User not found", "error.user_not_found")
         }
 
+        val authorities = mutableListOf<SimpleGrantedAuthority>()
+        
+        val leagueMemberships = userLeagueMembershipRepository.findAllByUserId(userId)
+        leagueMemberships.forEach { membership ->
+            authorities.add(SimpleGrantedAuthority("ROLE_${membership.role.name}"))
+        }
+
+        val platformMembership = userPlatformMembershipRepository.findByUserId(userId)
+        if (platformMembership != null) {
+            authorities.add(SimpleGrantedAuthority("ROLE_PLATFORM_ADMIN"))
+        }
+
         return User.builder()
             .username(user.id.toString())
             .password("") // OTP-only, no password
             .disabled(user.profileStatus == ProfileStatus.GHOST)
-            .authorities(emptyList()) // Roles handled by custom AuthorizationService
+            .authorities(authorities)
             .build()
     }
 }

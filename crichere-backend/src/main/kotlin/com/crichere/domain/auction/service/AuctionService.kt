@@ -3,6 +3,7 @@ package com.crichere.domain.auction.service
 import com.crichere.common.exception.BusinessLogicException
 import com.crichere.common.exception.InsufficientPurseException
 import com.crichere.common.exception.ResourceNotFoundException
+import com.crichere.domain.auction.dto.*
 import com.crichere.domain.auction.entity.*
 import com.crichere.domain.auction.enums.*
 import com.crichere.domain.auction.repository.*
@@ -26,6 +27,7 @@ class AuctionService(
     private val auctionRepository: AuctionRepository,
     private val roundConfigRepository: AuctionRoundConfigRepository,
     private val slabRepository: BidIncrementSlabRepository,
+    private val categoryIncrementRepository: AuctionRoundCategoryIncrementRepository,
     private val bidRepository: BidRepository,
     private val playerStateRepository: PlayerAuctionStateRepository,
     private val purseRepository: FranchisePurseStateRepository,
@@ -266,10 +268,13 @@ class AuctionService(
         val currentBid = playerState.currentHighestBid
         val player = leaguePlayerRepository.findById(playerId).get()
         val basePrice = leagueService.resolveBasePrice(player)
+
+        val minIncrement = resolveBidIncrement(roundId, player, currentBid ?: 0)
+
         if (currentBid == null) {
             if (bidAmount < basePrice) throw BusinessLogicException("Bid must be at least base price", "error.invalid_bid_amount")
         } else {
-            if (bidAmount <= currentBid) throw BusinessLogicException("Bid must be higher than current highest bid", "error.invalid_bid_amount")
+            if (bidAmount < currentBid + minIncrement) throw BusinessLogicException("Bid must be at least current highest bid + increment ($minIncrement)", "error.invalid_bid_amount")
         }
         
         val bid = bidRepository.save(Bid(
@@ -296,8 +301,130 @@ class AuctionService(
             "previousHighestBid" to prevBid,
             "previousHighestBidder" to prevBidder
         ), actorId)
+
+        // Anti-snipe logic
+        if (auction.timerStartedAt != null && auction.timerDurationSeconds != null) {
+            val now = Instant.now()
+            val elapsed = java.time.Duration.between(auction.timerStartedAt, now).seconds
+            val remaining = auction.timerDurationSeconds!! - elapsed
+            val round = roundConfigRepository.findById(roundId).get()
+            
+            if (round.antiSnipeSeconds > 0 && remaining <= round.antiSnipeSeconds) {
+                auction.timerStartedAt = now
+                auction.timerDurationSeconds = round.antiSnipeSeconds
+                auctionRepository.save(auction)
+                logAndBroadcast(auctionId, AuctionAction.TIMER_RESET, mapOf(
+                    "newDurationSeconds" to round.antiSnipeSeconds,
+                    "reason" to "ANTI_SNIPE",
+                    "leaguePlayerId" to playerId
+                ), actorId)
+            }
+        }
         
         return bid
+    }
+
+    @Transactional
+    fun startTimer(auctionId: UUID, durationOverride: Int?, actorId: UUID): TimerStateResponse {
+        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        if (auction.status != AuctionStatus.LIVE) throw BusinessLogicException("Auction must be LIVE to start timer", "error.invalid_auction_status")
+        val playerId = auction.currentLeaguePlayerId ?: throw BusinessLogicException("No player currently up for bidding", "error.no_player_up")
+        val roundId = auction.currentRoundId ?: throw BusinessLogicException("No active round", "error.no_active_round")
+        val round = roundConfigRepository.findById(roundId).get()
+
+        val duration = durationOverride ?: round.countdownSeconds
+        auction.timerStartedAt = Instant.now()
+        auction.timerDurationSeconds = duration
+        auctionRepository.save(auction)
+
+        logAndBroadcast(auctionId, AuctionAction.TIMER_STARTED, mapOf(
+            "durationSeconds" to duration,
+            "startedAt" to auction.timerStartedAt,
+            "antiSnipeSeconds" to round.antiSnipeSeconds,
+            "leaguePlayerId" to playerId
+        ), actorId)
+
+        return getTimerState(auction)
+    }
+
+    @Transactional
+    fun stopTimer(auctionId: UUID, actorId: UUID) {
+        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        auction.timerStartedAt = null
+        auction.timerDurationSeconds = null
+        auctionRepository.save(auction)
+
+        logAndBroadcast(auctionId, AuctionAction.TIMER_STOPPED, emptyMap(), actorId)
+    }
+
+    fun getTimerState(auctionId: UUID): TimerStateResponse {
+        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        return getTimerState(auction)
+    }
+
+    private fun resolveBidIncrement(roundId: UUID, player: com.crichere.domain.player.entity.LeaguePlayer, currentBid: Int = 0): Int {
+        val categoryIncrements = categoryIncrementRepository.findByRoundId(roundId)
+        
+        // Priority 1: Tag-based increment
+        if (player.tag != null) {
+            val tagInc = categoryIncrements.find { it.tag == player.tag }
+            if (tagInc != null) return tagInc.bidIncrement
+        }
+
+        // Priority 2: Category-based increment
+        if (player.category != null) {
+            val catInc = categoryIncrements.find { it.category == player.category }
+            if (catInc != null) return catInc.bidIncrement
+        }
+
+        // Fallback: Slab-based increment
+        val slabs = slabRepository.findByRoundIdOrderByFromAmountAsc(roundId)
+        val slab = slabs.findLast { currentBid >= it.fromAmount && (it.toAmount == null || currentBid < it.toAmount!!) }
+        return slab?.incrementBy ?: 500
+    }
+
+    @Transactional
+    fun updateCategoryIncrements(roundId: UUID, increments: List<com.crichere.domain.auction.dto.CategoryIncrementRequest>): List<com.crichere.domain.auction.entity.AuctionRoundCategoryIncrement> {
+        val round = roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
+        if (round.status != RoundStatus.PENDING) throw BusinessLogicException("Only PENDING rounds can be updated", "error.invalid_round_status")
+
+        val existing = categoryIncrementRepository.findByRoundId(roundId)
+        categoryIncrementRepository.deleteAll(existing)
+
+        val newIncrements = increments.map { 
+            com.crichere.domain.auction.entity.AuctionRoundCategoryIncrement(
+                roundId = roundId,
+                category = it.category,
+                tag = it.tag,
+                bidIncrement = it.bidIncrement
+            )
+        }
+        return categoryIncrementRepository.saveAll(newIncrements)
+    }
+
+    fun getCategoryIncrements(roundId: UUID): List<com.crichere.domain.auction.entity.AuctionRoundCategoryIncrement> {
+        return categoryIncrementRepository.findByRoundId(roundId)
+    }
+
+    private fun getTimerState(auction: Auction): TimerStateResponse {
+        val round = auction.currentRoundId?.let { roundConfigRepository.findById(it).orElse(null) }
+        val antiSnipe = round?.antiSnipeSeconds ?: 10
+
+        if (auction.timerStartedAt == null || auction.timerDurationSeconds == null) {
+            return TimerStateResponse(false, null, null, null, antiSnipe)
+        }
+
+        val now = Instant.now()
+        val elapsed = java.time.Duration.between(auction.timerStartedAt, now).seconds
+        val remaining = (auction.timerDurationSeconds!!.toLong() - elapsed).toInt().coerceAtLeast(0)
+
+        return TimerStateResponse(
+            isRunning = true,
+            startedAt = auction.timerStartedAt,
+            durationSeconds = auction.timerDurationSeconds,
+            remainingSeconds = remaining,
+            antiSnipeSeconds = antiSnipe
+        )
     }
 
     @Transactional
@@ -529,14 +656,18 @@ class AuctionService(
 
     fun getAuction(auctionId: UUID) = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
 
+    fun getAuctionByToken(token: String) = auctionRepository.findByPublicViewToken(token) ?: throw ResourceNotFoundException("Auction not found", "error.auction_not_found")
+
     fun getStateSnapshot(auctionId: UUID): com.crichere.domain.auction.dto.AuctionStateSnapshot {
         val auction = getAuction(auctionId)
+        val league = leagueRepository.findById(auction.leagueId).get()
         val round = auction.currentRoundId?.let { roundConfigRepository.findById(it).orElse(null) }
         val playerState = auction.currentLeaguePlayerId?.let { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, it).orElse(null) }
         val purses = purseRepository.findByAuctionId(auctionId)
         val lastSeq = auctionAuditLogRepository.findMaxSequenceNumberByAuctionId(auctionId)
         
         return com.crichere.domain.auction.dto.AuctionStateSnapshot(
+            leagueName = league.name,
             auctionStatus = auction.status,
             currentRound = round?.let { r -> com.crichere.domain.auction.dto.RoundConfigDto(
                 roundNumber = r.roundNumber,
@@ -560,6 +691,7 @@ class AuctionService(
             franchisePurseStates = purses.map { p -> com.crichere.domain.auction.dto.FranchisePurseStateResponse(
                 p.id, p.franchiseId, p.roundId, p.currencyType, p.startingAmount, p.currentAmount, p.reservedAmount
             )},
+            timer = getTimerState(auction),
             lastSequenceNumber = lastSeq
         )
     }
@@ -801,6 +933,13 @@ class AuctionService(
         }
         roundConfigRepository.deleteAll(rounds)
         auctionRepository.delete(auction)
+    }
+
+    @Transactional
+    fun regeneratePublicViewToken(auctionId: UUID): Auction {
+        val auction = getAuction(auctionId)
+        auction.publicViewToken = Auction.generateSecureToken()
+        return auctionRepository.save(auction)
     }
 
     @Transactional

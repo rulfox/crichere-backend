@@ -18,7 +18,9 @@ import java.util.*
 @Tag(name = "Auction Management")
 class AuctionController(
     private val auctionService: AuctionService,
-    private val exportService: com.crichere.domain.auction.service.ExportService
+    private val exportService: com.crichere.domain.auction.service.ExportService,
+    @org.springframework.beans.factory.annotation.Value("\${app.base-url:http://localhost:8080}")
+    private val baseUrl: String
 ) {
 
     @PostMapping("/leagues/{leagueId}")
@@ -176,6 +178,56 @@ class AuctionController(
         return ResponseHelper.success(data = mapToStateResponse(state))
     }
 
+    @PostMapping("/{id}/timer/start")
+    @PreAuthorize("hasRole('AUCTIONEER')")
+    fun startTimer(
+        @PathVariable id: UUID,
+        @RequestBody(required = false) request: TimerStartRequest?,
+        @AuthenticationPrincipal user: UserDetails
+    ): ApiResponse<TimerStateResponse> {
+        val state = auctionService.startTimer(id, request?.durationSeconds, UUID.fromString(user.username))
+        return ResponseHelper.success(data = state)
+    }
+
+    @PostMapping("/{id}/timer/stop")
+    @PreAuthorize("hasRole('AUCTIONEER')")
+    fun stopTimer(
+        @PathVariable id: UUID,
+        @AuthenticationPrincipal user: UserDetails
+    ): ApiResponse<Nothing> {
+        auctionService.stopTimer(id, UUID.fromString(user.username))
+        return ResponseHelper.success(message = "Timer stopped")
+    }
+
+    @GetMapping("/{id}/timer/state")
+    fun getTimerState(@PathVariable id: UUID): ApiResponse<TimerStateResponse> {
+        return ResponseHelper.success(data = auctionService.getTimerState(id))
+    }
+
+    @PostMapping("/{id}/rounds/{roundId}/category-increments")
+    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    fun updateCategoryIncrements(
+        @PathVariable id: UUID,
+        @PathVariable roundId: UUID,
+        @RequestBody request: List<CategoryIncrementRequest>
+    ): ApiResponse<List<CategoryIncrementResponse>> {
+        val increments = auctionService.updateCategoryIncrements(roundId, request)
+        return ResponseHelper.success(data = increments.map { 
+            CategoryIncrementResponse(it.id, it.roundId, it.category, it.tag, it.bidIncrement)
+        })
+    }
+
+    @GetMapping("/{id}/rounds/{roundId}/category-increments")
+    fun getCategoryIncrements(
+        @PathVariable id: UUID,
+        @PathVariable roundId: UUID
+    ): ApiResponse<List<CategoryIncrementResponse>> {
+        val increments = auctionService.getCategoryIncrements(roundId)
+        return ResponseHelper.success(data = increments.map { 
+            CategoryIncrementResponse(it.id, it.roundId, it.category, it.tag, it.bidIncrement)
+        })
+    }
+
     @GetMapping("/{id}/audit-log")
     fun getAuditLog(
         @PathVariable id: UUID,
@@ -321,8 +373,25 @@ class AuctionController(
         return ResponseHelper.success(message = "Auction deleted")
     }
 
+    @PostMapping("/{id}/regenerate-view-token")
+    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    fun regenerateViewToken(@PathVariable id: UUID): ApiResponse<AuctionResponse> {
+        val auction = auctionService.regeneratePublicViewToken(id)
+        return ResponseHelper.success(data = mapToResponse(auction))
+    }
+
     private fun mapToResponse(auction: Auction) = AuctionResponse(
-        auction.id, auction.leagueId, auction.auctioneerId, auction.status, auction.currentRoundId, auction.currentLeaguePlayerId, auction.startedAt, auction.completedAt
+        auction.id, 
+        auction.leagueId, 
+        auction.auctioneerId, 
+        auction.status, 
+        auction.currentRoundId, 
+        auction.currentLeaguePlayerId, 
+        auction.startedAt, 
+        auction.completedAt,
+        "\$baseUrl/api/v1/public/auctions/\${auction.id}/display",
+        "\$baseUrl/api/v1/public/auctions/view/\${auction.publicViewToken}",
+        auction.publicViewToken
     )
 
     private fun mapToStateResponse(s: com.crichere.domain.auction.entity.PlayerAuctionState) = PlayerAuctionStateResponse(

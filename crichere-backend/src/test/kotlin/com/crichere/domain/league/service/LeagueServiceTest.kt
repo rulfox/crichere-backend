@@ -11,6 +11,8 @@ import com.crichere.domain.league.repository.*
 import com.crichere.domain.player.entity.LeaguePlayer
 import com.crichere.domain.player.repository.LeaguePlayerRepository
 import io.mockk.every
+import io.mockk.just
+import io.mockk.runs
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
@@ -94,5 +96,47 @@ class LeagueServiceTest {
 
         assertEquals(LeagueStatus.OPEN, league.status)
         verify { leagueRepository.save(league) }
+    }
+
+    @Test
+    @DisplayName("updateCategoryPrices - success")
+    fun updateCategoryPricesSuccess() {
+        val leagueId = UUID.randomUUID()
+        val league = League(id = leagueId, name = "Test", status = LeagueStatus.DRAFT, createdBy = UUID.randomUUID())
+        val requests = listOf(com.crichere.domain.league.dto.CategoryPriceRequest("A", 100))
+
+        every { leagueRepository.findById(leagueId) } returns Optional.of(league)
+        every { leagueCategoryBasePriceRepository.findByLeagueId(leagueId) } returns emptyList()
+        every { leagueCategoryBasePriceRepository.deleteAll(any()) } just runs
+        every { leagueCategoryBasePriceRepository.saveAll(any<List<LeagueCategoryBasePrice>>()) } answers { firstArg() }
+
+        val result = leagueService.updateCategoryPrices(leagueId, requests)
+
+        assertEquals(1, result.size)
+        assertEquals("A", result[0].category)
+        assertEquals(100, result[0].price)
+        verify { leagueCategoryBasePriceRepository.deleteAll(any()) }
+        verify { leagueCategoryBasePriceRepository.saveAll(any<List<LeagueCategoryBasePrice>>()) }
+    }
+
+    @Test
+    @DisplayName("updateTagPrices - success")
+    fun updateTagPricesSuccess() {
+        val leagueId = UUID.randomUUID()
+        val league = League(id = leagueId, name = "Test", status = LeagueStatus.DRAFT, createdBy = UUID.randomUUID())
+        val requests = listOf(com.crichere.domain.league.dto.TagPriceRequest("Star", 500))
+
+        every { leagueRepository.findById(leagueId) } returns Optional.of(league)
+        every { leagueTagBasePriceRepository.findByLeagueId(leagueId) } returns emptyList()
+        every { leagueTagBasePriceRepository.deleteAll(any()) } just runs
+        every { leagueTagBasePriceRepository.saveAll(any<List<LeagueTagBasePrice>>()) } answers { firstArg() }
+
+        val result = leagueService.updateTagPrices(leagueId, requests)
+
+        assertEquals(1, result.size)
+        assertEquals("Star", result[0].tag)
+        assertEquals(500, result[0].price)
+        verify { leagueTagBasePriceRepository.deleteAll(any()) }
+        verify { leagueTagBasePriceRepository.saveAll(any<List<LeagueTagBasePrice>>()) }
     }
 }

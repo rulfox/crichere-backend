@@ -43,6 +43,20 @@ data class BidIncrementSlabDto(
     val incrementBy: Int
 )
 
+data class CategoryIncrementRequest(
+    val category: String? = null,
+    val tag: String? = null,
+    val bidIncrement: Int
+)
+
+data class CategoryIncrementResponse(
+    val id: UUID,
+    val roundId: UUID,
+    val category: String?,
+    val tag: String?,
+    val bidIncrement: Int
+)
+
 data class AuctionResponse(
     val id: UUID,
     val leagueId: UUID,
@@ -51,16 +65,21 @@ data class AuctionResponse(
     val currentRoundId: UUID?,
     val currentLeaguePlayerId: UUID?,
     val startedAt: Instant?,
-    val completedAt: Instant?
+    val completedAt: Instant?,
+    val displayUrl: String? = null,
+    val publicViewUrl: String? = null,
+    val publicViewToken: String? = null
 )
 
 data class AuctionStateSnapshot(
+    val leagueName: String,
     val auctionStatus: AuctionStatus,
     val currentRound: RoundConfigDto?,
     val currentPlayer: PlayerAuctionStateResponse?,
     val currentHighestBid: Int?,
     val currentHighestBidderId: UUID?,
     val franchisePurseStates: List<FranchisePurseStateResponse>,
+    val timer: TimerStateResponse? = null,
     val lastSequenceNumber: Long
 )
 
@@ -90,6 +109,18 @@ data class BidRequest(
 
     @field:Positive
     val bidAmount: Int
+)
+
+data class TimerStartRequest(
+    val durationSeconds: Int? = null
+)
+
+data class TimerStateResponse(
+    val isRunning: Boolean,
+    val startedAt: Instant?,
+    val durationSeconds: Int?,
+    val remainingSeconds: Int?,
+    val antiSnipeSeconds: Int
 )
 
 data class BidResponse(

@@ -53,6 +53,12 @@ class AuctionRoundConfig(
     var startedAt: Instant? = null,
     var completedAt: Instant? = null,
 
+    @Column(nullable = false)
+    var countdownSeconds: Int = 60,
+
+    @Column(nullable = false)
+    var antiSnipeSeconds: Int = 10,
+
     @Column(nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 
