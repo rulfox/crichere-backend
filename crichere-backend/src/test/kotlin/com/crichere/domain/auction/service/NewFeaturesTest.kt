@@ -121,7 +121,7 @@ class NewFeaturesTest {
         round.antiSnipeSeconds = 10
         
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = auction.currentLeaguePlayerId!!, state = PlayerAuctionStateValue.UP_FOR_BIDDING)
-        val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currentAmount = 10000)
+        val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
         val leaguePlayer = LeaguePlayer(id = auction.currentLeaguePlayerId!!, leagueId = auction.leagueId, userId = UUID.randomUUID())
 
         every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
@@ -156,7 +156,7 @@ class NewFeaturesTest {
             AuctionRoundCategoryIncrement(roundId = roundId, tag = "A", bidIncrement = 2000)
         )
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = player.id, state = PlayerAuctionStateValue.UP_FOR_BIDDING, currentHighestBid = 5000)
-        val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currentAmount = 10000)
+        val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
 
         every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(any(), any()) } returns Optional.of(playerState)
@@ -187,7 +187,7 @@ class NewFeaturesTest {
             BidIncrementSlab(roundId = roundId, fromAmount = 0, toAmount = 10000, incrementBy = 500)
         )
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = player.id, state = PlayerAuctionStateValue.UP_FOR_BIDDING, currentHighestBid = 2000)
-        val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currentAmount = 10000)
+        val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
 
         every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(any(), any()) } returns Optional.of(playerState)

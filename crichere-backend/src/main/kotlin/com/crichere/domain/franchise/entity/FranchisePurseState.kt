@@ -20,13 +20,15 @@ class FranchisePurseState(
     @Column(nullable = false)
     val auctionId: UUID,
 
-    @Column(name = "round_id")
-    var roundId: UUID? = null,
+    @Column(name = "round_id", nullable = false)
+    var roundId: UUID,
 
     @Enumerated(EnumType.STRING)
-    var currencyType: CurrencyType? = null,
+    @Column(nullable = false)
+    var currencyType: CurrencyType,
 
-    var startingAmount: Int? = null,
+    @Column(nullable = false)
+    var startingAmount: Int,
 
     @Column(name = "current_amount", nullable = false)
     var currentAmount: Int,

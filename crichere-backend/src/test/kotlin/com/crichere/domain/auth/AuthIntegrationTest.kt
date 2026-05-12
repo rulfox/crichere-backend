@@ -32,10 +32,13 @@ import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.springframework.data.redis.core.StringRedisTemplate
+import com.crichere.common.MockConfig
+import org.springframework.context.annotation.Import
 import java.util.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
+@Import(MockConfig::class)
 @DisplayName("Authentication Integration Tests")
 class AuthIntegrationTest {
 
@@ -63,25 +66,6 @@ class AuthIntegrationTest {
             registry.add("spring.datasource.password", postgres::getPassword)
             registry.add("spring.flyway.clean-disabled") { "false" }
         }
-    }
-
-    @TestConfiguration
-    class TestConfig {
-        @Bean
-        @Primary
-        fun smsProvider() = mockk<SmsProvider>()
-
-        @Bean
-        @Primary
-        fun pushProvider() = mockk<PushProvider>()
-
-        @Bean
-        @Primary
-        fun s3Presigner() = mockk<S3Presigner>()
-
-        @Bean
-        @Primary
-        fun stringRedisTemplate() = mockk<StringRedisTemplate>(relaxed = true)
     }
 
     @Autowired

@@ -33,15 +33,20 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import org.springframework.data.redis.core.StringRedisTemplate
 import java.time.Instant
 import java.util.*
+import com.crichere.common.MockConfig
+import org.springframework.context.annotation.Import
+import org.springframework.http.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers
+@Import(MockConfig::class)
 @DisplayName("Full Auction Lifecycle Integration Test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class FullAuctionLifecycleIntegrationTest {
 
     @Autowired lateinit var restTemplate: TestRestTemplate
     @Autowired lateinit var userRepository: UserRepository
+    @Autowired lateinit var userLeagueMembershipRepository: com.crichere.domain.auth.repository.UserLeagueMembershipRepository
     @Autowired lateinit var leagueRepository: LeagueRepository
     @Autowired lateinit var auctionRepository: AuctionRepository
     @Autowired lateinit var roundConfigRepository: AuctionRoundConfigRepository
@@ -76,13 +81,6 @@ class FullAuctionLifecycleIntegrationTest {
         var publicViewToken: String? = null
     }
 
-    @TestConfiguration
-    class TestConfig {
-        @Bean @Primary fun smsProvider() = mockk<SmsProvider>(relaxed = true)
-        @Bean @Primary fun pushProvider() = mockk<PushProvider>(relaxed = true)
-        @Bean @Primary fun stringRedisTemplate() = mockk<StringRedisTemplate>(relaxed = true)
-    }
-
     private fun getHeaders(token: String?): HttpHeaders {
         val headers = HttpHeaders()
         if (token != null) {
@@ -108,11 +106,26 @@ class FullAuctionLifecycleIntegrationTest {
     @Order(2)
     @DisplayName("2. Create League and Configure Prices")
     fun createLeagueAndConfigPrices() {
-        val createReq = LeagueCreateRequest(name = "E2E Test League")
+        val createReq = LeagueCreateRequest(
+            name = "E2E Test League",
+            playerOrderMode = com.crichere.domain.league.enums.PlayerOrderMode.FREE_PICK
+        )
         val createRes = restTemplate.exchange("/leagues", HttpMethod.POST, HttpEntity(createReq, getHeaders(adminToken)), Map::class.java)
         assertEquals(HttpStatus.OK, createRes.statusCode)
         val data = createRes.body?.get("data") as Map<*, *>
         leagueId = UUID.fromString(data["id"] as String)
+
+        // Assign Roles to Admin
+        userLeagueMembershipRepository.save(com.crichere.domain.auth.entity.UserLeagueMembership(
+            userId = adminId!!,
+            leagueId = leagueId!!,
+            role = com.crichere.domain.auth.enums.LeagueRole.LEAGUE_ADMIN
+        ))
+        userLeagueMembershipRepository.save(com.crichere.domain.auth.entity.UserLeagueMembership(
+            userId = adminId!!,
+            leagueId = leagueId!!,
+            role = com.crichere.domain.auth.enums.LeagueRole.AUCTIONEER
+        ))
 
         val catReq = listOf(CategoryPriceRequest("BATTER", 1000), CategoryPriceRequest("BOWLER", 800))
         val catRes = restTemplate.exchange("/leagues/$leagueId/category-prices", HttpMethod.POST, HttpEntity(catReq, getHeaders(adminToken)), Map::class.java)
@@ -201,8 +214,18 @@ class FullAuctionLifecycleIntegrationTest {
         restTemplate.exchange("/leagues/$leagueId/players/bulk-import", HttpMethod.POST, HttpEntity(playerReq, getHeaders(adminToken)), Map::class.java)
         
         // Use repo to find player since we need leaguePlayerId
-        val leaguePlayerRepo = org.springframework.test.context.TestContextManager(this.javaClass).testContext.applicationContext.getBean(com.crichere.domain.player.repository.LeaguePlayerRepository::class.java)
-        val player = leaguePlayerRepo.findAll().find { it.leagueId == leagueId }!!
+        val ctx = org.springframework.test.context.TestContextManager(this.javaClass).testContext.applicationContext
+        val leaguePlayerRepo = ctx.getBean(com.crichere.domain.player.repository.LeaguePlayerRepository::class.java)
+        val playerStateRepo = ctx.getBean(com.crichere.domain.auction.repository.PlayerAuctionStateRepository::class.java)
+        
+        val player = leaguePlayerRepo.findAll().find { it.leagueId == leagueId && it.auctionEligible }!!
+        
+        // Manually initialize player state since startAuction already ran
+        playerStateRepo.save(com.crichere.domain.auction.entity.PlayerAuctionState(
+            auctionId = auctionId!!,
+            leaguePlayerId = player.id,
+            state = com.crichere.domain.auction.enums.PlayerAuctionStateValue.AVAILABLE
+        ))
         
         val putReq = mapOf("leaguePlayerId" to player.id)
         val putRes = restTemplate.exchange("/auctions/$auctionId/player/put", HttpMethod.POST, HttpEntity(putReq, getHeaders(adminToken)), Map::class.java)

@@ -94,7 +94,7 @@ class AuctionServiceTest {
     fun placeBidHappyPath() {
         val auction = Auction(id = auctionId, leagueId = UUID.randomUUID(), currentLeaguePlayerId = playerId, currentRoundId = roundId)
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = playerId, state = PlayerAuctionStateValue.UP_FOR_BIDDING)
-        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, roundId = roundId, currentAmount = 10000)
+        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
         val leaguePlayer = LeaguePlayer(id = playerId, leagueId = auction.leagueId, userId = UUID.randomUUID())
         val bidAmount = 5000
 
@@ -123,7 +123,7 @@ class AuctionServiceTest {
     fun placeBidInsufficientPurse() {
         val auction = Auction(id = auctionId, leagueId = UUID.randomUUID(), currentLeaguePlayerId = playerId, currentRoundId = roundId)
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = playerId, state = PlayerAuctionStateValue.UP_FOR_BIDDING)
-        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, currentAmount = 4000)
+        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, roundId = UUID.randomUUID(), currencyType = CurrencyType.CASH, startingAmount = 4000, currentAmount = 4000)
         val bidAmount = 5000
 
         every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
@@ -193,7 +193,7 @@ class AuctionServiceTest {
     fun sellPlayerHappyPath() {
         val auction = Auction(id = auctionId, leagueId = UUID.randomUUID(), currentRoundId = roundId)
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = playerId, state = PlayerAuctionStateValue.UP_FOR_BIDDING)
-        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, currentAmount = 10000)
+        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
         val finalPrice = 5000
         val leaguePlayer = LeaguePlayer(id = playerId, leagueId = UUID.randomUUID(), userId = UUID.randomUUID())
         val franchise = Franchise(id = franchiseId, name = "Team A", ownerId = UUID.randomUUID(), leagueId = UUID.randomUUID())
@@ -232,7 +232,7 @@ class AuctionServiceTest {
             soldToFranchiseId = franchiseId,
             finalPrice = 5000
         )
-        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, currentAmount = 5000)
+        val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 5000, currentAmount = 5000)
         val lastLog = AuctionAuditLog(
             auctionId = auctionId,
             action = AuctionAction.PLAYER_SOLD,
