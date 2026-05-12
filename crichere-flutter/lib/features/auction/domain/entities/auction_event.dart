@@ -12,12 +12,14 @@ sealed class AuctionEvent with _$AuctionEvent {
     required String playerName,
     String? playerPhotoUrl,
     required int basePrice,
+    int? bidIncrement,
   }) = PlayerUp;
 
   const factory AuctionEvent.bidPlaced({
     required String franchiseId,
     required String franchiseName,
     required int amount,
+    int? nextMinimumBid,
   }) = BidPlaced;
 
   const factory AuctionEvent.playerSold({
@@ -35,6 +37,18 @@ sealed class AuctionEvent with _$AuctionEvent {
     required String franchiseId,
     required String franchiseName,
   }) = PlayerForceAssigned;
+
+  const factory AuctionEvent.timerStarted({
+    required int remainingSeconds,
+  }) = TimerStarted;
+
+  const factory AuctionEvent.timerPaused({
+    required int remainingSeconds,
+  }) = TimerPaused;
+
+  const factory AuctionEvent.timerReset({
+    required int remainingSeconds,
+  }) = TimerReset;
 
   const factory AuctionEvent.roundStarted({required int roundNumber}) = RoundStarted;
   const factory AuctionEvent.auctionStarted() = AuctionStarted;

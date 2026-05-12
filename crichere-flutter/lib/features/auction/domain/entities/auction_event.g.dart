@@ -11,6 +11,7 @@ PlayerUp _$PlayerUpFromJson(Map<String, dynamic> json) => PlayerUp(
   playerName: json['playerName'] as String,
   playerPhotoUrl: json['playerPhotoUrl'] as String?,
   basePrice: (json['basePrice'] as num).toInt(),
+  bidIncrement: (json['bidIncrement'] as num?)?.toInt(),
   $type: json['runtimeType'] as String?,
 );
 
@@ -19,6 +20,7 @@ Map<String, dynamic> _$PlayerUpToJson(PlayerUp instance) => <String, dynamic>{
   'playerName': instance.playerName,
   'playerPhotoUrl': instance.playerPhotoUrl,
   'basePrice': instance.basePrice,
+  'bidIncrement': instance.bidIncrement,
   'runtimeType': instance.$type,
 };
 
@@ -26,6 +28,7 @@ BidPlaced _$BidPlacedFromJson(Map<String, dynamic> json) => BidPlaced(
   franchiseId: json['franchiseId'] as String,
   franchiseName: json['franchiseName'] as String,
   amount: (json['amount'] as num).toInt(),
+  nextMinimumBid: (json['nextMinimumBid'] as num?)?.toInt(),
   $type: json['runtimeType'] as String?,
 );
 
@@ -33,6 +36,7 @@ Map<String, dynamic> _$BidPlacedToJson(BidPlaced instance) => <String, dynamic>{
   'franchiseId': instance.franchiseId,
   'franchiseName': instance.franchiseName,
   'amount': instance.amount,
+  'nextMinimumBid': instance.nextMinimumBid,
   'runtimeType': instance.$type,
 };
 
@@ -91,6 +95,39 @@ Map<String, dynamic> _$PlayerForceAssignedToJson(
   'franchiseName': instance.franchiseName,
   'runtimeType': instance.$type,
 };
+
+TimerStarted _$TimerStartedFromJson(Map<String, dynamic> json) => TimerStarted(
+  remainingSeconds: (json['remainingSeconds'] as num).toInt(),
+  $type: json['runtimeType'] as String?,
+);
+
+Map<String, dynamic> _$TimerStartedToJson(TimerStarted instance) =>
+    <String, dynamic>{
+      'remainingSeconds': instance.remainingSeconds,
+      'runtimeType': instance.$type,
+    };
+
+TimerPaused _$TimerPausedFromJson(Map<String, dynamic> json) => TimerPaused(
+  remainingSeconds: (json['remainingSeconds'] as num).toInt(),
+  $type: json['runtimeType'] as String?,
+);
+
+Map<String, dynamic> _$TimerPausedToJson(TimerPaused instance) =>
+    <String, dynamic>{
+      'remainingSeconds': instance.remainingSeconds,
+      'runtimeType': instance.$type,
+    };
+
+TimerReset _$TimerResetFromJson(Map<String, dynamic> json) => TimerReset(
+  remainingSeconds: (json['remainingSeconds'] as num).toInt(),
+  $type: json['runtimeType'] as String?,
+);
+
+Map<String, dynamic> _$TimerResetToJson(TimerReset instance) =>
+    <String, dynamic>{
+      'remainingSeconds': instance.remainingSeconds,
+      'runtimeType': instance.$type,
+    };
 
 RoundStarted _$RoundStartedFromJson(Map<String, dynamic> json) => RoundStarted(
   roundNumber: (json['roundNumber'] as num).toInt(),

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crichere — S7: Fees, Forfeits & Waitlist</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0A0F1E; --slate:#1A2236; --card:#1E2A3A; --border:#2A3A50;
+  --green:#22C55E; --gold:#F59E0B; --red:#EF4444; --blue:#3B82F6; --purple:#A855F7;
+  --text:#E2E8F0; --muted:#64748B; --dim:#94A3B8;
+  --chip-unpaid:#7F1D1D; --chip-partial:#78350F; --chip-paid:#14532D; --chip-waived:#1E293B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060B14;font-family:'DM Sans',sans-serif;color:var(--text);padding:32px 24px}
+h1{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green);margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:40px}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;color:var(--gold);margin:40px 0 20px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.screens-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:48px}
+.label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+
+/* MOBILE FRAME */
+.mobile{width:375px;background:var(--navy);border-radius:40px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.mobile-bar{height:44px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
+.m-body{padding:16px}
+.m-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.m-back{width:32px;height:32px;border-radius:10px;background:var(--slate);display:grid;place-items:center;cursor:pointer;color:var(--dim);font-size:16px}
+.m-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700}
+.m-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+/* WEB FRAME */
+.web{width:1100px;background:var(--navy);border-radius:16px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.web-topbar{height:56px;background:#0D1626;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px}
+.web-logo{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--green);font-size:18px}
+.web-layout{display:flex}
+.web-sidebar{width:220px;border-right:1px solid var(--border);padding:20px 0;flex-shrink:0}
+.web-nav-item{padding:10px 20px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px;border-left:3px solid transparent}
+.web-nav-item.active{color:var(--text);background:rgba(34,197,94,.06);border-left-color:var(--green)}
+.web-main{flex:1;padding:24px;overflow:hidden}
+
+/* Components */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.chip-unpaid{background:var(--chip-unpaid);color:#FCA5A5}
+.chip-partial{background:var(--chip-partial);color:#FCD34D}
+.chip-paid{background:var(--chip-paid);color:#86EFAC}
+.chip-waived{background:var(--chip-waived);color:var(--muted);border:1px solid var(--border)}
+.chip-pending{background:#1E3A5F;color:#93C5FD}
+.chip-approved{background:#14532D;color:#86EFAC}
+.chip-rejected{background:#7F1D1D;color:#FCA5A5}
+.chip-live{background:rgba(239,68,68,.15);color:var(--red);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+.tab-bar{display:flex;gap:4px;background:var(--slate);border-radius:10px;padding:4px;margin-bottom:16px}
+.tab{flex:1;padding:8px;border-radius:7px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;color:var(--muted)}
+.tab.active{background:var(--card);color:var(--text)}
+
+.player-row{display:flex;align-items:center;gap:10px;padding:12px;background:var(--slate);border-radius:12px;margin-bottom:8px}
+.avatar{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:14px;font-weight:700;flex-shrink:0}
+.player-info{flex:1;min-width:0}
+.player-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-meta{font-size:11px;color:var(--muted)}
+.amount{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);font-weight:700}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.btn-green{background:var(--green);color:#000}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}
+.btn-red{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-gold{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+
+.modal-overlay{background:rgba(0,0,0,.7);border-radius:28px;padding:16px;margin-top:16px}
+.modal-card{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--border)}
+.modal-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px}
+.form-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:4px}
+.form-input{width:100%;background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;margin-bottom:12px;font-family:'DM Sans',sans-serif}
+.form-input:focus{outline:none;border-color:var(--green)}
+.radio-group{display:flex;gap:8px;margin-bottom:12px}
+.radio-opt{flex:1;padding:8px;background:var(--slate);border:1px solid var(--border);border-radius:8px;text-align:center;font-size:12px;cursor:pointer;color:var(--muted)}
+.radio-opt.sel{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.07)}
+
+.summary-bar{display:flex;gap:8px;margin-bottom:16px}
+.stat-pill{flex:1;background:var(--slate);border-radius:10px;padding:10px 12px;text-align:center}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--gold)}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+
+.forfeit-card{background:var(--slate);border-radius:14px;padding:14px;margin-bottom:10px;border-left:3px solid var(--border)}
+.forfeit-card.pending{border-left-color:var(--gold)}
+.forfeit-card.approved{border-left-color:var(--green)}
+.forfeit-card.rejected{border-left-color:var(--red)}
+.fc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.fc-name{font-weight:600;font-size:14px}
+.fc-type{font-size:11px;color:var(--muted)}
+.fc-reason{font-size:12px;color:var(--dim);margin-bottom:10px;line-height:1.5}
+.fc-actions{display:flex;gap:8px}
+
+.waitlist-row{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(--slate);border-radius:11px;margin-bottom:6px}
+.position-badge{width:28px;height:28px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold);flex-shrink:0}
+.position-badge.p1{background:rgba(245,158,11,.12);border-color:var(--gold)}
+
+.purse-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px}
+.purse-fill{height:100%;border-radius:3px;background:var(--green);transition:width .4s}
+
+/* WEB TABLE */
+.w-table{width:100%;border-collapse:collapse}
+.w-table th{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.w-table td{padding:12px;border-bottom:1px solid rgba(42,58,80,.4);font-size:13px}
+.w-table tr:last-child td{border-bottom:none}
+.w-table tr:hover td{background:rgba(255,255,255,.02)}
+
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section-hdr h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600}
+
+.refund-select{background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;width:100%;margin-bottom:10px}
+.warning-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:12px;font-size:12px;color:var(--gold);margin-bottom:12px}
+.info-box{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:10px;font-size:12px;color:#93C5FD;margin-bottom:12px}
+</style>
+</head>
+<body>
+<h1>S7 — Fees, Forfeits & Waitlist</h1>
+<p class="subtitle">Mobile + Web · Full screens for fee collection, forfeit management, waitlist administration</p>
+
+<!-- ══════════════════════════════════════════════
+     MOBILE: FEE OBLIGATIONS — PLAYER FEES
+══════════════════════════════════════════════ -->
+<div class="section-title">📱 Mobile — Fee Obligations (Player view)</div>
+<div class="screens-row">
+
+  <!-- My Fee Status -->
+  <div>
+    <div class="label">My Fee — PARTIALLY_PAID</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">My Fee Obligation</div><div class="m-sub">TechCup 2026 · Player Fee</div></div>
+        </div>
+        <!-- Status hero -->
+        <div style="background:var(--slate);border-radius:16px;padding:18px;margin-bottom:16px;text-align:center;border:1px solid var(--chip-partial)">
+          <div class="chip chip-partial" style="font-size:13px;padding:5px 14px;margin-bottom:10px">PARTIALLY PAID</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--gold)">₹750</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">of ₹1,500 total · ₹750 remaining</div>
+          <!-- Progress bar -->
+          <div style="background:var(--border);border-radius:4px;height:8px;margin-top:14px;overflow:hidden">
+            <div style="width:50%;height:100%;background:var(--gold);border-radius:4px"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px">
+            <span>Paid: ₹750</span><span>Min to register: ₹500 ✓</span><span>Due: ₹750</span>
+          </div>
+        </div>
+        <!-- Minimum note -->
+        <div class="info-box">✓ Minimum ₹500 paid — you're auction eligible</div>
+        <!-- Payment history -->
+        <div class="section-hdr"><h3>Payment History</h3></div>
+        <div style="background:var(--slate);border-radius:12px;overflow:hidden">
+          <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:13px;font-weight:600">Cash payment</div><div style="font-size:11px;color:var(--muted)">Recorded by Rahul · 3 days ago</div></div>
+            <div class="amount">+₹750</div>
+          </div>
+        </div>
+        <!-- Contact admin note -->
+        <div style="background:var(--slate);border-radius:12px;padding:14px;margin-top:12px;text-align:center">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Need to pay remaining ₹750?</div>
+          <div style="font-size:12px;color:var(--dim)">Contact league admin to record payment.<br>V1 cash payments only.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Fee — PAID -->
+  <div>
+    <div class="label">My Fee — PAID</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">My Fee Obligation</div><div class="m-sub">TechCup 2026 · Player Fee</div></div>
+        </div>
+        <div style="background:var(--slate);border-radius:16px;padding:18px;margin-bottom:16px;text-align:center;border:1px solid #14532D">
+          <div class="chip chip-paid" style="font-size:13px;padding:5px 14px;margin-bottom:10px">FULLY PAID</div>
+          <div style="font-size:40px">✅</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--green);margin-top:8px">₹1,500</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Fully settled · Auction eligible</div>
+        </div>
+        <div style="background:var(--slate);border-radius:12px;overflow:hidden">
+          <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:600">Cash — Final payment</div><div style="font-size:11px;color:var(--muted)">May 8, 2026</div></div>
+            <div class="amount">+₹750</div>
+          </div>
+          <div style="padding:12px;display:flex;justify-content:space-between">
+            <div><div style="font-size:13px;font-weight:600">Cash — First payment</div><div style="font-size:11px;color:var(--muted)">May 5, 2026</div></div>
+            <div class="amount">+₹750</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Fee — UNPAID (auction-ineligible warning) -->
+  <div>
+    <div class="label">My Fee — UNPAID (blocked)</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">My Fee Obligation</div><div class="m-sub">TechCup 2026 · Player Fee</div></div>
+        </div>
+        <div style="background:rgba(239,68,68,.08);border-radius:16px;padding:18px;margin-bottom:16px;text-align:center;border:1px solid rgba(239,68,68,.3)">
+          <div class="chip chip-unpaid" style="font-size:13px;padding:5px 14px;margin-bottom:10px">UNPAID</div>
+          <div style="font-size:36px">🔒</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--red);margin-top:8px">₹0 / ₹1,500</div>
+          <div style="font-size:12px;color:#FCA5A5;margin-top:6px">⚠️ Not auction-eligible until ₹500 is paid</div>
+        </div>
+        <div class="warning-box">You won't appear in the auction until minimum ₹500 is paid. Contact the league admin to record your payment.</div>
+        <button class="btn btn-ghost" style="width:100%">📞 Contact Admin</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MOBILE: ADMIN — RECORD PAYMENT + WAIVE
+══════════════════════════════════════════════ -->
+<div class="section-title">📱 Mobile — Admin: Record Payment Modal + Waive</div>
+<div class="screens-row">
+
+  <!-- Record Payment Modal -->
+  <div>
+    <div class="label">Record Payment Modal</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Fee Management</div><div class="m-sub">TechCup 2026</div></div>
+        </div>
+        <!-- Summary -->
+        <div class="summary-bar">
+          <div class="stat-pill"><div class="stat-num">₹12,000</div><div class="stat-lbl">Collected</div></div>
+          <div class="stat-pill"><div class="stat-num">₹9,000</div><div class="stat-lbl">Pending</div></div>
+          <div class="stat-pill"><div class="stat-num" style="color:var(--green)">72%</div><div class="stat-lbl">Rate</div></div>
+        </div>
+        <!-- Record Payment modal -->
+        <div class="modal-card">
+          <div class="modal-title">💳 Record Payment</div>
+          <div class="form-label">PLAYER / FRANCHISE</div>
+          <div class="form-input" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <div class="avatar" style="background:rgba(168,85,247,.2);color:var(--purple);width:28px;height:28px;border-radius:7px;font-size:12px">AK</div>
+            <span style="font-size:13px">Anjali Kumar</span>
+            <span style="margin-left:auto;color:var(--muted)">▼</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <div style="flex:1"><div class="form-label">AMOUNT (₹)</div><input class="form-input" style="margin:0" value="750" type="number"></div>
+            <div style="flex:1"><div class="form-label">OBLIGATION STATUS</div><div class="form-input" style="margin:0;font-size:12px;color:var(--gold)">₹750 remaining</div></div>
+          </div>
+          <div class="form-label">PAYMENT MODE</div>
+          <div class="radio-group">
+            <div class="radio-opt sel">💵 Cash</div>
+            <div class="radio-opt" style="opacity:.4">🌐 Online (V2)</div>
+          </div>
+          <div class="form-label">NOTES (optional)</div>
+          <input class="form-input" placeholder="e.g. Collected at ground on May 10" style="margin-bottom:16px">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="flex:1">Cancel</button>
+            <button class="btn btn-green" style="flex:1">Record ₹750</button>
+          </div>
+          <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px">POST /leagues/{id}/fee-obligations/{id}/payments</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Waive Fee Confirmation -->
+  <div>
+    <div class="label">Waive Fee (with refund)</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Waive Fee</div><div class="m-sub">Irreversible · Terminal state</div></div>
+        </div>
+        <div class="warning-box">⚠️ Waiving is permanent. Status will become WAIVED and cannot be changed.</div>
+        <!-- Player info -->
+        <div style="background:var(--slate);border-radius:12px;padding:14px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="avatar" style="background:rgba(34,197,94,.15);color:var(--green);width:40px;height:40px;border-radius:11px">AK</div>
+            <div><div style="font-weight:600">Anjali Kumar</div><div style="font-size:12px;color:var(--muted)">Total: ₹1,500 · Paid: ₹750</div></div>
+          </div>
+        </div>
+        <div class="form-label">REFUND DECISION</div>
+        <select class="refund-select">
+          <option>FULL REFUND — Return ₹750</option>
+          <option>PARTIAL REFUND — Custom amount</option>
+          <option>NO REFUND</option>
+        </select>
+        <div class="form-label">REFUND AMOUNT (whole INR)</div>
+        <input class="form-input" value="750" placeholder="0 – 750">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Fixed rupee amount · 0 ≤ refund ≤ paid amount (₹750)</div>
+        <div class="form-label">ADMIN NOTES</div>
+        <input class="form-input" placeholder="Reason for waiver...">
+        <button class="btn btn-red" style="width:100%;margin-top:8px">Waive & Record Refund</button>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px">PATCH /leagues/{id}/fee-obligations/{id}/waive</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MOBILE: FORFEIT REQUESTS
+══════════════════════════════════════════════ -->
+<div class="section-title">📱 Mobile — Forfeit Request Flow (Player + Admin)</div>
+<div class="screens-row">
+
+  <!-- Player: Submit Forfeit -->
+  <div>
+    <div class="label">Player — Submit Forfeit Request</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Forfeit League</div><div class="m-sub">TechCup 2026</div></div>
+        </div>
+        <div class="warning-box">⚠️ Submitting a forfeit request will mark you as leaving this league. Refund decisions are made by the admin.</div>
+        <div style="background:var(--slate);border-radius:12px;padding:14px;margin-bottom:16px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">YOUR FEE STATUS</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:14px;font-weight:600">Player Fee</div>
+            <div><span class="chip chip-partial">PARTIAL</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Paid: ₹750 of ₹1,500</div>
+        </div>
+        <div class="form-label">FORFEIT TYPE</div>
+        <div class="radio-group">
+          <div class="radio-opt sel">🧍 Player</div>
+          <div class="radio-opt">🏟️ Franchise</div>
+        </div>
+        <div class="form-label">REASON</div>
+        <textarea class="form-input" rows="3" placeholder="Medical emergency, relocation...">Medical emergency — unable to participate</textarea>
+        <div style="background:rgba(239,68,68,.06);border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:var(--muted)">
+          You can cancel this request before admin approves it.
+        </div>
+        <button class="btn btn-red" style="width:100%">Submit Forfeit Request</button>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px">POST /leagues/{id}/forfeit</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin: Forfeit List -->
+  <div>
+    <div class="label">Admin — Forfeit Requests List</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Forfeit Requests</div><div class="m-sub">TechCup 2026 · 3 pending</div></div>
+        </div>
+        <!-- Filter -->
+        <div class="tab-bar" style="margin-bottom:14px">
+          <div class="tab active">Pending (3)</div>
+          <div class="tab">Approved</div>
+          <div class="tab">Rejected</div>
+        </div>
+        <!-- Cards -->
+        <div class="forfeit-card pending">
+          <div class="fc-top">
+            <div>
+              <div class="fc-name">Anjali Kumar</div>
+              <div class="fc-type">PLAYER forfeit · Submitted 2 days ago</div>
+            </div>
+            <span class="chip chip-pending">PENDING</span>
+          </div>
+          <div class="fc-reason">Medical emergency — unable to participate in TechCup 2026</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Paid: ₹750 · Thunder Strikers slot</div>
+          <div class="fc-actions">
+            <button class="btn btn-green btn-sm" style="flex:1">Review & Approve</button>
+            <button class="btn btn-red btn-sm">Reject</button>
+          </div>
+        </div>
+        <div class="forfeit-card pending">
+          <div class="fc-top">
+            <div><div class="fc-name">Ravi Sharma</div><div class="fc-type">PLAYER forfeit · 1 day ago</div></div>
+            <span class="chip chip-pending">PENDING</span>
+          </div>
+          <div class="fc-reason">Relocated to another city</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Paid: ₹0 · No refund needed</div>
+          <div class="fc-actions">
+            <button class="btn btn-green btn-sm" style="flex:1">Review & Approve</button>
+            <button class="btn btn-red btn-sm">Reject</button>
+          </div>
+        </div>
+        <div class="forfeit-card pending">
+          <div class="fc-top">
+            <div><div class="fc-name">Lightning Kings</div><div class="fc-type">FRANCHISE forfeit · 3 days ago</div></div>
+            <span class="chip chip-pending">PENDING</span>
+          </div>
+          <div class="fc-reason">Owner unable to manage team this season</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Franchise fee: ₹10,000 · Paid: ₹10,000</div>
+          <div class="fc-actions">
+            <button class="btn btn-green btn-sm" style="flex:1">Review & Approve</button>
+            <button class="btn btn-red btn-sm">Reject</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin: Approve Forfeit Modal -->
+  <div>
+    <div class="label">Admin — Approve Forfeit + Refund Decision</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Approve Forfeit</div><div class="m-sub">Terminal action</div></div>
+        </div>
+        <!-- Player card -->
+        <div style="background:var(--slate);border-radius:12px;padding:14px;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:600">Anjali Kumar</div>
+            <span class="chip chip-pending">PENDING</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">Reason: Medical emergency</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Paid: ₹750 | Total: ₹1,500</div>
+        </div>
+        <div class="form-label">REFUND DECISION</div>
+        <select class="refund-select">
+          <option>FULL — Return all ₹750 paid</option>
+          <option>PARTIAL — Custom fixed amount</option>
+          <option selected>NO REFUND</option>
+        </select>
+        <div class="form-label">REFUND AMOUNT (₹)</div>
+        <input class="form-input" value="0" placeholder="0 — 750">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Always whole INR integers · Never percentages</div>
+        <div class="form-label">WAITING LIST ACTION</div>
+        <div class="radio-group">
+          <div class="radio-opt sel">Auto-promote next</div>
+          <div class="radio-opt">Admin picks</div>
+        </div>
+        <div class="form-label">ADMIN NOTES</div>
+        <input class="form-input" placeholder="Internal notes...">
+        <button class="btn btn-green" style="width:100%;margin-top:8px">Approve — Status → WAIVED</button>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">PATCH /leagues/{id}/forfeit-requests/{id}/approve</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MOBILE: WAITING LIST
+══════════════════════════════════════════════ -->
+<div class="section-title">📱 Mobile — Waiting List (Player view + Admin view)</div>
+<div class="screens-row">
+
+  <!-- Player: My Waitlist Position -->
+  <div>
+    <div class="label">Player — My Waitlist Position</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Waiting List</div><div class="m-sub">TechCup 2026 · League full</div></div>
+        </div>
+        <!-- Hero -->
+        <div style="background:var(--slate);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px;border:1px solid var(--border)">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">YOUR POSITION</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:56px;font-weight:700;color:var(--gold)">#3</div>
+          <div style="font-size:13px;color:var(--dim)">2 people ahead of you</div>
+          <div style="margin-top:12px;font-size:12px;color:var(--muted)">Mode: <span style="color:var(--green)">AUTO_PROMOTE</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">You'll be notified when promoted</div>
+        </div>
+        <div class="info-box">When someone forfeits, you'll automatically move up. You'll be promoted once you reach position #1.</div>
+        <!-- Queue preview -->
+        <div class="section-hdr"><h3>Queue Preview</h3></div>
+        <div class="waitlist-row">
+          <div class="position-badge">1</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Suresh Patel</div><div style="font-size:11px;color:var(--muted)">Joined May 7</div></div>
+          <div class="chip" style="background:rgba(34,197,94,.1);color:var(--green)">Next up</div>
+        </div>
+        <div class="waitlist-row">
+          <div class="position-badge">2</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Priya Nair</div><div style="font-size:11px;color:var(--muted)">Joined May 8</div></div>
+        </div>
+        <div class="waitlist-row" style="border:1px solid var(--gold);background:rgba(245,158,11,.06)">
+          <div class="position-badge p1">3</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">You</div><div style="font-size:11px;color:var(--muted)">Joined May 9</div></div>
+          <span style="font-size:11px;color:var(--gold)">← YOU</span>
+        </div>
+        <button class="btn btn-red" style="width:100%;margin-top:16px">Withdraw from Queue</button>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">DELETE /leagues/{id}/waiting-list/{entryId}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin: Waitlist Management — AUTO_PROMOTE -->
+  <div>
+    <div class="label">Admin — Waitlist (AUTO_PROMOTE)</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Waiting List</div><div class="m-sub">TechCup 2026 · AUTO_PROMOTE</div></div>
+        </div>
+        <div class="info-box">AUTO_PROMOTE mode: next person in queue is automatically promoted when a spot opens up.</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">5 in queue · Positions by createdAt ASC</div>
+        <div class="waitlist-row" style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2)">
+          <div class="position-badge p1">1</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">Suresh Patel</div>
+            <div style="font-size:11px;color:var(--muted)">Joined May 7 · Player</div>
+          </div>
+          <div class="chip chip-approved">Next up</div>
+        </div>
+        <div class="waitlist-row">
+          <div class="position-badge">2</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Priya Nair</div><div style="font-size:11px;color:var(--muted)">May 8 · Player</div></div>
+          <button class="btn btn-ghost btn-sm">Remove</button>
+        </div>
+        <div class="waitlist-row">
+          <div class="position-badge">3</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Vikram Das</div><div style="font-size:11px;color:var(--muted)">May 9 · Player</div></div>
+          <button class="btn btn-ghost btn-sm">Remove</button>
+        </div>
+        <div class="waitlist-row">
+          <div class="position-badge">4</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Anita Singh</div><div style="font-size:11px;color:var(--muted)">May 9 · Player</div></div>
+          <button class="btn btn-ghost btn-sm">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin: Waitlist ADMIN_PICKS -->
+  <div>
+    <div class="label">Admin — Waitlist (ADMIN_PICKS)</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Waiting List</div><div class="m-sub">TechCup 2026 · ADMIN_PICKS</div></div>
+        </div>
+        <div class="warning-box">ADMIN_PICKS mode: you manually promote any entry (not just #1). Positions recalculate automatically.</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">5 in queue · Tap "Promote" on any entry</div>
+        <div class="waitlist-row">
+          <div class="position-badge">1</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Suresh Patel</div><div style="font-size:11px;color:var(--muted)">Bat · Level B · May 7</div></div>
+          <button class="btn btn-green btn-sm">Promote</button>
+        </div>
+        <div class="waitlist-row">
+          <div class="position-badge">2</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Priya Nair</div><div style="font-size:11px;color:var(--muted)">Bowl · Level A · May 8</div></div>
+          <button class="btn btn-green btn-sm">Promote</button>
+        </div>
+        <div class="waitlist-row">
+          <div class="position-badge">3</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:600">Vikram Das</div><div style="font-size:11px;color:var(--muted)">AR · Level A · May 9</div></div>
+          <button class="btn btn-green btn-sm">Promote</button>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center">Positions recalculate (1,2,3…) after each promotion · PESSIMISTIC_WRITE lock</div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px">PATCH /leagues/{id}/waiting-list/{entryId}/promote</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     WEB: FEE MANAGEMENT DASHBOARD
+══════════════════════════════════════════════ -->
+<div class="section-title">🖥️ Web — Fee Management Dashboard</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Admin Web — Full Fee Dashboard</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere</div>
+        <span style="color:var(--muted);font-size:13px">/ TechCup 2026 / Fees</span>
+      </div>
+      <div class="web-layout">
+        <div class="web-sidebar">
+          <div class="web-nav-item">🏠 Dashboard</div>
+          <div class="web-nav-item">👥 Players</div>
+          <div class="web-nav-item">🏟️ Franchises</div>
+          <div class="web-nav-item active">💰 Fees</div>
+          <div class="web-nav-item">⚠️ Forfeits</div>
+          <div class="web-nav-item">📋 Waitlist</div>
+          <div class="web-nav-item">🔨 Auction</div>
+        </div>
+        <div class="web-main">
+          <!-- Summary cards -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
+            <div style="background:var(--slate);border-radius:12px;padding:14px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">EXPECTED</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--text)">₹2.1L</div>
+            </div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">COLLECTED</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--green)">₹1.5L</div>
+            </div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">PENDING</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--gold)">₹60K</div>
+            </div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">COLLECTION RATE</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--green)">71.4%</div>
+            </div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">WAIVED</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--muted)">₹1,500</div>
+            </div>
+          </div>
+          <!-- Tabs -->
+          <div class="tab-bar" style="width:300px;margin-bottom:18px">
+            <div class="tab active">Player Fees</div>
+            <div class="tab">Franchise Fees</div>
+          </div>
+          <!-- Player Fees Table -->
+          <div style="background:var(--slate);border-radius:14px;overflow:hidden">
+            <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+              <span style="font-family:'Rajdhani',sans-serif;font-weight:600">Player Fee Obligations</span>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px">Export CSV</button>
+                <button class="btn btn-green" style="font-size:12px;padding:6px 12px">+ Record Payment</button>
+              </div>
+            </div>
+            <table class="w-table">
+              <thead>
+                <tr><th>Player</th><th>Category</th><th>Total</th><th>Paid</th><th>Remaining</th><th>Status</th><th>Eligible</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div style="font-weight:600">Anjali Kumar</div><div style="font-size:11px;color:var(--muted)">+91 98765 43210</div></td>
+                  <td><span style="color:var(--purple)">AR</span></td>
+                  <td class="amount">₹1,500</td>
+                  <td class="amount" style="color:var(--green)">₹1,500</td>
+                  <td class="amount" style="color:var(--muted)">₹0</td>
+                  <td><span class="chip chip-paid">PAID</span></td>
+                  <td><span style="color:var(--green)">✓</span></td>
+                  <td><button class="btn btn-ghost btn-sm">History</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:600">Ravi Sharma</div><div style="font-size:11px;color:var(--muted)">+91 87654 32109</div></td>
+                  <td><span style="color:var(--blue)">BAT</span></td>
+                  <td class="amount">₹1,500</td>
+                  <td class="amount" style="color:var(--gold)">₹750</td>
+                  <td class="amount" style="color:var(--gold)">₹750</td>
+                  <td><span class="chip chip-partial">PARTIAL</span></td>
+                  <td><span style="color:var(--green)">✓</span></td>
+                  <td><div style="display:flex;gap:6px"><button class="btn btn-green btn-sm">Pay</button><button class="btn btn-ghost btn-sm">Waive</button></div></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:600">Sam Patel</div><div style="font-size:11px;color:var(--muted)">+91 76543 21098</div></td>
+                  <td><span style="color:var(--blue)">BAT</span></td>
+                  <td class="amount">₹1,500</td>
+                  <td class="amount" style="color:var(--red)">₹0</td>
+                  <td class="amount" style="color:var(--red)">₹1,500</td>
+                  <td><span class="chip chip-unpaid">UNPAID</span></td>
+                  <td><span style="color:var(--red)">✗</span></td>
+                  <td><div style="display:flex;gap:6px"><button class="btn btn-green btn-sm">Pay</button><button class="btn btn-ghost btn-sm">Waive</button></div></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:600">Deepa Menon</div><div style="font-size:11px;color:var(--muted)">+91 65432 10987</div></td>
+                  <td><span style="color:var(--red)">BOWL</span></td>
+                  <td class="amount">₹1,500</td>
+                  <td class="amount" style="color:var(--muted)">₹750</td>
+                  <td class="amount" style="color:var(--muted)">—</td>
+                  <td><span class="chip chip-waived">WAIVED</span></td>
+                  <td><span style="color:var(--green)">✓</span></td>
+                  <td><button class="btn btn-ghost btn-sm">History</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     WEB: FORFEIT + WAITLIST
+══════════════════════════════════════════════ -->
+<div class="section-title">🖥️ Web — Forfeit Requests + Waitlist Management</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Admin Web — Forfeit + Waitlist</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere</div>
+        <span style="color:var(--muted);font-size:13px">/ TechCup 2026 / Forfeits</span>
+      </div>
+      <div class="web-layout">
+        <div class="web-sidebar">
+          <div class="web-nav-item">🏠 Dashboard</div>
+          <div class="web-nav-item">👥 Players</div>
+          <div class="web-nav-item">🏟️ Franchises</div>
+          <div class="web-nav-item">💰 Fees</div>
+          <div class="web-nav-item active">⚠️ Forfeits</div>
+          <div class="web-nav-item">📋 Waitlist</div>
+          <div class="web-nav-item">🔨 Auction</div>
+        </div>
+        <div class="web-main">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <!-- Left: Forfeit Requests -->
+            <div>
+              <div class="section-hdr">
+                <h3>Forfeit Requests</h3>
+                <span class="chip chip-pending">3 Pending</span>
+              </div>
+              <div class="forfeit-card pending" style="background:var(--slate)">
+                <div class="fc-top">
+                  <div><div class="fc-name">Anjali Kumar</div><div class="fc-type">PLAYER · 2d ago · Paid ₹750</div></div>
+                  <span class="chip chip-pending">PENDING</span>
+                </div>
+                <div class="fc-reason">Medical emergency</div>
+                <div class="fc-actions">
+                  <button class="btn btn-green btn-sm">Approve</button>
+                  <button class="btn btn-red btn-sm">Reject</button>
+                  <button class="btn btn-ghost btn-sm">Details</button>
+                </div>
+              </div>
+              <div class="forfeit-card approved" style="background:var(--slate)">
+                <div class="fc-top">
+                  <div><div class="fc-name">Karan Mehta</div><div class="fc-type">PLAYER · 1w ago · No refund</div></div>
+                  <span class="chip chip-approved">APPROVED</span>
+                </div>
+                <div class="fc-reason">Relocation — no refund decision</div>
+                <div style="font-size:11px;color:var(--muted)">Resolved by Rahul · Fee status → WAIVED</div>
+              </div>
+              <div class="forfeit-card rejected" style="background:var(--slate)">
+                <div class="fc-top">
+                  <div><div class="fc-name">Sneha Rao</div><div class="fc-type">PLAYER · 5d ago</div></div>
+                  <span class="chip chip-rejected">REJECTED</span>
+                </div>
+                <div class="fc-reason">Insufficient reason per league rules</div>
+                <div style="font-size:11px;color:var(--muted)">Resolved by Rahul</div>
+              </div>
+            </div>
+            <!-- Right: Waitlist -->
+            <div>
+              <div class="section-hdr">
+                <h3>Waiting List</h3>
+                <span style="font-size:12px;color:var(--muted)">ADMIN_PICKS mode</span>
+              </div>
+              <div class="waitlist-row" style="background:var(--slate)">
+                <div class="position-badge p1">1</div>
+                <div style="flex:1"><div style="font-weight:600">Suresh Patel</div><div style="font-size:11px;color:var(--muted)">Bat · Level B · May 7</div></div>
+                <button class="btn btn-green btn-sm">Promote</button>
+                <button class="btn btn-ghost btn-sm">Remove</button>
+              </div>
+              <div class="waitlist-row" style="background:var(--slate)">
+                <div class="position-badge">2</div>
+                <div style="flex:1"><div style="font-weight:600">Priya Nair</div><div style="font-size:11px;color:var(--muted)">Bowl · Level A · May 8</div></div>
+                <button class="btn btn-green btn-sm">Promote</button>
+                <button class="btn btn-ghost btn-sm">Remove</button>
+              </div>
+              <div class="waitlist-row" style="background:var(--slate)">
+                <div class="position-badge">3</div>
+                <div style="flex:1"><div style="font-weight:600">Vikram Das</div><div style="font-size:11px;color:var(--muted)">AR · Level A · May 9</div></div>
+                <button class="btn btn-green btn-sm">Promote</button>
+                <button class="btn btn-ghost btn-sm">Remove</button>
+              </div>
+              <div class="info-box" style="margin-top:12px">After promoting, positions auto-recalculate (1,2,3…) by createdAt ASC. Row locking prevents concurrent collisions.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

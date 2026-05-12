@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crichere — S10: UI States & Platform Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0A0F1E;--slate:#1A2236;--card:#1E2A3A;--border:#2A3A50;--green:#22C55E;--gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;--purple:#A855F7;--text:#E2E8F0;--muted:#64748B;--dim:#94A3B8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060B14;font-family:'DM Sans',sans-serif;color:var(--text);padding:32px 24px}
+h1{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green);margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:40px}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;color:var(--gold);margin:40px 0 20px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.screens-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:48px}
+.label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.mobile{width:375px;background:var(--navy);border-radius:40px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.mobile-bar{height:44px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
+.m-body{padding:16px;position:relative}
+.web{width:1100px;background:var(--navy);border-radius:16px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.web-topbar{height:56px;background:#0D1626;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px}
+.web-logo{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--green);font-size:18px}
+.web-sidebar{width:220px;border-right:1px solid var(--border);padding:20px 0;flex-shrink:0}
+.web-nav-item{padding:10px 20px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px;border-left:3px solid transparent}
+.web-nav-item.active{color:var(--text);background:rgba(34,197,94,.06);border-left-color:var(--green)}
+.web-main{flex:1;padding:24px;overflow:hidden}
+.web-layout{display:flex}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.btn-green{background:var(--green);color:#000}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}
+.btn-red{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.amount{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);font-weight:700}
+.w-table{width:100%;border-collapse:collapse}
+.w-table th{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.w-table td{padding:11px 12px;border-bottom:1px solid rgba(42,58,80,.4);font-size:13px}
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-hdr h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600}
+
+/* Shimmer */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.shimmer{background:linear-gradient(90deg,var(--slate) 25%,var(--card) 50%,var(--slate) 75%);background-size:800px 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+
+/* Offline overlay */
+.offline-overlay{position:absolute;inset:0;background:rgba(10,15,30,.85);backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;border-radius:38px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 1s linear infinite}
+
+/* Grayscale state */
+.grayscale{filter:grayscale(100%);opacity:.5}
+
+/* Purse shake */
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.shake{animation:shake 0.4s ease}
+</style>
+</head>
+<body>
+<h1>S10 — UI States & Platform Admin</h1>
+<p class="subtitle">Loading states, error states, connectivity loss, empty states · Platform admin web dashboard</p>
+
+<!-- ══════ SHIMMER LOADING STATES ══════ -->
+<div class="section-title">📱 Mobile — Shimmer Loading States</div>
+<div class="screens-row">
+
+  <!-- Shimmer: League List -->
+  <div>
+    <div class="label">Shimmer — League list</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <div class="shimmer" style="width:120px;height:24px"></div>
+          <div class="shimmer" style="width:32px;height:32px;border-radius:10px"></div>
+        </div>
+        <!-- Shimmer cards -->
+        <div style="background:var(--slate);border-radius:14px;padding:14px;margin-bottom:10px">
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <div class="shimmer" style="width:48px;height:48px;border-radius:12px;flex-shrink:0"></div>
+            <div style="flex:1">
+              <div class="shimmer" style="width:70%;height:16px;margin-bottom:8px"></div>
+              <div class="shimmer" style="width:50%;height:12px"></div>
+            </div>
+          </div>
+          <div class="shimmer" style="height:6px;width:100%;margin-bottom:6px;border-radius:4px"></div>
+          <div style="display:flex;gap:8px">
+            <div class="shimmer" style="height:28px;width:80px;border-radius:7px"></div>
+            <div class="shimmer" style="height:28px;width:80px;border-radius:7px"></div>
+          </div>
+        </div>
+        <div style="background:var(--slate);border-radius:14px;padding:14px;margin-bottom:10px">
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <div class="shimmer" style="width:48px;height:48px;border-radius:12px;flex-shrink:0"></div>
+            <div style="flex:1">
+              <div class="shimmer" style="width:60%;height:16px;margin-bottom:8px"></div>
+              <div class="shimmer" style="width:40%;height:12px"></div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--slate);border-radius:14px;padding:14px">
+          <div style="display:flex;gap:10px">
+            <div class="shimmer" style="width:48px;height:48px;border-radius:12px;flex-shrink:0"></div>
+            <div style="flex:1">
+              <div class="shimmer" style="width:75%;height:16px;margin-bottom:8px"></div>
+              <div class="shimmer" style="width:45%;height:12px"></div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted)">Shows if data &gt; 300ms · max 10 items · 10s timeout → error</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shimmer: Player card -->
+  <div>
+    <div class="label">Shimmer — Auction player card</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <!-- Top bar shimmer -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:18px">
+          <div class="shimmer" style="width:80px;height:20px;border-radius:8px"></div>
+          <div class="shimmer" style="width:60px;height:20px;border-radius:8px"></div>
+        </div>
+        <!-- Player card shimmer -->
+        <div style="background:var(--slate);border-radius:20px;padding:20px;margin-bottom:14px">
+          <div style="text-align:center;margin-bottom:14px">
+            <div class="shimmer" style="width:80px;height:80px;border-radius:20px;margin:0 auto 12px"></div>
+            <div class="shimmer" style="width:60%;height:24px;margin:0 auto 8px"></div>
+            <div class="shimmer" style="width:40%;height:16px;margin:0 auto"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <div class="shimmer" style="flex:1;height:40px;border-radius:10px"></div>
+            <div class="shimmer" style="flex:1;height:40px;border-radius:10px"></div>
+          </div>
+          <div class="shimmer" style="width:100%;height:56px;border-radius:14px"></div>
+        </div>
+        <!-- Bid log shimmer -->
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="shimmer" style="height:40px;border-radius:10px"></div>
+          <div class="shimmer" style="height:40px;border-radius:10px"></div>
+          <div class="shimmer" style="height:40px;border-radius:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════ OFFLINE / SSE DISCONNECTED ══════ -->
+<div class="section-title">📱 Mobile — Connectivity & SSE Disconnect States</div>
+<div class="screens-row">
+
+  <!-- SSE Disconnected — Live Auction -->
+  <div>
+    <div class="label">SSE Disconnected (auction room)</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body" style="min-height:480px">
+        <!-- Background (blurred/greyed auction content) -->
+        <div class="grayscale">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+            <div style="background:var(--slate);border-radius:8px;padding:6px 12px;font-size:12px">Round 1</div>
+            <div style="background:rgba(239,68,68,.15);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--red)">● LIVE</div>
+          </div>
+          <div style="background:var(--slate);border-radius:20px;padding:20px;text-align:center">
+            <div style="width:64px;height:64px;background:var(--card);border-radius:16px;margin:0 auto 10px"></div>
+            <div style="height:22px;background:var(--card);border-radius:6px;width:60%;margin:0 auto 8px"></div>
+            <div style="height:40px;background:var(--card);border-radius:10px;margin-bottom:10px"></div>
+          </div>
+        </div>
+        <!-- Offline overlay -->
+        <div class="offline-overlay">
+          <div style="font-size:36px">📡</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text)">Connection Lost</div>
+          <div class="spinner"></div>
+          <div style="font-size:13px;color:var(--muted);text-align:center;max-width:220px">Reconnecting with exponential backoff<br>2s → 4s → 8s → 30s cap</div>
+          <div style="font-size:11px;color:var(--muted)">Attempt 2/∞ · Next in 4s</div>
+          <button class="btn btn-ghost" style="font-size:12px">Retry now</button>
+          <div style="font-size:10px;color:var(--border);text-align:center">On reconnect: GET /auctions/{id}/state<br>then re-attach SSE with Last-Event-ID</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bidding Offline (connectivity_plus) -->
+  <div>
+    <div class="label">Offline — Bid blocked (SnackBar)</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+          <div style="background:var(--slate);border-radius:8px;padding:6px 12px;font-size:12px">Round 1</div>
+          <div style="background:rgba(239,68,68,.15);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--red)">● LIVE</div>
+        </div>
+        <!-- Player card (visible but limited) -->
+        <div style="background:var(--slate);border-radius:20px;padding:20px;text-align:center;margin-bottom:14px">
+          <div style="background:rgba(168,85,247,.2);color:var(--purple);width:64px;height:64px;border-radius:16px;display:grid;place-items:center;font-size:24px;font-weight:700;margin:0 auto 10px">AK</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700">Anjali Kumar</div>
+          <div style="font-size:12px;color:var(--muted)">All-rounder</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--gold);margin-top:10px">₹9,500</div>
+          <div style="font-size:12px;color:var(--muted)">Thunder Strikers leading</div>
+        </div>
+        <!-- Disabled bid buttons with shake -->
+        <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:14px;padding:14px;text-align:center" class="shake">
+          <div style="font-size:13px;color:var(--red);font-weight:600;margin-bottom:8px">⚠️ You're offline</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <button disabled class="btn btn-ghost" style="flex:1;opacity:.3;cursor:not-allowed">+500</button>
+            <button disabled class="btn btn-ghost" style="flex:1;opacity:.3;cursor:not-allowed">+1K</button>
+            <button disabled class="btn btn-ghost" style="flex:1;opacity:.3;cursor:not-allowed">+2K</button>
+          </div>
+          <button disabled class="btn" style="width:100%;background:rgba(239,68,68,.15);color:var(--red);opacity:.3;cursor:not-allowed">BID</button>
+        </div>
+        <!-- SnackBar -->
+        <div style="background:rgba(239,68,68,.9);border-radius:12px;padding:12px 14px;margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;color:#fff;font-weight:600">No internet connection</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.7)">Bidding blocked</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">connectivity_plus offline · No auto-queue · Manual retry required</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Purse Depleted / Insufficient Funds -->
+  <div>
+    <div class="label">Purse Depleted / Insufficient Funds</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+          <div style="background:var(--slate);border-radius:8px;padding:6px 12px;font-size:12px">Round 1</div>
+          <div style="background:rgba(239,68,68,.15);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--red)">● LIVE</div>
+        </div>
+        <div style="background:var(--slate);border-radius:20px;padding:20px;text-align:center;margin-bottom:14px">
+          <div style="background:rgba(59,130,246,.2);color:var(--blue);width:64px;height:64px;border-radius:16px;display:grid;place-items:center;font-size:24px;font-weight:700;margin:0 auto 10px">SP</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700">Sam Patel</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--gold);margin-top:10px">₹7,500</div>
+        </div>
+        <!-- Purse meter — depleted -->
+        <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:14px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px">
+            <span style="color:var(--red);font-weight:600">Purse remaining</span>
+            <span class="amount" style="color:var(--red)">₹1,200</span>
+          </div>
+          <div style="background:var(--border);border-radius:4px;height:8px;overflow:hidden">
+            <div style="width:2.4%;height:100%;background:var(--red);border-radius:4px"></div>
+          </div>
+          <div style="font-size:11px;color:var(--red);margin-top:6px">⚠️ Next bid ₹8,000 exceeds your purse</div>
+        </div>
+        <!-- Locked bid buttons -->
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <button disabled class="btn btn-ghost" style="flex:1;opacity:.25;cursor:not-allowed">+500</button>
+          <button disabled class="btn btn-ghost" style="flex:1;opacity:.25;cursor:not-allowed">+1K</button>
+          <button disabled class="btn btn-ghost" style="flex:1;opacity:.25;cursor:not-allowed">+2K</button>
+        </div>
+        <button disabled class="btn" style="width:100%;background:rgba(100,116,139,.15);color:var(--muted);cursor:not-allowed;border:1px solid var(--border)">🔒 Insufficient Purse</button>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">InsufficientPurseException · Bid buttons shake + turn gray</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════ EMPTY STATES ══════ -->
+<div class="section-title">📱 Mobile — Empty States & Errors</div>
+<div class="screens-row">
+
+  <div>
+    <div class="label">Empty — No leagues yet</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700">My Leagues</div>
+        </div>
+        <div style="min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px">
+          <div style="font-size:56px">🏏</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">No leagues yet</div>
+          <div style="font-size:13px;color:var(--muted);max-width:240px;line-height:1.5">You haven't joined any leagues. Ask an admin to invite you or discover public leagues.</div>
+          <button class="btn btn-ghost" style="margin-top:6px">Discover Leagues →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Error state — 10s timeout + Retry</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700">Discover</div>
+        </div>
+        <div style="min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px">
+          <div style="font-size:48px">⚠️</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--red)">Failed to load</div>
+          <div style="font-size:13px;color:var(--muted);max-width:240px;line-height:1.5">Shimmer timeout after 10s. Check your connection and try again.</div>
+          <button class="btn btn-green" style="margin-top:6px">↺ Retry</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Auction ended / round complete</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="min-height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:20px">
+          <div style="font-size:56px">🏆</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--gold)">Auction Complete!</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.5">TechCup 2026 auction has ended.<br>96 players sold · ₹8.4L total</div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="btn btn-gold" style="font-size:12px">View Summary</button>
+            <button class="btn btn-ghost" style="font-size:12px">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════ WEB: PLATFORM ADMIN ══════ -->
+<div class="section-title">🖥️ Web — Platform Admin Dashboard</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Platform Admin — Users & Leagues</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere Admin</div>
+        <span style="color:var(--red);font-size:12px;font-weight:700;background:rgba(239,68,68,.1);padding:4px 10px;border-radius:6px">PLATFORM ADMIN</span>
+        <div style="margin-left:auto;font-size:13px;color:var(--muted)">PLATFORM_ADMIN role required</div>
+      </div>
+      <div class="web-layout">
+        <div class="web-sidebar">
+          <div class="web-nav-item active">👥 Users</div>
+          <div class="web-nav-item">🏆 Leagues</div>
+          <div class="web-nav-item">📊 Metrics</div>
+          <div class="web-nav-item">💳 Subscriptions</div>
+        </div>
+        <div class="web-main">
+          <!-- Stats row -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
+            <div style="background:var(--slate);border-radius:12px;padding:14px"><div style="font-size:11px;color:var(--muted)">TOTAL USERS</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--text);margin-top:4px">2,841</div></div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px"><div style="font-size:11px;color:var(--muted)">ACTIVE</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--green);margin-top:4px">1,203</div></div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px"><div style="font-size:11px;color:var(--muted)">GHOST</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--muted);margin-top:4px">1,528</div></div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px"><div style="font-size:11px;color:var(--muted)">LIVE AUCTIONS</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--red);margin-top:4px">7</div></div>
+            <div style="background:var(--slate);border-radius:12px;padding:14px"><div style="font-size:11px;color:var(--muted)">TOTAL LEAGUES</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--gold);margin-top:4px">148</div></div>
+          </div>
+          <!-- Users table -->
+          <div style="background:var(--slate);border-radius:14px;overflow:hidden;margin-bottom:16px">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+              <span style="font-family:'Rajdhani',sans-serif;font-weight:600">User Management</span>
+              <input style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-size:12px" placeholder="Search users...">
+            </div>
+            <table class="w-table">
+              <thead><tr><th>User</th><th>Phone</th><th>Status</th><th>Leagues</th><th>Joined</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><div style="font-weight:600">Anjali Kumar</div></td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">+91 98765 43210</td>
+                  <td><span class="chip" style="background:rgba(34,197,94,.1);color:var(--green)">ACTIVE</span></td>
+                  <td>3</td>
+                  <td style="color:var(--muted)">May 2026</td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:600">Ravi Sharma</div></td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">+91 87654 32109</td>
+                  <td><span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted)">GHOST</span></td>
+                  <td>1</td>
+                  <td style="color:var(--muted)">May 2026</td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td><div style="font-weight:600">Karan Mehta</div></td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">+91 76543 21098</td>
+                  <td><span class="chip" style="background:rgba(239,68,68,.1);color:var(--red)">SUSPENDED</span></td>
+                  <td>0</td>
+                  <td style="color:var(--muted)">Apr 2026</td>
+                  <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">Manage</button><button class="btn btn-red btn-sm">Unsuspend</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Leagues table -->
+          <div style="background:var(--slate);border-radius:14px;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-family:'Rajdhani',sans-serif;font-weight:600">League Management</div>
+            <table class="w-table">
+              <thead><tr><th>League</th><th>Admin</th><th>Status</th><th>Players</th><th>Auctions</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span style="font-weight:600">TechCup 2026</span></td>
+                  <td style="color:var(--muted)">Rahul Kumar</td>
+                  <td><span class="chip" style="background:rgba(239,68,68,.12);color:var(--red);font-size:10px">● AUCTION LIVE</span></td>
+                  <td>120</td>
+                  <td>1 live</td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+                <tr>
+                  <td><span style="font-weight:600">CorpLeague 2025</span></td>
+                  <td style="color:var(--muted)">Priya S.</td>
+                  <td><span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted);font-size:10px">COMPLETED</span></td>
+                  <td>96</td>
+                  <td>1 done</td>
+                  <td><button class="btn btn-ghost btn-sm">Manage</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ WEB: PROMETHEUS METRICS ══════ -->
+<div class="section-title">🖥️ Web — Platform Metrics (Prometheus)</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Metrics Dashboard — Prometheus key metrics</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere Admin</div>
+        <span style="color:var(--muted);font-size:13px">/ Metrics</span>
+        <span style="font-size:12px;color:var(--muted);margin-left:auto">GET /actuator/prometheus · PLATFORM_ADMIN role</span>
+      </div>
+      <div class="web-layout">
+        <div class="web-sidebar">
+          <div class="web-nav-item">👥 Users</div>
+          <div class="web-nav-item">🏆 Leagues</div>
+          <div class="web-nav-item active">📊 Metrics</div>
+          <div class="web-nav-item">💳 Subscriptions</div>
+        </div>
+        <div class="web-main">
+          <!-- Key metrics grid -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+            <div style="background:var(--slate);border-radius:14px;padding:16px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">crichere.otp.sent</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--green)">14,382</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Total OTP sends</div>
+              <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden;margin-top:8px"><div style="width:70%;height:100%;background:var(--green);border-radius:4px"></div></div>
+            </div>
+            <div style="background:var(--slate);border-radius:14px;padding:16px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">crichere.otp.verified</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--blue)">11,203</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Verification rate: 77.9%</div>
+              <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden;margin-top:8px"><div style="width:78%;height:100%;background:var(--blue);border-radius:4px"></div></div>
+            </div>
+            <div style="background:var(--slate);border-radius:14px;padding:16px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">crichere.auction.started</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--gold)">148</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Total auctions started</div>
+              <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden;margin-top:8px"><div style="width:45%;height:100%;background:var(--gold);border-radius:4px"></div></div>
+            </div>
+            <div style="background:var(--slate);border-radius:14px;padding:16px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">crichere.auction.bids.placed</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--purple)">42,817</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Total bids recorded</div>
+              <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden;margin-top:8px"><div style="width:90%;height:100%;background:var(--purple);border-radius:4px"></div></div>
+            </div>
+            <div style="background:var(--slate);border-radius:14px;padding:16px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">crichere.auction.players.sold</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--green)">9,240</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Total players auctioned</div>
+              <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden;margin-top:8px"><div style="width:60%;height:100%;background:var(--green);border-radius:4px"></div></div>
+            </div>
+            <div style="background:var(--slate);border-radius:14px;padding:16px;border:1px solid rgba(239,68,68,.2)">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:6px">SSE connections (live)</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--red)">3,842</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Target: 5,000/auction max</div>
+              <div style="background:var(--border);border-radius:4px;height:4px;overflow:hidden;margin-top:8px"><div style="width:77%;height:100%;background:var(--red);border-radius:4px"></div></div>
+            </div>
+          </div>
+          <!-- X-Request-ID note -->
+          <div style="background:var(--slate);border-radius:12px;padding:14px;font-size:12px;color:var(--muted)">
+            Every request receives and returns an <span style="font-family:'JetBrains Mono',monospace;color:var(--gold)">X-Request-ID</span> header for distributed tracing across logs.
+            SSE ping every 15s · Gzip disabled for SSE streams · 95th percentile target &lt; 500ms on 4G.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

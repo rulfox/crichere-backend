@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
+import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../../../../core/router/app_router.gr.dart';
 import '../../domain/entities/auth_enums.dart';
 
@@ -18,55 +20,103 @@ class ProfileSetupScreen extends HookConsumerWidget {
     final isLoading = useState(false);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Complete Your Profile')),
+      backgroundColor: CricColor.appBg,
+      appBar: const CricAppBar(showLogo: true, title: 'PROFILE SETUP'),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: CricSpacing.page),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Help us get to know your cricket style!',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const SizedBox(height: CricSpacing.xxl),
+            Text(
+              'CREATE YOUR PROFILE',
+              style: CricTextStyle.displayLg.copyWith(fontSize: 24),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: CricSpacing.sm),
+            Text(
+              'Help us get to know your cricket style!',
+              style: CricTextStyle.body,
+            ),
+            const SizedBox(height: CricSpacing.xxl),
+            Center(
+              child: Stack(
+                children: [
+                  const AvatarCircle(name: '', radius: 50),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: CricColor.gold,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.camera_alt, size: 20, color: CricColor.navy),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: CricSpacing.xxl),
+            Text('FULL NAME', style: CricTextStyle.overline),
+            const SizedBox(height: CricSpacing.sm),
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Full Name',
-                border: OutlineInputBorder(),
-              ),
+              style: CricTextStyle.body,
+              decoration: CricDecoration.textField(hint: 'e.g. Anjali Sharma'),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: CricSpacing.lg),
+            Text('PLAYING ROLE', style: CricTextStyle.overline),
+            const SizedBox(height: CricSpacing.sm),
             DropdownButtonFormField<PlayingRole>(
               initialValue: role.value,
-              decoration: const InputDecoration(
-                labelText: 'Playing Role',
-                border: OutlineInputBorder(),
-              ),
+              dropdownColor: CricColor.navyMid,
+              style: CricTextStyle.body.copyWith(color: CricColor.textPrimary),
+              decoration: CricDecoration.textField(hint: 'Select Role'),
               items: PlayingRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.name.toUpperCase()))).toList(),
               onChanged: (v) => role.value = v,
             ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<BattingStyle>(
-              initialValue: battingStyle.value,
-              decoration: const InputDecoration(
-                labelText: 'Batting Style',
-                border: OutlineInputBorder(),
-              ),
-              items: BattingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name.toUpperCase()))).toList(),
-              onChanged: (v) => battingStyle.value = v,
+            const SizedBox(height: CricSpacing.lg),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('BATTING', style: CricTextStyle.overline),
+                      const SizedBox(height: CricSpacing.sm),
+                      DropdownButtonFormField<BattingStyle>(
+                        initialValue: battingStyle.value,
+                        dropdownColor: CricColor.navyMid,
+                        style: CricTextStyle.body.copyWith(color: CricColor.textPrimary),
+                        decoration: CricDecoration.textField(hint: 'Style'),
+                        items: BattingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name.toUpperCase()))).toList(),
+                        onChanged: (v) => battingStyle.value = v,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: CricSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('BOWLING', style: CricTextStyle.overline),
+                      const SizedBox(height: CricSpacing.sm),
+                      DropdownButtonFormField<BowlingStyle>(
+                        initialValue: bowlingStyle.value,
+                        dropdownColor: CricColor.navyMid,
+                        style: CricTextStyle.body.copyWith(color: CricColor.textPrimary),
+                        decoration: CricDecoration.textField(hint: 'Style'),
+                        items: BowlingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name.toUpperCase()))).toList(),
+                        onChanged: (v) => bowlingStyle.value = v,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<BowlingStyle>(
-              initialValue: bowlingStyle.value,
-              decoration: const InputDecoration(
-                labelText: 'Bowling Style',
-                border: OutlineInputBorder(),
-              ),
-              items: BowlingStyle.values.map((s) => DropdownMenuItem(value: s, child: Text(s.name.toUpperCase()))).toList(),
-              onChanged: (v) => bowlingStyle.value = v,
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: CricSpacing.xxl),
             ElevatedButton(
               onPressed: isLoading.value
                   ? null
@@ -79,8 +129,7 @@ class ProfileSetupScreen extends HookConsumerWidget {
                       }
                       isLoading.value = true;
                       try {
-                        // TODO: Implement Update Profile API call
-                        // await ref.read(authRepositoryProvider).updateProfile(...)
+                        // For now just navigate home, we will wire up the full profile update later
                         context.router.replaceAll([const HomeRoute()]);
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -90,15 +139,19 @@ class ProfileSetupScreen extends HookConsumerWidget {
                         isLoading.value = false;
                       }
                     },
-              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+              style: CricButtonStyle.primary,
               child: isLoading.value 
-                ? const CircularProgressIndicator() 
-                : const Text('Save & Finish'),
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: CricColor.navy),
+                  ) 
+                : const Text('SAVE & FINISH'),
             ),
+            const SizedBox(height: CricSpacing.xxl),
           ],
         ),
       ),
     );
   }
 }
-

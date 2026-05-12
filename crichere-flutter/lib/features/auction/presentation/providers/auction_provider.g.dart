@@ -171,3 +171,78 @@ final class AuctionRepositoryProvider
 }
 
 String _$auctionRepositoryHash() => r'63ac664b433292612efb48a5417270c7a734d57a';
+
+@ProviderFor(getAuctionSummary)
+final getAuctionSummaryProvider = GetAuctionSummaryFamily._();
+
+final class GetAuctionSummaryProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<AuctionSummary>,
+          AuctionSummary,
+          FutureOr<AuctionSummary>
+        >
+    with $FutureModifier<AuctionSummary>, $FutureProvider<AuctionSummary> {
+  GetAuctionSummaryProvider._({
+    required GetAuctionSummaryFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'getAuctionSummaryProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$getAuctionSummaryHash();
+
+  @override
+  String toString() {
+    return r'getAuctionSummaryProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<AuctionSummary> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<AuctionSummary> create(Ref ref) {
+    final argument = this.argument as String;
+    return getAuctionSummary(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GetAuctionSummaryProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$getAuctionSummaryHash() => r'088c3132af1766938e0215c7bd99567581cb4b42';
+
+final class GetAuctionSummaryFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<AuctionSummary>, String> {
+  GetAuctionSummaryFamily._()
+    : super(
+        retry: null,
+        name: r'getAuctionSummaryProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  GetAuctionSummaryProvider call(String auctionId) =>
+      GetAuctionSummaryProvider._(argument: auctionId, from: this);
+
+  @override
+  String toString() => r'getAuctionSummaryProvider';
+}

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Crichere — S5: Auctioneer Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0A0F1E;--slate:#1A2236;--card:#1E2A3A;--border:#2A3A50;--green:#22C55E;--gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;--purple:#A855F7;--text:#E2E8F0;--muted:#64748B;--dim:#94A3B8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060B14;font-family:'DM Sans',sans-serif;color:var(--text);padding:32px 24px}
+h1{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green);margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:40px}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;color:var(--gold);margin:40px 0 20px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.screens-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:48px}
+.label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.mobile{width:375px;background:var(--navy);border-radius:40px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.mobile-bar{height:44px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
+.m-body{padding:16px;position:relative}
+.web{width:1280px;background:var(--navy);border-radius:16px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.web-topbar{height:56px;background:#0D1626;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px}
+.web-logo{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--green);font-size:18px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s infinite}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.btn-green{background:var(--green);color:#000}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}
+.btn-gold{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.btn-red{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-caution{background:rgba(239,68,68,.08);color:var(--red);border:2px dashed rgba(239,68,68,.4)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.btn-lg{padding:16px 24px;font-size:18px;font-weight:700;letter-spacing:1px}
+.amount{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);font-weight:700}
+.purse-bar{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.purse-fill{height:100%;border-radius:4px}
+.av{display:grid;place-items:center;font-weight:700;border-radius:12px}
+.av-ar{background:rgba(168,85,247,.2);color:var(--purple)}
+.av-bat{background:rgba(59,130,246,.2);color:var(--blue)}
+.av-bowl{background:rgba(239,68,68,.2);color:var(--red)}
+.av-wk{background:rgba(34,197,94,.2);color:var(--green)}
+.player-pool-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--slate);border-radius:10px;margin-bottom:5px;cursor:pointer}
+.player-pool-row:hover{background:var(--card)}
+.player-pool-row.current{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.3)}
+.franchise-bid-btn{flex:1;background:var(--slate);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;cursor:pointer}
+.franchise-bid-btn:hover{border-color:var(--gold);background:rgba(245,158,11,.06)}
+.franchise-bid-btn.leading{border-color:var(--gold);background:rgba(245,158,11,.08)}
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.section-hdr h3{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600}
+.audit-row{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(42,58,80,.4)}
+.audit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.kbd{background:var(--slate);border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-size:11px;font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+<h1>S5 — Auctioneer Command Center</h1>
+<p class="subtitle">Mobile simplified panel · Web full command center with 3 columns · Undo modal · Force-assign · Round controls · Keyboard shortcuts</p>
+
+<div class="section-title">📱 Mobile — Auctioneer Simplified Panel</div>
+<div class="screens-row">
+
+  <div>
+    <div class="label">Mobile Auctioneer — Player up + bid recording</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">Auctioneer</div>
+          <div style="display:flex;gap:6px">
+            <div class="chip" style="background:rgba(239,68,68,.15);color:var(--red)" class="pulse">● LIVE</div>
+            <button class="btn btn-ghost btn-sm">⏸ Pause</button>
+          </div>
+        </div>
+        <!-- Current player compact -->
+        <div style="background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(168,85,247,.03));border:1.5px solid rgba(168,85,247,.35);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:12px">
+          <div class="av av-ar" style="width:44px;height:44px;font-size:17px">AK</div>
+          <div style="flex:1"><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">Anjali Kumar</div><div style="font-size:11px;color:var(--muted)">All-rounder · Base ₹500</div></div>
+          <span class="chip" style="background:rgba(168,85,247,.1);color:var(--purple)">UP</span>
+        </div>
+        <!-- Live bid -->
+        <div style="background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.35);border-radius:14px;padding:12px;text-align:center;margin-bottom:12px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">LEADING BID</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--gold)">₹9,500</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px">Thunder Strikers</div>
+        </div>
+        <!-- Franchise bid buttons -->
+        <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:7px">RECORD BID FOR FRANCHISE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+          <div class="franchise-bid-btn leading">
+            <div style="font-size:12px;font-weight:700;color:var(--gold)">⭐ Thunder</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold)">₹43K left</div>
+          </div>
+          <div class="franchise-bid-btn">
+            <div style="font-size:12px;font-weight:600">Lightning</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">₹31K left</div>
+          </div>
+          <div class="franchise-bid-btn">
+            <div style="font-size:12px;font-weight:600">Blazers</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">₹22K left</div>
+          </div>
+          <div class="franchise-bid-btn">
+            <div style="font-size:12px;font-weight:600">Phoenix</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">₹18K left</div>
+          </div>
+        </div>
+        <!-- Custom bid -->
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <input style="flex:1;background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:9px;color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;text-align:center" value="10,000">
+          <button class="btn btn-gold" style="white-space:nowrap">Record</button>
+        </div>
+        <!-- SOLD / UNSOLD -->
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-green btn-lg" style="flex:2;padding:14px">🔨 SOLD</button>
+          <button class="btn btn-ghost" style="flex:1">UNSOLD</button>
+        </div>
+        <!-- Undo -->
+        <button class="btn btn-caution" style="width:100%;padding:10px">↩ Undo Last Bid</button>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">POST /bid · POST /player/sold · PATCH /bid/undo</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Mobile Auctioneer — Round management</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">Round Control</div>
+          <button class="btn btn-ghost btn-sm">Auction Settings</button>
+        </div>
+        <!-- Round cards -->
+        <div style="background:rgba(34,197,94,.08);border:1.5px solid rgba(34,197,94,.35);border-radius:12px;padding:14px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700">Round 1 — Main</div>
+            <span class="chip" style="background:rgba(34,197,94,.1);color:var(--green)">LIVE</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px">82 sold · 38 remaining · All categories</div>
+          <div class="purse-bar" style="margin-bottom:8px"><div class="purse-fill" style="width:68%;background:var(--green)"></div></div>
+          <button class="btn btn-red btn-sm" style="width:100%">Complete Round 1</button>
+        </div>
+        <div style="background:var(--slate);border-radius:12px;padding:14px;margin-bottom:8px;opacity:.7">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700">Round 2 — Unsold</div>
+            <span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted)">PENDING</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">38 players from R1 · Reduced increment</div>
+          <button class="btn btn-ghost btn-sm" style="width:100%">Configure</button>
+        </div>
+        <div style="background:var(--slate);border-radius:12px;padding:14px;opacity:.5">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700">Round 3 — Accelerated</div>
+            <span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted)">PENDING</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">Final unsold · Fast bidding</div>
+        </div>
+        <!-- Pause/Resume -->
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-ghost" style="flex:1">⏸ Pause Auction</button>
+          <button class="btn btn-ghost btn-sm">Skip Player</button>
+        </div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">PATCH /auctions/{id}/pause · /resume · /rounds/{id}/complete</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-title">🖥️ Web — Full Auctioneer Command Center (3-Column)</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Web — Complete command center with all controls</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere</div>
+        <div class="chip" style="background:rgba(239,68,68,.15);color:var(--red);font-size:13px;padding:5px 14px" class="pulse">● AUCTIONEER — TechCup 2026 · Round 1</div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm">⏸ Pause</button>
+          <button class="btn btn-caution btn-sm"><span class="kbd">Ctrl+Z</span> Undo</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:280px 1fr 300px;min-height:560px">
+
+        <!-- LEFT: Searchable Player Pool -->
+        <div style="border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:8px">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.5px">PLAYER POOL</div>
+          <input style="background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:12px;width:100%" placeholder="Search players...">
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <span class="chip" style="background:var(--slate);color:var(--text);cursor:pointer">All</span>
+            <span class="chip" style="background:rgba(59,130,246,.1);color:var(--blue);cursor:pointer">BAT</span>
+            <span class="chip" style="background:rgba(239,68,68,.1);color:var(--red);cursor:pointer">BOWL</span>
+            <span class="chip" style="background:rgba(168,85,247,.1);color:var(--purple);cursor:pointer">AR</span>
+            <span class="chip" style="background:rgba(34,197,94,.1);color:var(--green);cursor:pointer">WK</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);font-style:italic">Browsing = READ only. No SSE fires until PUT.</div>
+          <!-- Current -->
+          <div class="player-pool-row current">
+            <div class="av av-ar" style="width:36px;height:36px;font-size:14px">AK</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700">Anjali Kumar</div><div style="font-size:11px;color:var(--purple)">AR · Base ₹500</div></div>
+            <span class="chip" style="background:rgba(168,85,247,.12);color:var(--purple);font-size:10px">NOW</span>
+          </div>
+          <div class="player-pool-row">
+            <div class="av av-bat" style="width:36px;height:36px;font-size:14px">SP</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">Sam Patel</div><div style="font-size:11px;color:var(--blue)">BAT · ₹1,000</div></div>
+            <button class="btn btn-ghost btn-sm">Put Up</button>
+          </div>
+          <div class="player-pool-row">
+            <div class="av av-bowl" style="width:36px;height:36px;font-size:14px">MK</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">Mohan Kumar</div><div style="font-size:11px;color:var(--red)">BOWL · ₹500</div></div>
+            <button class="btn btn-ghost btn-sm">Put Up</button>
+          </div>
+          <div class="player-pool-row" style="opacity:.6">
+            <div class="av av-ar" style="width:36px;height:36px;font-size:14px">PN</div>
+            <div style="flex:1"><div style="font-size:13px">Priya Nair</div><div style="font-size:11px;color:var(--purple)">AR · ₹750</div></div>
+            <button class="btn btn-ghost btn-sm">Put Up</button>
+          </div>
+          <div class="player-pool-row" style="opacity:.4">
+            <div class="av av-wk" style="width:36px;height:36px;font-size:14px">RS</div>
+            <div style="flex:1"><div style="font-size:13px">Rahul Singh</div><div style="font-size:11px;color:var(--green)">WK · ₹500</div></div>
+            <button class="btn btn-ghost btn-sm">Put Up</button>
+          </div>
+          <div style="font-size:11px;color:var(--muted);text-align:center">+87 more · POST /auctions/{id}/player/put</div>
+        </div>
+
+        <!-- CENTER: Hammer Zone -->
+        <div style="padding:20px;display:flex;flex-direction:column;align-items:center;gap:14px">
+          <!-- Current player -->
+          <div style="background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(168,85,247,.03));border:1.5px solid rgba(168,85,247,.35);border-radius:18px;padding:18px;width:100%;max-width:400px;text-align:center">
+            <div class="av av-ar" style="width:80px;height:80px;border-radius:20px;font-size:30px;margin:0 auto 10px">AK</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700">Anjali Kumar</div>
+            <div style="display:flex;justify-content:center;gap:6px;margin-top:6px">
+              <span class="chip" style="background:rgba(168,85,247,.12);color:var(--purple)">ALL-ROUNDER</span>
+              <span class="chip" style="background:rgba(59,130,246,.1);color:var(--blue)">Right Hand</span>
+              <span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted)">Advanced</span>
+            </div>
+          </div>
+
+          <!-- Live bid display -->
+          <div style="background:rgba(245,158,11,.08);border:2px solid rgba(245,158,11,.4);border-radius:16px;padding:14px;width:100%;max-width:400px;text-align:center">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:2px">CURRENT BID</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:48px;font-weight:700;color:var(--gold)">₹9,500</div>
+            <div style="font-size:13px;color:var(--dim);margin-top:4px">⭐ Thunder Strikers leading</div>
+          </div>
+
+          <!-- Franchise bid recording buttons -->
+          <div style="width:100%;max-width:400px">
+            <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:8px">RECORD BID — SELECT FRANCHISE</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+              <div class="franchise-bid-btn leading">
+                <div style="font-size:14px;font-weight:700;color:var(--gold)">⭐ Thunder Strikers</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold)">₹43K · Leading</div>
+              </div>
+              <div class="franchise-bid-btn">
+                <div style="font-size:14px;font-weight:600">Lightning Kings</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">₹31K remaining</div>
+              </div>
+              <div class="franchise-bid-btn">
+                <div style="font-size:14px;font-weight:600">Royal Blazers</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">₹22K remaining</div>
+              </div>
+              <div class="franchise-bid-btn">
+                <div style="font-size:14px;font-weight:600">Phoenix XI</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">₹18K remaining</div>
+              </div>
+            </div>
+            <!-- Custom bid -->
+            <div style="display:flex;gap:8px;margin-bottom:14px">
+              <input style="flex:1;background:var(--slate);border:1.5px solid var(--gold);border-radius:8px;padding:10px;color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;text-align:center" value="10,000">
+              <select style="background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px">
+                <option>+500</option>
+                <option>+1K</option>
+                <option>+2K</option>
+                <option>Custom</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SOLD / UNSOLD / SKIP — big buttons -->
+          <div style="display:flex;gap:10px;width:100%;max-width:400px">
+            <button class="btn btn-green btn-lg" style="flex:2">🔨 SOLD</button>
+            <button class="btn btn-ghost" style="flex:1;padding:16px;font-size:15px;font-weight:700">UNSOLD</button>
+            <button class="btn btn-ghost" style="flex:1;padding:16px;font-size:13px">SKIP</button>
+          </div>
+
+          <!-- Undo + Force assign -->
+          <div style="display:flex;gap:8px;width:100%;max-width:400px">
+            <button class="btn btn-caution" style="flex:1;padding:10px"><span class="kbd">Ctrl+Z</span> Undo Last Bid</button>
+            <button class="btn btn-ghost" style="flex:1;padding:10px;color:var(--purple);border-color:rgba(168,85,247,.3)">Force Assign →</button>
+          </div>
+
+          <!-- Keyboard shortcuts -->
+          <div style="background:var(--slate);border-radius:10px;padding:10px;width:100%;max-width:400px">
+            <div style="font-size:10px;color:var(--muted);font-weight:600;margin-bottom:6px">WEB KEYBOARD SHORTCUTS</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--dim)">
+              <span><span class="kbd">Enter</span> SOLD</span>
+              <span><span class="kbd">U</span> UNSOLD</span>
+              <span><span class="kbd">Ctrl+Z</span> Undo</span>
+              <span><span class="kbd">Tab</span> Next franchise</span>
+              <span><span class="kbd">1-8</span> Select franchise</span>
+            </div>
+          </div>
+
+          <div style="font-size:10px;color:var(--border);text-align:center;line-height:1.8">POST /bid · POST /player/sold · POST /player/unsold<br>PATCH /bid/undo · PATCH /player/undo-sold · POST /player/force-assign<br>Undo-sold: only valid if PLAYER_SOLD was absolute last audit action</div>
+        </div>
+
+        <!-- RIGHT: Purse leaderboard + audit log -->
+        <div style="border-left:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px">
+          <!-- Round status -->
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div style="font-family:'Rajdhani',sans-serif;font-weight:700">Round 1</div>
+              <span class="chip" style="background:rgba(34,197,94,.1);color:var(--green)">LIVE</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">82 sold · 38 remaining</div>
+            <div class="purse-bar" style="margin-bottom:6px"><div class="purse-fill" style="width:68%;background:var(--green)"></div></div>
+            <button class="btn btn-red btn-sm" style="width:100%">Complete Round</button>
+          </div>
+
+          <!-- Purse leaderboard -->
+          <div>
+            <div class="section-hdr"><h3>Franchise Purses</h3></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:10px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:700;color:var(--gold)">⭐ Thunder</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--gold)">₹43K</span></div>
+                <div class="purse-bar"><div class="purse-fill" style="width:86%;background:var(--gold)"></div></div>
+                <div style="font-size:10px;color:var(--muted);margin-top:3px">4/15 slots</div>
+              </div>
+              <div style="background:var(--slate);border-radius:10px;padding:10px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">Lightning</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green)">₹31K</span></div>
+                <div class="purse-bar"><div class="purse-fill" style="width:62%;background:var(--green)"></div></div>
+                <div style="font-size:10px;color:var(--muted);margin-top:3px">5/15</div>
+              </div>
+              <div style="background:var(--slate);border-radius:10px;padding:10px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">Blazers</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue)">₹22K</span></div>
+                <div class="purse-bar"><div class="purse-fill" style="width:44%;background:var(--blue)"></div></div>
+              </div>
+              <div style="background:var(--slate);border-radius:10px;padding:10px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600">Phoenix</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--purple)">₹18K</span></div>
+                <div class="purse-bar"><div class="purse-fill" style="width:36%;background:var(--purple)"></div></div>
+              </div>
+              <div style="background:var(--slate);border-radius:10px;padding:10px;opacity:.4">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--red)">Wind Warriors</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red)">₹0</span></div>
+                <div class="purse-bar"><div class="purse-fill" style="width:0%;background:var(--red)"></div></div>
+                <div style="font-size:10px;color:var(--red);margin-top:3px">🔒 Depleted</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mini audit log -->
+          <div>
+            <div class="section-hdr"><h3>Recent Actions</h3><button class="btn btn-ghost btn-sm">Full Log →</button></div>
+            <div>
+              <div class="audit-row"><div class="audit-dot" style="background:var(--green)"></div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--green)">SOLD ₹12,500 — Thunder</div><div style="font-size:10px;color:var(--muted)">Priya · #seq 141</div></div></div>
+              <div class="audit-row"><div class="audit-dot" style="background:var(--gold)"></div><div style="flex:1"><div style="font-size:12px">BID ₹12,500 — Thunder</div><div style="font-size:10px;color:var(--muted)">#140</div></div></div>
+              <div class="audit-row"><div class="audit-dot" style="background:var(--red)"></div><div style="flex:1"><div style="font-size:12px;color:var(--red)">UNDO — ₹9,500 Blazers</div><div style="font-size:10px;color:var(--muted)">#139 · "Wrong team"</div></div></div>
+              <div class="audit-row" style="border:none"><div class="audit-dot" style="background:var(--blue)"></div><div style="flex:1"><div style="font-size:12px;color:var(--blue)">PLAYER_UP — Anjali</div><div style="font-size:10px;color:var(--muted)">#138</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">🖥️ Web — Undo Sold Modal + Force Assign Modal</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Undo Sold — Confirmation Modal</div>
+    <div style="background:var(--navy);border-radius:16px;border:2px solid var(--border);padding:24px;width:420px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--red);margin-bottom:4px">↩ Undo Sold</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Only valid if PLAYER_SOLD was the last audit action</div>
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Anjali Kumar → Thunder Strikers</div>
+        <div style="font-size:12px;color:var(--muted)">Final price: ₹12,500 · Seq #141</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">Restoring: Thunder Strikers purse += ₹12,500 (deterministic)</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">REASON (required)</div>
+      <input style="width:100%;background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;margin-bottom:14px" value="Wrong franchise selected">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" style="flex:1">Cancel</button>
+        <button class="btn btn-red" style="flex:1">Undo Sold — Restore State</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px">PATCH /auctions/{id}/player/undo-sold · PlayerState → UP_FOR_BIDDING</div>
+    </div>
+  </div>
+  <div>
+    <div class="label">Force Assign Modal</div>
+    <div style="background:var(--navy);border-radius:16px;border:2px solid var(--border);padding:24px;width:420px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--purple);margin-bottom:4px">Force Assign Player</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Admin override · Bypasses purse validation · Price = ₹0</div>
+      <div style="background:var(--slate);border-radius:12px;padding:14px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Kiran Chandran</div>
+        <div style="font-size:12px;color:var(--muted)">Batter · UNSOLD · Base ₹500</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">ASSIGN TO FRANCHISE</div>
+      <select style="width:100%;background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;margin-bottom:12px">
+        <option>Select franchise…</option>
+        <option>Thunder Strikers (11 slots remaining)</option>
+        <option>Lightning Kings (10 remaining)</option>
+      </select>
+      <div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:var(--purple)">⚠ Force-assign bypasses purse validation. Final price recorded as ₹0. Reason required.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">REASON</div>
+      <input style="width:100%;background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:13px;margin-bottom:14px" placeholder="Admin reason...">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" style="flex:1">Cancel</button>
+        <button class="btn" style="flex:1;background:rgba(168,85,247,.15);color:var(--purple);border:1px solid rgba(168,85,247,.3)">Force Assign</button>
+      </div>
+      <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px">POST /auctions/{id}/player/force-assign · State → FORCE_ASSIGNED</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

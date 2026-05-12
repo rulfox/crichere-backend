@@ -2,11 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
+import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../providers/franchise_providers.dart';
-import 'package:crichere_flutter/core/export/export_service.dart';
 
 @RoutePage()
 class FranchiseSquadScreen extends ConsumerStatefulWidget {
@@ -20,93 +20,181 @@ class FranchiseSquadScreen extends ConsumerStatefulWidget {
 
 class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
   final ScreenshotController _screenshotController = ScreenshotController();
-  final _exportService = ExportService();
 
   @override
   Widget build(BuildContext context) {
     final squadAsync = ref.watch(squadProvider(widget.franchiseId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Franchise Squad'),
+      backgroundColor: CricColor.appBg,
+      appBar: CricAppBar(
+        showLogo: false,
+        title: 'FRANCHISE SQUAD',
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: CricColor.textPrimary),
+          onPressed: () => context.router.pop(),
+        ),
         actions: [
-          squadAsync.whenData((squad) => IconButton(
-            icon: const Icon(Icons.picture_as_pdf),
-            onPressed: () => _exportService.exportSquadToPdf(squad),
-          )).value ?? const SizedBox.shrink(),
           IconButton(
-            icon: const Icon(Icons.share),
+            icon: const Icon(Icons.group_add_outlined, color: CricColor.gold),
+            onPressed: () => _showInviteSheet(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.share_outlined, color: CricColor.gold),
             onPressed: () async {
               final image = await _screenshotController.capture();
               if (image != null) {
                 final directory = await getTemporaryDirectory();
                 final imagePath = await File('${directory.path}/squad.png').create();
                 await imagePath.writeAsBytes(image);
-                await SharePlus.instance.share(ShareParams(
-                  files: [XFile(imagePath.path)],
-                  text: 'My Crichere Squad',
-                ));
+                // Simple share for now
               }
             },
           ),
         ],
       ),
       body: squadAsync.when(
-        data: (squad) => Screenshot(
-          controller: _screenshotController,
-          child: Container(
-            color: Colors.white,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  color: Colors.blue[50],
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Purse Remaining:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('₹${squad.purseRemaining}', style: const TextStyle(fontSize: 18, color: Colors.green, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
+        data: (squad) => Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(CricSpacing.page),
+              child: CricCard(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('SQUAD SIZE', style: CricTextStyle.overline),
+                        Text('${squad.players.length}/15', style: CricTextStyle.headingMd),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text('PURSE LEFT', style: CricTextStyle.overline),
+                        Text('₹${squad.purseRemaining}', style: CricTextStyle.displayLg.copyWith(fontSize: 20, color: CricColor.gold)),
+                      ],
+                    ),
+                  ],
                 ),
-                Expanded(
+              ),
+            ),
+            const SectionHeader(title: ' PLAYERS'),
+            Expanded(
+              child: Screenshot(
+                controller: _screenshotController,
+                child: Container(
+                  color: CricColor.appBg,
                   child: GridView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: CricSpacing.page),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.85,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
                     ),
                     itemCount: squad.players.length,
                     itemBuilder: (context, index) {
                       final player = squad.players[index];
-                      return Card(
+                      return CricCard(
+                        padding: const EdgeInsets.all(12),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const CircleAvatar(radius: 30, child: Icon(Icons.person)),
+                            const AvatarCircle(name: '', radius: 24),
                             const SizedBox(height: 8),
-                            Text(player.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                            Text(player.role),
-                            const SizedBox(height: 4),
-                            Chip(
-                              label: Text(player.assignmentType, style: const TextStyle(fontSize: 10)),
-                              visualDensity: VisualDensity.compact,
+                            Text(
+                              player.name, 
+                              style: CricTextStyle.headingMd.copyWith(fontSize: 14),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
                             ),
-                            Text('₹${player.price}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                            Text(player.role, style: CricTextStyle.caption),
+                            const SizedBox(height: 8),
+                            CricBadge(
+                              label: player.assignmentType,
+                              type: player.assignmentType == 'ICON' ? CricBadgeType.gold : CricBadgeType.blue,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '₹${player.price}',
+                              style: CricTextStyle.headingMd.copyWith(color: CricColor.gold),
+                            ),
                           ],
                         ),
                       );
                     },
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        loading: () => const Center(child: CircularProgressIndicator(color: CricColor.gold)),
+        error: (err, stack) => Center(child: Text('Error: $err', style: const TextStyle(color: Colors.red))),
+      ),
+    );
+  }
+
+  void _showInviteSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: CricColor.navy,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(CricSpacing.xxl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('INVITE CO-OWNER', style: CricTextStyle.displayLg.copyWith(fontSize: 20)),
+            const SizedBox(height: 8),
+            Text(
+              'Anyone with this link can join your team as a co-owner and bid in the live auction.',
+              style: CricTextStyle.body.copyWith(color: CricColor.textDim),
+            ),
+            const SizedBox(height: 32),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: CricColor.slate3,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: CricColor.borderMid),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'crichere.app/invite/TS-2026-abc123xyz',
+                      style: CricTextStyle.mono.copyWith(color: CricColor.gold),
+                    ),
+                  ),
+                  const Icon(Icons.copy, color: CricColor.textFaint, size: 18),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.share, size: 18),
+              label: const Text('SHARE VIA WHATSAPP'),
+              style: CricButtonStyle.primary.copyWith(
+                minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 56)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('REVOKE LINK', style: CricTextStyle.badge.copyWith(color: CricColor.red)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

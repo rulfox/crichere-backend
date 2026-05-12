@@ -42,7 +42,7 @@ final class AuctionStateNotifierProvider
 }
 
 String _$auctionStateNotifierHash() =>
-    r'fe76d58c1b3c02c4a45233edde305c69b53f9e72';
+    r'2143719dda3e02e56904b7acbc94c1ef98b8d5ec';
 
 abstract class _$AuctionStateNotifier extends $Notifier<AuctionState> {
   AuctionState build();

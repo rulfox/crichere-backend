@@ -24,5 +24,9 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: FranchiseSquadRoute.page, guards: [authGuard]),
     AutoRoute(page: NotificationRoute.page, guards: [authGuard]),
     AutoRoute(page: LeagueCreateRoute.page, guards: [authGuard]),
+    AutoRoute(page: PostAuctionRoute.page, guards: [authGuard]),
+    AutoRoute(page: FranchiseInviteRoute.page, path: '/invite/:token', guards: [authGuard]),
+    AutoRoute(page: PlatformAdminRoute.page, path: '/admin', guards: [authGuard]),
+    AutoRoute(page: PreAssignmentRoute.page, path: '/leagues/:leagueId/pre-assignment', guards: [authGuard]),
   ];
 }

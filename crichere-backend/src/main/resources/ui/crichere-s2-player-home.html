@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crichere · S2 — Home & Discover</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0A0F1E;--navym:#0F172A;--slate:#1A2236;--slate2:#1E293B;--slate3:#243047;--slate4:#2D3A52;--green:#22C55E;--gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;--purp:#A855F7;--cyan:#06B6D4;--tx:#F1F5F9;--txm:#CBD5E1;--txd:#94A3B8;--txf:#64748B;--bdr:rgba(148,163,184,.1);--bdr2:rgba(148,163,184,.18)}
+body{font-family:'DM Sans',sans-serif;background:#060C1A;color:var(--tx);min-height:100vh}
+.topnav{position:sticky;top:0;z-index:50;background:rgba(6,12,26,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold)}
+.sec-title{font-size:11px;font-weight:600;color:var(--txf);letter-spacing:.5px}
+.nav-pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.pill{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bdr2);background:transparent;color:var(--txd);transition:all .15s}
+.pill.act,.pill:hover{background:var(--gold);color:#1a0f00;border-color:var(--gold)}
+.canvas{padding:32px 24px 80px;display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start}
+.sw{display:none;animation:fi .25s ease}
+.sw.show{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.frame-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--txf);text-align:center;margin-top:10px;font-family:'Rajdhani',sans-serif}
+.phone{width:375px;min-height:812px;background:var(--navy);border-radius:44px;border:2px solid var(--slate4);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);position:relative;flex-shrink:0}
+.ph-notch{height:44px;background:var(--navym);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.notch-pill{width:90px;height:10px;background:#060c1a;border-radius:5px}
+.web-frame{width:1200px;background:var(--navym);border-radius:14px;border:1.5px solid var(--slate4);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6);flex-shrink:0}
+.web-chrome{height:36px;background:var(--slate2);display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid var(--bdr)}
+.wdot{width:10px;height:10px;border-radius:50%}
+.wurl{flex:1;height:18px;background:var(--navy);border-radius:4px;margin:0 8px;display:flex;align-items:center;padding:0 10px;font-size:10px;color:var(--txf);font-family:'JetBrains Mono',monospace}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.8)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1.4s infinite;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px}
+.b-gold{background:rgba(245,158,11,.12);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.b-green{background:rgba(34,197,94,.12);color:#4ADE80;border:1px solid rgba(34,197,94,.28)}
+.b-blue{background:rgba(59,130,246,.12);color:#93C5FD;border:1px solid rgba(59,130,246,.28)}
+.b-red{background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.28)}
+.b-gray{background:rgba(100,116,139,.12);color:var(--txd);border:1px solid rgba(100,116,139,.22)}
+.b-purp{background:rgba(168,85,247,.12);color:#D8B4FE;border:1px solid rgba(168,85,247,.28)}
+.b-cyan{background:rgba(6,182,212,.12);color:#67E8F9;border:1px solid rgba(6,182,212,.28)}
+.card{background:var(--slate);border:1px solid var(--bdr);border-radius:16px;overflow:hidden}
+.slbl{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--txf);font-family:'Rajdhani',sans-serif}
+.shim{background:linear-gradient(90deg,var(--slate) 25%,var(--slate3) 50%,var(--slate) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+/* Bottom nav */
+.bnav{display:flex;border-top:1px solid var(--bdr);background:var(--navym)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px;cursor:pointer;position:relative}
+.bni span:first-child{font-size:18px}
+.bni-lbl{font-size:9px;font-weight:600;font-family:'Rajdhani',sans-serif;color:var(--txf)}
+.bni.act .bni-lbl{color:var(--gold)}
+.notif-dot{position:absolute;top:7px;right:calc(50% - 14px);width:15px;height:15px;background:var(--red);border-radius:50%;font-size:8px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid var(--navym)}
+/* Purse bar */
+.purse-wrap{background:var(--slate4);border-radius:4px;height:7px;overflow:hidden;position:relative}
+.purse-fill{height:100%;border-radius:4px;transition:width .5s}
+.purse-hatch{position:absolute;right:0;top:0;height:100%;background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(100,116,139,.4) 3px,rgba(100,116,139,.4) 6px)}
+/* Sidebar nav for web */
+.sidebar{width:220px;background:var(--navy);border-right:1px solid var(--bdr);display:flex;flex-direction:column;min-height:664px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;border-left:3px solid transparent;font-size:13px;color:var(--txd);transition:all .15s}
+.nav-item.act{background:rgba(245,158,11,.07);border-left-color:var(--gold);color:var(--tx);font-weight:600}
+.nav-item:hover:not(.act){background:rgba(255,255,255,.03)}
+</style>
+</head>
+<body>
+<div class="topnav">
+  <span class="logo">🏏 CRICHERE</span>
+  <span class="sec-title">Section 2 — Home &amp; Discover</span>
+  <div class="nav-pills">
+    <button class="pill act" onclick="show('player-home')">Player Home</button>
+    <button class="pill" onclick="show('admin-home')">Admin Home</button>
+    <button class="pill" onclick="show('discover')">Discover</button>
+    <button class="pill" onclick="show('web-dashboard')">Web Dashboard</button>
+    <button class="pill" onclick="show('notifications')">Notifications</button>
+  </div>
+</div>
+<div class="canvas">
+
+<!-- ═══ PLAYER HOME MOBILE ═══ -->
+<div class="sw show" id="sw-player-home">
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd);font-weight:600">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <!-- Header -->
+        <div style="padding:16px 20px 12px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:11px;color:var(--txf)">Good evening,</div><div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700">Anjali Sharma</div></div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="position:relative;cursor:pointer"><span style="font-size:22px">🔔</span><div class="notif-dot" style="top:0;right:-2px">3</div></div>
+            <div style="width:38px;height:38px;border-radius:50%;background:rgba(168,85,247,.18);border:2px solid rgba(168,85,247,.4);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#D8B4FE;font-family:'Rajdhani',sans-serif">AS</div>
+          </div>
+        </div>
+        <!-- Live banner -->
+        <div style="margin:0 14px 14px;background:linear-gradient(135deg,rgba(239,68,68,.18),var(--slate));border:1px solid rgba(239,68,68,.35);border-radius:16px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:6px"><div class="live-dot"></div><span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#FC8181;letter-spacing:.5px">LIVE NOW</span></div>
+            <span class="badge b-gold">T20</span>
+          </div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:3px">TechCup 2026</div>
+          <div style="font-size:11px;color:var(--txd);margin-bottom:10px">Round 1 · Player 23 of 120 · 47 viewers</div>
+          <button style="width:100%;padding:11px;background:var(--green);color:#0a2010;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">🚪 Enter Auction Room</button>
+        </div>
+        <!-- Stats row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 14px;margin-bottom:14px">
+          <div class="card" style="padding:11px 8px;text-align:center;border-radius:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold)">₹2k</div><div style="font-size:9px;color:var(--txf);margin-top:3px">Top sale</div></div>
+          <div class="card" style="padding:11px 8px;text-align:center;border-radius:12px"><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">3</div><div style="font-size:9px;color:var(--txf);margin-top:3px">Leagues</div></div>
+          <div class="card" style="padding:11px 8px;text-align:center;border-radius:12px"><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--green)">1</div><div style="font-size:9px;color:var(--txf);margin-top:3px">Live</div></div>
+        </div>
+        <!-- My leagues -->
+        <div style="padding:0 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="slbl">MY LEAGUES</div>
+          <span style="font-size:11px;color:var(--gold);cursor:pointer">See all →</span>
+        </div>
+        <div style="padding:0 14px;display:flex;flex-direction:column;gap:8px;flex:1">
+          <div class="card" style="padding:13px 14px;border-radius:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <div><div style="font-weight:600;font-size:14px">TechCup 2026</div><div style="font-size:11px;color:var(--txf);margin-top:2px">8 franchises · 120 players</div></div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="badge b-gold">T20</span><span class="badge b-red" style="gap:5px"><div class="live-dot" style="width:5px;height:5px"></div>Live</span></div>
+            </div>
+            <div style="font-size:11px;color:var(--green)">✓ Sold to Thunder Strikers · ₹2,000</div>
+            <div class="purse-wrap" style="margin-top:7px"><div class="purse-fill" style="width:23%;background:var(--gold)"></div></div>
+            <div style="font-size:9px;color:var(--txf);margin-top:3px">Auction 23% complete</div>
+          </div>
+          <div class="card" style="padding:13px 14px;border-radius:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <div><div style="font-weight:600;font-size:14px">Premier Office League</div><div style="font-size:11px;color:var(--txf);margin-top:2px">6 franchises · 90 players</div></div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="badge b-blue">T10</span><span class="badge b-blue">Upcoming</span></div>
+            </div>
+            <div style="font-size:11px;color:var(--gold)">⏱ Auction in 7 days · Purse ₹40,000</div>
+          </div>
+          <!-- Shimmer placeholder -->
+          <div class="card" style="padding:13px 14px;border-radius:14px;opacity:.5">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <div style="flex:1;margin-right:12px"><div class="shim" style="height:14px;width:70%;margin-bottom:6px"></div><div class="shim" style="height:10px;width:45%"></div></div>
+              <div class="shim" style="width:40px;height:40px;border-radius:50%"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Bottom nav -->
+        <div class="bnav">
+          <div class="bni act"><span>⌂</span><div class="bni-lbl">Home</div></div>
+          <div class="bni"><span>🔍</span><div class="bni-lbl">Discover</div></div>
+          <div class="bni" style="position:relative"><span>🔔</span><div class="notif-dot">2</div><div class="bni-lbl">Alerts</div></div>
+          <div class="bni"><span>👤</span><div class="bni-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S2-A · PLAYER HOME · Mobile</div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN HOME MOBILE ═══ -->
+<div class="sw" id="sw-admin-home">
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd);font-weight:600">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <!-- Header -->
+        <div style="padding:16px 20px 12px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:11px;color:var(--txf)">League Admin</div><div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700">Rahul Kumar</div></div>
+          <div style="display:flex;gap:10px;align-items:center"><span style="font-size:22px;cursor:pointer">🔔</span><div style="width:38px;height:38px;border-radius:50%;background:rgba(34,197,94,.18);border:2px solid rgba(34,197,94,.4);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green);font-family:'Rajdhani',sans-serif">RK</div></div>
+        </div>
+        <!-- Stats grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;padding:0 14px;margin-bottom:14px">
+          <div class="card" style="padding:10px 6px;text-align:center;border-radius:12px"><div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--green)">3</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Leagues</div></div>
+          <div class="card" style="padding:10px 6px;text-align:center;border-radius:12px"><div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--red)">1</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Live</div></div>
+          <div class="card" style="padding:10px 6px;text-align:center;border-radius:12px"><div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--blue)">8</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Franchises</div></div>
+          <div class="card" style="padding:10px 6px;text-align:center;border-radius:12px"><div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--gold)">120</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Players</div></div>
+        </div>
+        <!-- Fee alert banner -->
+        <div style="margin:0 14px 12px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:13px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:12px;font-weight:700;color:#FCA5A5">⚠ 4 fee payments due</div><div style="font-size:10px;color:var(--txd);margin-top:2px">₹2,000 pending across TechCup 2026</div></div>
+          <span style="font-size:11px;color:var(--gold);cursor:pointer;font-weight:600">View →</span>
+        </div>
+        <!-- My leagues header -->
+        <div style="padding:0 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="slbl">MY LEAGUES</div>
+          <button style="padding:6px 14px;background:var(--gold);color:#1a0f00;border:none;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer">+ Create</button>
+        </div>
+        <!-- League cards -->
+        <div style="padding:0 14px;display:flex;flex-direction:column;gap:8px;flex:1">
+          <div class="card" style="padding:13px 14px;border-radius:14px;border-color:rgba(239,68,68,.3)">
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+              <div style="font-weight:700;font-size:14px">TechCup 2026</div>
+              <div style="display:flex;gap:5px;align-items:center"><span class="badge b-red" style="font-size:8px">4 fees due</span><span class="badge b-red" style="gap:5px"><div class="live-dot" style="width:5px;height:5px"></div>Live</span></div>
+            </div>
+            <div style="font-size:11px;color:var(--txf);margin-bottom:10px">8 franchises · 120 players · Round 1/3</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <button style="padding:9px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">⚙ Manage</button>
+              <button style="padding:9px;background:var(--gold);color:#1a0f00;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">🔨 Auction</button>
+            </div>
+          </div>
+          <div class="card" style="padding:13px 14px;border-radius:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+              <div style="font-weight:600;font-size:14px">Premier Office League</div>
+              <span class="badge b-gray">Draft</span>
+            </div>
+            <div style="font-size:11px;color:var(--txf);margin-bottom:10px">0/6 franchises · 45 players</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <button style="padding:9px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">✎ Edit</button>
+              <button style="padding:9px;background:transparent;color:var(--green);border:1px solid rgba(34,197,94,.35);border-radius:10px;font-size:12px;font-weight:600;cursor:pointer">↑ Publish</button>
+            </div>
+          </div>
+          <div class="card" style="padding:13px 14px;border-radius:14px;opacity:.6">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <div style="font-weight:600;font-size:14px">Society Cup 2025</div>
+              <span class="badge b-gray">Completed</span>
+            </div>
+            <div style="font-size:11px;color:var(--txf)">Final results available · PDF exported</div>
+          </div>
+        </div>
+        <!-- Admin bottom nav -->
+        <div class="bnav">
+          <div class="bni act"><span>⌂</span><div class="bni-lbl">Home</div></div>
+          <div class="bni"><span>🏆</span><div class="bni-lbl">Leagues</div></div>
+          <div class="bni"><span>🔔</span><div class="bni-lbl">Alerts</div></div>
+          <div class="bni"><span>⚙</span><div class="bni-lbl">Admin</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S2-B · ADMIN HOME · Mobile (standalone screen)</div>
+  </div>
+</div>
+
+<!-- ═══ DISCOVER MOBILE ═══ -->
+<div class="sw" id="sw-discover">
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd);font-weight:600">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <!-- Search bar -->
+        <div style="padding:14px 16px 10px;border-bottom:1px solid var(--bdr)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:10px">Discover Leagues</div>
+          <div style="background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txf)">🔍 Search leagues, cities, formats...</div>
+        </div>
+        <!-- Filter chips -->
+        <div style="display:flex;gap:7px;padding:10px 14px;overflow-x:auto;border-bottom:1px solid var(--bdr);flex-shrink:0">
+          <span class="badge b-gold" style="cursor:pointer;white-space:nowrap;padding:5px 12px;font-size:10px">All</span>
+          <span class="badge b-red" style="cursor:pointer;white-space:nowrap;padding:5px 12px;font-size:10px;gap:5px"><div class="live-dot" style="width:5px;height:5px"></div>Live Now</span>
+          <span class="badge b-blue" style="cursor:pointer;white-space:nowrap;padding:5px 12px;font-size:10px">Upcoming</span>
+          <span class="badge b-green" style="cursor:pointer;white-space:nowrap;padding:5px 12px;font-size:10px">Open</span>
+          <span class="badge b-gray" style="cursor:pointer;white-space:nowrap;padding:5px 12px;font-size:10px">T20</span>
+          <span class="badge b-gray" style="cursor:pointer;white-space:nowrap;padding:5px 12px;font-size:10px">T10</span>
+        </div>
+        <!-- Live now section -->
+        <div style="padding:10px 14px 6px"><div class="slbl">🔴 LIVE NOW (2)</div></div>
+        <div style="display:flex;gap:10px;padding:0 14px 12px;overflow-x:auto">
+          <div style="background:linear-gradient(135deg,rgba(239,68,68,.16),var(--slate));border:1px solid rgba(239,68,68,.35);border-radius:16px;padding:14px;min-width:200px;flex-shrink:0">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="badge b-red" style="gap:5px;font-size:8px"><div class="live-dot" style="width:5px;height:5px"></div>Live</span><span class="badge b-gold" style="font-size:8px">T20</span></div>
+            <div style="font-size:26px;margin-bottom:6px">🏏</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px">TechCup 2026</div>
+            <div style="font-size:10px;color:var(--txd);margin-bottom:10px">Mumbai · 47 watching</div>
+            <button style="width:100%;padding:9px;background:var(--green);color:#0a2010;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">🚪 Enter Room</button>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(239,68,68,.12),var(--slate));border:1px solid rgba(239,68,68,.28);border-radius:16px;padding:14px;min-width:200px;flex-shrink:0">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span class="badge b-red" style="gap:5px;font-size:8px"><div class="live-dot" style="width:5px;height:5px"></div>Live</span><span class="badge b-blue" style="font-size:8px">T10</span></div>
+            <div style="font-size:26px;margin-bottom:6px">🏟️</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px">Corporate Premier</div>
+            <div style="font-size:10px;color:var(--txd);margin-bottom:10px">Bangalore · 22 watching</div>
+            <button style="width:100%;padding:9px;background:var(--green);color:#0a2010;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">🚪 Enter Room</button>
+          </div>
+        </div>
+        <!-- Upcoming -->
+        <div style="padding:2px 14px 6px"><div class="slbl">UPCOMING AUCTIONS</div></div>
+        <div style="padding:0 14px;display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto">
+          <div class="card" style="padding:13px 14px;border-radius:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+              <div><div style="font-weight:600;font-size:13px">Premier Office League</div><div style="font-size:10px;color:var(--txf);margin-top:2px">Mumbai · 6 franchises · 90 players</div></div>
+              <span class="badge b-blue">T10</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <div style="font-size:10px;color:var(--gold)">⏱ Jun 15 · Purse ₹40k</div>
+              <button style="padding:6px 12px;background:var(--gold);color:#1a0f00;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">Register →</button>
+            </div>
+          </div>
+          <div class="card" style="padding:13px 14px;border-radius:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+              <div><div style="font-weight:600;font-size:13px">Society Cup 2026</div><div style="font-size:10px;color:var(--txf);margin-top:2px">Pune · 4 franchises · 48 players</div></div>
+              <span class="badge b-gold">T20</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <div style="font-size:10px;color:var(--green)">✓ Registration open</div>
+              <button style="padding:6px 12px;background:var(--green);color:#0a2010;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">Join</button>
+            </div>
+          </div>
+          <div class="card" style="padding:13px 14px;border-radius:14px;opacity:.6">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <div style="font-weight:600;font-size:13px">University League 2026</div>
+              <span class="badge b-gray">Completed</span>
+            </div>
+            <div style="font-size:10px;color:var(--txf)">Chennai · Results available</div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni"><span>⌂</span><div class="bni-lbl">Home</div></div>
+          <div class="bni act"><span>🔍</span><div class="bni-lbl">Discover</div></div>
+          <div class="bni"><span>🔔</span><div class="bni-lbl">Alerts</div></div>
+          <div class="bni"><span>👤</span><div class="bni-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S2-C · DISCOVER LEAGUES · Mobile</div>
+  </div>
+</div>
+
+<!-- ═══ WEB DASHBOARD ═══ -->
+<div class="sw" id="sw-web-dashboard">
+  <div>
+    <div class="web-frame">
+      <div class="web-chrome">
+        <div class="wdot" style="background:#FC8181"></div><div class="wdot" style="background:#FCD34D"></div><div class="wdot" style="background:#4ADE80"></div>
+        <div class="wurl">crichere.app/dashboard</div>
+        <span class="badge b-green" style="margin-left:auto;font-size:8px">League Admin</span>
+      </div>
+      <div style="display:grid;grid-template-columns:220px 1fr;min-height:664px">
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <div style="padding:16px;border-bottom:1px solid var(--bdr)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,.18);border:2px solid rgba(34,197,94,.4);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--green);font-family:'Rajdhani',sans-serif">RK</div>
+              <div><div style="font-size:13px;font-weight:600">Rahul Kumar</div><div style="font-size:10px;color:var(--txf)">League Admin</div></div>
+            </div>
+          </div>
+          <div style="padding:8px 0">
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--txf);padding:8px 16px 4px;font-family:'Rajdhani',sans-serif">MAIN</div>
+            <div class="nav-item act"><span>⌂</span> Dashboard</div>
+            <div class="nav-item"><span>🏆</span> My Leagues</div>
+            <div class="nav-item"><span>👥</span> Players</div>
+            <div class="nav-item"><span>🏟️</span> Franchises</div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:1px;color:var(--txf);padding:12px 16px 4px;font-family:'Rajdhani',sans-serif">MANAGEMENT</div>
+            <div class="nav-item"><span>💰</span> Fees &amp; Payments</div>
+            <div class="nav-item"><span>📋</span> Forfeits</div>
+            <div class="nav-item"><span>⏳</span> Waitlist</div>
+            <div class="nav-item"><span>🔔</span> Notifications <span class="badge b-red" style="margin-left:auto;font-size:8px">3</span></div>
+          </div>
+          <div style="margin-top:auto;padding:12px 16px;border-top:1px solid var(--bdr)">
+            <div class="nav-item" style="padding:8px 0"><span>⚙</span> Settings</div>
+            <div class="nav-item" style="padding:8px 0"><span>🚪</span> Sign Out</div>
+          </div>
+        </div>
+        <!-- Main content -->
+        <div style="background:var(--navy);padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+            <div><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700">Good evening, Rahul 👋</div><div style="font-size:12px;color:var(--txd);margin-top:2px">Here's what's happening across your leagues</div></div>
+            <button style="padding:10px 18px;background:var(--gold);color:#1a0f00;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;letter-spacing:.5px">+ Create League</button>
+          </div>
+          <!-- Stats cards -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px">
+            <div class="card" style="padding:14px;border-radius:14px"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px">LEAGUES</div><div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--green)">3</div></div>
+            <div class="card" style="padding:14px;border-radius:14px;border-color:rgba(239,68,68,.3)"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px">LIVE</div><div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--red)">1</div></div>
+            <div class="card" style="padding:14px;border-radius:14px"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px">FRANCHISES</div><div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--blue)">8</div></div>
+            <div class="card" style="padding:14px;border-radius:14px"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px">PLAYERS</div><div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--gold)">120</div></div>
+            <div class="card" style="padding:14px;border-radius:14px;border-color:rgba(239,68,68,.3)"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:.8px;margin-bottom:6px">FEES DUE</div><div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--red)">₹2k</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 320px;gap:14px">
+            <!-- Left: leagues table -->
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--txd);letter-spacing:.5px">MY LEAGUES</div>
+              </div>
+              <div class="card" style="overflow:hidden;border-radius:14px">
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.5fr;padding:10px 16px;font-size:10px;color:var(--txf);font-weight:700;letter-spacing:.5px;border-bottom:1px solid var(--bdr);background:var(--slate2)"><span>LEAGUE</span><span>FORMAT</span><span>PLAYERS</span><span>STATUS</span><span>ACTIONS</span></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.5fr;padding:13px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+                  <div><div style="font-weight:600;font-size:13px">TechCup 2026</div><div style="font-size:10px;color:var(--txf);margin-top:1px">8 franchises · Mumbai</div></div>
+                  <span class="badge b-gold" style="font-size:9px">T20</span>
+                  <span style="font-size:12px;color:var(--txd)">120/120</span>
+                  <span class="badge b-red" style="gap:5px;font-size:9px"><div class="live-dot" style="width:5px;height:5px"></div>Live</span>
+                  <div style="display:flex;gap:6px"><button style="padding:5px 11px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:11px;cursor:pointer">Manage</button><button style="padding:5px 11px;background:var(--gold);color:#1a0f00;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">Auction</button></div>
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.5fr;padding:13px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+                  <div><div style="font-weight:600;font-size:13px">Premier Office League</div><div style="font-size:10px;color:var(--txf);margin-top:1px">6 franchises · Mumbai</div></div>
+                  <span class="badge b-blue" style="font-size:9px">T10</span>
+                  <span style="font-size:12px;color:var(--txd)">45/90</span>
+                  <span class="badge b-gray" style="font-size:9px">Draft</span>
+                  <div style="display:flex;gap:6px"><button style="padding:5px 11px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:11px;cursor:pointer">Edit</button><button style="padding:5px 11px;background:var(--green);color:#0a2010;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">↑ Publish</button></div>
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.5fr;padding:13px 16px;align-items:center;opacity:.6">
+                  <div><div style="font-weight:600;font-size:13px">Society Cup 2025</div><div style="font-size:10px;color:var(--txf);margin-top:1px">4 franchises</div></div>
+                  <span class="badge b-gold" style="font-size:9px">T20</span>
+                  <span style="font-size:12px;color:var(--txd)">48/48</span>
+                  <span class="badge b-gray" style="font-size:9px">Completed</span>
+                  <div style="display:flex;gap:6px"><button style="padding:5px 11px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:11px;cursor:pointer">Summary</button></div>
+                </div>
+              </div>
+            </div>
+            <!-- Right: quick actions + fee summary -->
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="card" style="padding:14px;border-radius:14px;border-color:rgba(239,68,68,.3)">
+                <div style="font-size:10px;font-weight:700;color:var(--red);font-family:'Rajdhani',sans-serif;letter-spacing:.8px;margin-bottom:10px">⚠ FEE ALERTS</div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px">Sam Patel</div><span class="badge b-red" style="font-size:8px">Unpaid</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px">Rohit Verma</div><span class="badge b-gold" style="font-size:8px">Partial</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px">Thunder Strikers</div><span class="badge b-red" style="font-size:8px">Unpaid</span></div>
+                </div>
+                <button style="width:100%;padding:9px;background:transparent;color:var(--gold);border:1px solid rgba(245,158,11,.3);border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px">View All Fees →</button>
+              </div>
+              <div class="card" style="padding:14px;border-radius:14px">
+                <div style="font-size:10px;font-weight:700;color:var(--txf);font-family:'Rajdhani',sans-serif;letter-spacing:.8px;margin-bottom:10px">QUICK ACTIONS</div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <button style="width:100%;padding:10px;background:var(--slate3);color:var(--tx);border:1px solid var(--bdr2);border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;text-align:left">📥 Bulk Import Players</button>
+                  <button style="width:100%;padding:10px;background:var(--slate3);color:var(--tx);border:1px solid var(--bdr2);border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;text-align:left">🏟️ Create Franchise</button>
+                  <button style="width:100%;padding:10px;background:var(--slate3);color:var(--tx);border:1px solid var(--bdr2);border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;text-align:left">💰 Record Payment</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S2-D · ADMIN DASHBOARD · Web 1440px (sidebar + content)</div>
+  </div>
+</div>
+
+<!-- ═══ NOTIFICATIONS MOBILE ═══ -->
+<div class="sw" id="sw-notifications">
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd);font-weight:600">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <div style="padding:14px 16px 12px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700">Notifications</div>
+          <span style="font-size:11px;color:var(--gold);cursor:pointer">Mark all read</span>
+        </div>
+        <div style="flex:1;overflow-y:auto">
+          <!-- Unread -->
+          <div style="display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--bdr);border-left:3px solid var(--gold);background:rgba(245,158,11,.02)">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(34,197,94,.14);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🔨</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:3px">You were sold!</div><div style="font-size:11px;color:var(--txd);line-height:1.5">Thunder Strikers bought you for ₹2,000 in TechCup 2026.</div><div style="font-size:9px;color:var(--txf);margin-top:5px">PLAYER_SOLD · 2 min ago</div></div>
+          </div>
+          <div style="display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--bdr);border-left:3px solid var(--gold);background:rgba(245,158,11,.015)">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(245,158,11,.14);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🏆</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:3px">Auction started</div><div style="font-size:11px;color:var(--txd);line-height:1.5">TechCup 2026 Round 1 has begun. 120 players up for bid.</div><div style="font-size:9px;color:var(--txf);margin-top:5px">AUCTION_STARTED · 18 min ago</div></div>
+          </div>
+          <div style="display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--bdr);border-left:3px solid var(--gold)">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(59,130,246,.14);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">💰</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700;margin-bottom:3px">Fee recorded</div><div style="font-size:11px;color:var(--txd);line-height:1.5">₹500 player fee recorded for TechCup 2026.</div><div style="font-size:9px;color:var(--txf);margin-top:5px">FEE_PAYMENT_RECORDED · Yesterday</div></div>
+          </div>
+          <!-- Read -->
+          <div style="display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--bdr);border-left:3px solid transparent;opacity:.6">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(34,197,94,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✅</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:3px">Profile activated</div><div style="font-size:11px;color:var(--txd)">Ghost profile claimed successfully.</div><div style="font-size:9px;color:var(--txf);margin-top:5px">3 days ago</div></div>
+          </div>
+          <div style="display:flex;gap:12px;padding:13px 16px;border-bottom:1px solid var(--bdr);border-left:3px solid transparent;opacity:.45">
+            <div style="width:36px;height:36px;border-radius:10px;background:rgba(168,85,247,.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📋</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:3px">Waitlist position updated</div><div style="font-size:11px;color:var(--txd)">You are #3 on Premier Office League waitlist.</div><div style="font-size:9px;color:var(--txf);margin-top:5px">1 week ago · PATCH /notifications/{id}/read</div></div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni"><span>⌂</span><div class="bni-lbl">Home</div></div>
+          <div class="bni"><span>🔍</span><div class="bni-lbl">Discover</div></div>
+          <div class="bni act" style="position:relative"><span>🔔</span><div class="notif-dot">3</div><div class="bni-lbl">Alerts</div></div>
+          <div class="bni"><span>👤</span><div class="bni-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S2-E · NOTIFICATIONS · Mobile</div>
+  </div>
+</div>
+
+</div>
+<script>
+function show(id){
+  document.querySelectorAll('.sw').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('act'));
+  document.getElementById('sw-'+id)?.classList.add('show');
+  event.target.classList.add('act');
+  window.scrollTo(0,0);
+}
+</script>
+</body></html>

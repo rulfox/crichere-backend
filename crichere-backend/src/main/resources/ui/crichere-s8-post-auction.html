@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crichere — S8: Post-Auction & Exports</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0A0F1E;--slate:#1A2236;--card:#1E2A3A;--border:#2A3A50;--green:#22C55E;--gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;--purple:#A855F7;--text:#E2E8F0;--muted:#64748B;--dim:#94A3B8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060B14;font-family:'DM Sans',sans-serif;color:var(--text);padding:32px 24px}
+h1{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green);margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:40px}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;color:var(--gold);margin:40px 0 20px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.screens-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:48px}
+.label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.mobile{width:375px;background:var(--navy);border-radius:40px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.mobile-bar{height:44px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
+.m-body{padding:16px}
+.m-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.m-back{width:32px;height:32px;border-radius:10px;background:var(--slate);display:grid;place-items:center;color:var(--dim);font-size:16px}
+.m-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700}
+.m-sub{font-size:12px;color:var(--muted)}
+.web{width:1100px;background:var(--navy);border-radius:16px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.web-topbar{height:56px;background:#0D1626;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px}
+.web-logo{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--green);font-size:18px}
+.web-sidebar{width:220px;border-right:1px solid var(--border);padding:20px 0;flex-shrink:0}
+.web-nav-item{padding:10px 20px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px;border-left:3px solid transparent}
+.web-nav-item.active{color:var(--text);background:rgba(34,197,94,.06);border-left-color:var(--green)}
+.web-main{flex:1;padding:24px;overflow:hidden}
+.web-layout{display:flex}
+.tab-bar{display:flex;gap:4px;background:var(--slate);border-radius:10px;padding:4px;margin-bottom:16px}
+.tab{flex:1;padding:8px;border-radius:7px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;color:var(--muted)}
+.tab.active{background:var(--card);color:var(--text)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.chip-sold{background:rgba(34,197,94,.12);color:var(--green)}
+.chip-unsold{background:rgba(100,116,139,.15);color:var(--muted)}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.btn-green{background:var(--green);color:#000}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}
+.btn-gold{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.amount{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);font-weight:700}
+.stat-card{background:var(--slate);border-radius:12px;padding:14px}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.w-table{width:100%;border-collapse:collapse}
+.w-table th{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.5px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.w-table td{padding:11px 12px;border-bottom:1px solid rgba(42,58,80,.4);font-size:13px}
+.avatar{display:grid;place-items:center;font-size:14px;font-weight:700;border-radius:10px}
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.section-hdr h3{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600}
+
+/* Audit log timeline */
+.audit-item{display:flex;gap:10px;margin-bottom:0}
+.audit-line{display:flex;flex-direction:column;align-items:center;gap:0}
+.audit-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.audit-connector{width:2px;background:var(--border);flex:1;min-height:20px}
+.audit-content{padding-bottom:14px;flex:1}
+.audit-action{font-size:13px;font-weight:600;line-height:1.3}
+.audit-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.audit-seq{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--border);float:right}
+
+/* Squad card (1080x1080 preview) */
+.squad-preview{width:320px;height:320px;background:linear-gradient(135deg,#0F2027,#203A43,#2C5364);border-radius:16px;overflow:hidden;position:relative;flex-shrink:0;border:2px solid var(--border)}
+.squad-preview .sp-logo{position:absolute;top:16px;left:16px;font-size:28px}
+.squad-preview .sp-team{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff;position:absolute;top:52px;left:16px}
+.squad-preview .sp-badge{position:absolute;top:16px;right:16px;background:var(--gold);color:#000;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11px;padding:4px 8px;border-radius:6px}
+.squad-preview .sp-players{position:absolute;top:90px;left:16px;right:16px}
+.sp-player-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.85)}
+.squad-preview .sp-footer{position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center}
+.sp-purse{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)}
+</style>
+</head>
+<body>
+<h1>S8 — Post-Auction Summary & Exports</h1>
+<p class="subtitle">Mobile + Web · Summary dashboards, audit log, PDF/image exports</p>
+
+<!-- ══════ MOBILE: POST-AUCTION SUMMARY ══════ -->
+<div class="section-title">📱 Mobile — Post-Auction Summary Tabs</div>
+<div class="screens-row">
+
+  <!-- Overview Tab -->
+  <div>
+    <div class="label">Summary — Overview</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Auction Summary</div><div class="m-sub">TechCup 2026 · Completed</div></div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab active" style="font-size:11px">Overview</div>
+          <div class="tab" style="font-size:11px">Squads</div>
+          <div class="tab" style="font-size:11px">Unsold</div>
+          <div class="tab" style="font-size:11px">Share</div>
+        </div>
+        <!-- Stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+          <div class="stat-card"><div class="stat-num" style="color:var(--green)">96</div><div class="stat-lbl">Players Sold</div></div>
+          <div class="stat-card"><div class="stat-num" style="color:var(--gold)">₹8.4L</div><div class="stat-lbl">Total Spent</div></div>
+          <div class="stat-card"><div class="stat-num" style="color:var(--muted)">24</div><div class="stat-lbl">Unsold</div></div>
+          <div class="stat-card"><div class="stat-num">8</div><div class="stat-lbl">Franchises</div></div>
+        </div>
+        <!-- Top buys -->
+        <div class="section-hdr"><h3>Top Buys 🏆</h3></div>
+        <div style="background:var(--slate);border-radius:12px;overflow:hidden;margin-bottom:12px">
+          <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold);width:28px">#1</div>
+            <div class="avatar" style="background:rgba(168,85,247,.2);color:var(--purple);width:36px;height:36px">AK</div>
+            <div style="flex:1"><div style="font-weight:600;font-size:14px">Anjali Kumar</div><div style="font-size:11px;color:var(--muted)">Thunder Strikers</div></div>
+            <div class="amount" style="font-size:16px">₹12,500</div>
+          </div>
+          <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--dim);width:28px">#2</div>
+            <div class="avatar" style="background:rgba(59,130,246,.2);color:var(--blue);width:36px;height:36px">SP</div>
+            <div style="flex:1"><div style="font-weight:600;font-size:14px">Sam Patel</div><div style="font-size:11px;color:var(--muted)">Lightning Kings</div></div>
+            <div class="amount" style="font-size:16px">₹10,000</div>
+          </div>
+          <div style="padding:12px;display:flex;gap:10px;align-items:center">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--dim);width:28px">#3</div>
+            <div class="avatar" style="background:rgba(239,68,68,.2);color:var(--red);width:36px;height:36px">RD</div>
+            <div style="flex:1"><div style="font-weight:600;font-size:14px">Rahul Das</div><div style="font-size:11px;color:var(--muted)">Royal Blazers</div></div>
+            <div class="amount" style="font-size:16px">₹8,500</div>
+          </div>
+        </div>
+        <!-- Purse utilization -->
+        <div class="section-hdr"><h3>Purse Usage</h3></div>
+        <div style="background:var(--slate);border-radius:12px;padding:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Thunder Strikers</span><span class="amount">₹43,200 spent</span></div>
+          <div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden;margin-bottom:10px">
+            <div style="width:86%;height:100%;background:var(--green);border-radius:4px"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span>Lightning Kings</span><span class="amount">₹38,500 spent</span></div>
+          <div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden">
+            <div style="width:77%;height:100%;background:var(--gold);border-radius:4px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unsold Tab -->
+  <div>
+    <div class="label">Summary — Unsold Players</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Auction Summary</div><div class="m-sub">TechCup 2026 · Completed</div></div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab" style="font-size:11px">Overview</div>
+          <div class="tab" style="font-size:11px">Squads</div>
+          <div class="tab active" style="font-size:11px">Unsold (24)</div>
+          <div class="tab" style="font-size:11px">Share</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">24 players went unsold across all rounds</div>
+        <!-- Filter by category -->
+        <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px">
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--text);white-space:nowrap">All (24)</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--blue);white-space:nowrap">BAT (8)</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--red);white-space:nowrap">BOWL (10)</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--purple);white-space:nowrap">AR (4)</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--green);white-space:nowrap">WK (2)</div>
+        </div>
+        <!-- Unsold player rows -->
+        <div style="background:var(--slate);border-radius:12px;overflow:hidden">
+          <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center">
+            <div class="avatar" style="background:rgba(59,130,246,.2);color:var(--blue);width:36px;height:36px">KC</div>
+            <div style="flex:1"><div style="font-weight:600;font-size:13px">Kiran Chandran</div><div style="font-size:11px;color:var(--muted)">Batter · Base ₹500</div></div>
+            <span class="chip chip-unsold">UNSOLD</span>
+          </div>
+          <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center">
+            <div class="avatar" style="background:rgba(239,68,68,.2);color:var(--red);width:36px;height:36px">MK</div>
+            <div style="flex:1"><div style="font-weight:600;font-size:13px">Mohan Kumar</div><div style="font-size:11px;color:var(--muted)">Bowler · Base ₹500</div></div>
+            <span class="chip chip-unsold">UNSOLD</span>
+          </div>
+          <div style="padding:12px;display:flex;gap:10px;align-items:center">
+            <div class="avatar" style="background:rgba(168,85,247,.2);color:var(--purple);width:36px;height:36px">AP</div>
+            <div style="flex:1"><div style="font-weight:600;font-size:13px">Arjun Pillai</div><div style="font-size:11px;color:var(--muted)">All-rounder · Base ₹1,000</div></div>
+            <span class="chip chip-unsold">UNSOLD</span>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:12px"><button class="btn btn-ghost btn-sm">View all 24 unsold →</button></div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:6px">GET /auctions/{id}/summary/unsold</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Tab + Export -->
+  <div>
+    <div class="label">Summary — Share & Export</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Auction Summary</div><div class="m-sub">TechCup 2026</div></div>
+        </div>
+        <div class="tab-bar">
+          <div class="tab" style="font-size:11px">Overview</div>
+          <div class="tab" style="font-size:11px">Squads</div>
+          <div class="tab" style="font-size:11px">Unsold</div>
+          <div class="tab active" style="font-size:11px">Share</div>
+        </div>
+        <!-- Squad image preview -->
+        <div class="squad-preview" style="width:100%;height:200px;margin-bottom:14px">
+          <div class="sp-logo">⚡</div>
+          <div class="sp-team">Thunder Strikers</div>
+          <div class="sp-badge">TechCup 2026</div>
+          <div class="sp-players" style="top:80px">
+            <div class="sp-player-row"><span>1. Anjali Kumar (C)</span><span style="color:var(--gold)">₹12,500</span></div>
+            <div class="sp-player-row"><span>2. Ravi Sharma</span><span style="color:var(--gold)">₹7,000</span></div>
+            <div class="sp-player-row"><span>3. Priya Nair</span><span style="color:var(--gold)">₹5,500</span></div>
+            <div class="sp-player-row"><span style="color:rgba(255,255,255,.4)">...+12 more</span><span></span></div>
+          </div>
+          <div class="sp-footer">
+            <span style="font-size:10px;color:rgba(255,255,255,.5)">crichere.app</span>
+            <span class="sp-purse">Remaining: ₹6,800</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px">1080×1080 PNG — optimized for WhatsApp</div>
+        <!-- Export buttons -->
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-gold" style="width:100%;padding:12px">📱 Share Squad Image (WhatsApp)</button>
+          <button class="btn btn-ghost" style="width:100%;padding:12px">📄 Download Squad PDF</button>
+          <button class="btn btn-ghost" style="width:100%;padding:12px">📊 Full Auction PDF Report</button>
+        </div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:10px">
+          GET .../franchises/{id}/export/image<br>
+          GET .../franchises/{id}/export/pdf<br>
+          GET .../summary/export/pdf
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════ MOBILE: AUDIT LOG ══════ -->
+<div class="section-title">📱 Mobile — Auction Audit Log</div>
+<div class="screens-row">
+
+  <div>
+    <div class="label">Audit Log — Timeline View</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Audit Log</div><div class="m-sub">TechCup 2026 · 284 events</div></div>
+        </div>
+        <!-- Filter chips -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px">
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;white-space:nowrap;color:var(--text)">All</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;white-space:nowrap;color:var(--gold)">BID_PLACED</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;white-space:nowrap;color:var(--green)">PLAYER_SOLD</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;white-space:nowrap;color:var(--muted)">UNSOLD</div>
+          <div style="background:var(--slate);border-radius:8px;padding:5px 12px;font-size:12px;white-space:nowrap;color:var(--red)">UNDO</div>
+        </div>
+        <!-- Timeline -->
+        <div>
+          <!-- PLAYER_SOLD -->
+          <div class="audit-item">
+            <div class="audit-line">
+              <div class="audit-dot" style="background:var(--green)"></div>
+              <div class="audit-connector"></div>
+            </div>
+            <div class="audit-content" style="margin-left:10px">
+              <div class="audit-action">Anjali Kumar sold <span style="color:var(--gold)">₹12,500</span>
+                <span class="audit-seq">#284</span>
+              </div>
+              <div class="audit-meta">Thunder Strikers · Priya (auctioneer) · 7:42 PM</div>
+            </div>
+          </div>
+          <!-- BID_PLACED x3 -->
+          <div class="audit-item">
+            <div class="audit-line">
+              <div class="audit-dot" style="background:var(--gold)"></div>
+              <div class="audit-connector"></div>
+            </div>
+            <div class="audit-content" style="margin-left:10px">
+              <div class="audit-action">Bid ₹12,500 — Thunder Strikers <span class="audit-seq">#283</span></div>
+              <div class="audit-meta">Recorded by Priya · 7:41 PM</div>
+            </div>
+          </div>
+          <div class="audit-item">
+            <div class="audit-line">
+              <div class="audit-dot" style="background:var(--gold)"></div>
+              <div class="audit-connector"></div>
+            </div>
+            <div class="audit-content" style="margin-left:10px">
+              <div class="audit-action">Bid ₹11,000 — Lightning Kings <span class="audit-seq">#282</span></div>
+              <div class="audit-meta">7:41 PM</div>
+            </div>
+          </div>
+          <!-- UNDO -->
+          <div class="audit-item">
+            <div class="audit-line">
+              <div class="audit-dot" style="background:var(--red)"></div>
+              <div class="audit-connector"></div>
+            </div>
+            <div class="audit-content" style="margin-left:10px">
+              <div class="audit-action" style="color:var(--red)">BID UNDONE — ₹9,500 Royal Blazers <span class="audit-seq">#281</span></div>
+              <div class="audit-meta">Reason: "Wrong franchise selected" · 7:40 PM</div>
+            </div>
+          </div>
+          <!-- PLAYER_UP -->
+          <div class="audit-item">
+            <div class="audit-line">
+              <div class="audit-dot" style="background:var(--blue)"></div>
+              <div class="audit-connector"></div>
+            </div>
+            <div class="audit-content" style="margin-left:10px">
+              <div class="audit-action" style="color:var(--blue)">Anjali Kumar put up for bidding <span class="audit-seq">#280</span></div>
+              <div class="audit-meta">Base price ₹500 · Round 1 · 7:38 PM</div>
+            </div>
+          </div>
+          <!-- FORCE_ASSIGN -->
+          <div class="audit-item">
+            <div class="audit-line">
+              <div class="audit-dot" style="background:var(--purple)"></div>
+            </div>
+            <div class="audit-content" style="margin-left:10px">
+              <div class="audit-action" style="color:var(--purple)">FORCE ASSIGNED — Sam Patel → Lightning Kings <span class="audit-seq">#279</span></div>
+              <div class="audit-meta">₹0 · Admin override · 7:35 PM</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:12px">GET /auctions/{id}/audit-log · All 15+ action types</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Franchise Summary -->
+  <div>
+    <div class="label">Franchise Squad Summary</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="m-header">
+          <div class="m-back">←</div>
+          <div><div class="m-title">Thunder Strikers</div><div class="m-sub">Final Squad · TechCup 2026</div></div>
+        </div>
+        <!-- Purse summary -->
+        <div style="background:var(--slate);border-radius:14px;padding:14px;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+            <div><div style="font-size:11px;color:var(--muted)">STARTING PURSE</div><div class="amount" style="font-size:18px">₹50,000</div></div>
+            <div style="text-align:right"><div style="font-size:11px;color:var(--muted)">SPENT</div><div class="amount" style="font-size:18px;color:var(--red)">₹43,200</div></div>
+            <div style="text-align:right"><div style="font-size:11px;color:var(--muted)">REMAINING</div><div class="amount" style="font-size:18px;color:var(--green)">₹6,800</div></div>
+          </div>
+          <div style="background:var(--border);border-radius:4px;height:8px;overflow:hidden">
+            <div style="width:86%;height:100%;background:linear-gradient(to right,var(--green),var(--gold));border-radius:4px"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px">
+            <span>15/15 slots filled</span><span>86% purse used</span>
+          </div>
+        </div>
+        <!-- Player list -->
+        <div class="section-hdr"><h3>Squad (15)</h3><button class="btn btn-gold btn-sm">Share</button></div>
+        <div style="background:var(--slate);border-radius:12px;overflow:hidden">
+          <div style="padding:11px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="avatar" style="background:rgba(168,85,247,.2);color:var(--purple);width:32px;height:32px;font-size:12px">AK</div>
+              <div><div style="font-size:13px;font-weight:600">Anjali Kumar <span style="color:var(--gold);font-size:11px">★ C</span></div><div style="font-size:11px;color:var(--muted)">All-rounder</div></div>
+            </div>
+            <div class="amount">₹12,500</div>
+          </div>
+          <div style="padding:11px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="avatar" style="background:rgba(59,130,246,.2);color:var(--blue);width:32px;height:32px;font-size:12px">RS</div>
+              <div><div style="font-size:13px;font-weight:600">Ravi Sharma <span style="color:var(--green);font-size:10px">★ ICON</span></div><div style="font-size:11px;color:var(--muted)">Batter · Pre-assigned</div></div>
+            </div>
+            <div class="amount">FREE</div>
+          </div>
+          <div style="padding:11px 12px;display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="avatar" style="background:rgba(239,68,68,.2);color:var(--red);width:32px;height:32px;font-size:12px">PD</div>
+              <div><div style="font-size:13px;font-weight:600">Pradeep Das</div><div style="font-size:11px;color:var(--muted)">Bowler</div></div>
+            </div>
+            <div class="amount">₹3,500</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted)">+12 more players</div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn btn-gold" style="flex:1;font-size:12px">📱 WhatsApp Image</button>
+          <button class="btn btn-ghost" style="flex:1;font-size:12px">📄 PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════ WEB: POST-AUCTION DASHBOARD ══════ -->
+<div class="section-title">🖥️ Web — Post-Auction Summary Dashboard</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Web — Full Summary Dashboard</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere</div>
+        <span style="color:var(--muted);font-size:13px">/ TechCup 2026 / Post-Auction</span>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="btn btn-gold btn-sm">📄 Export PDF</button>
+          <button class="btn btn-ghost btn-sm">Share</button>
+        </div>
+      </div>
+      <div class="web-layout">
+        <div class="web-sidebar">
+          <div class="web-nav-item">🔨 Auction</div>
+          <div class="web-nav-item active">📊 Summary</div>
+          <div class="web-nav-item">📋 Audit Log</div>
+          <div class="web-nav-item">📤 Exports</div>
+        </div>
+        <div class="web-main">
+          <!-- Top stats -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
+            <div class="stat-card"><div class="stat-num" style="color:var(--green)">96</div><div class="stat-lbl">Players Sold</div></div>
+            <div class="stat-card"><div class="stat-num" style="color:var(--gold)">₹8.4L</div><div class="stat-lbl">Total Spent</div></div>
+            <div class="stat-card"><div class="stat-num" style="color:var(--muted)">24</div><div class="stat-lbl">Unsold</div></div>
+            <div class="stat-card"><div class="stat-num">8</div><div class="stat-lbl">Franchises</div></div>
+            <div class="stat-card"><div class="stat-num" style="color:var(--blue)">284</div><div class="stat-lbl">Audit Events</div></div>
+          </div>
+          <!-- Two column layout -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <!-- Left: Franchise table -->
+            <div style="background:var(--slate);border-radius:14px;overflow:hidden">
+              <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-family:'Rajdhani',sans-serif;font-weight:600">Franchise Results</div>
+              <table class="w-table">
+                <thead><tr><th>Team</th><th>Spent</th><th>Players</th><th>Remaining</th><th></th></tr></thead>
+                <tbody>
+                  <tr><td><span style="font-weight:600">Thunder Strikers</span></td><td class="amount">₹43,200</td><td>15/15</td><td class="amount" style="color:var(--green)">₹6,800</td><td><button class="btn btn-ghost btn-sm">Squad</button></td></tr>
+                  <tr><td><span style="font-weight:600">Lightning Kings</span></td><td class="amount">₹38,500</td><td>15/15</td><td class="amount" style="color:var(--green)">₹11,500</td><td><button class="btn btn-ghost btn-sm">Squad</button></td></tr>
+                  <tr><td><span style="font-weight:600">Royal Blazers</span></td><td class="amount">₹45,000</td><td>15/15</td><td class="amount" style="color:var(--gold)">₹5,000</td><td><button class="btn btn-ghost btn-sm">Squad</button></td></tr>
+                  <tr><td><span style="font-weight:600">Phoenix XI</span></td><td class="amount">₹30,000</td><td>14/15</td><td class="amount" style="color:var(--green)">₹20,000</td><td><button class="btn btn-ghost btn-sm">Squad</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Right: Top buys + unsold count -->
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="background:var(--slate);border-radius:14px;padding:14px">
+                <div style="font-family:'Rajdhani',sans-serif;font-weight:600;margin-bottom:12px">🏆 Top 5 Buys</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>#1 Anjali Kumar (Thunder)</span><span class="amount">₹12,500</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>#2 Sam Patel (Lightning)</span><span class="amount">₹10,000</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>#3 Rahul Das (Blazers)</span><span class="amount">₹8,500</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>#4 Suresh K (Phoenix)</span><span class="amount">₹7,500</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span>#5 Priya Nair (Kings)</span><span class="amount">₹6,000</span></div>
+                </div>
+              </div>
+              <div style="background:var(--slate);border-radius:14px;padding:14px">
+                <div style="font-family:'Rajdhani',sans-serif;font-weight:600;margin-bottom:10px">Unsold by Category</div>
+                <div style="display:flex;gap:8px">
+                  <div class="stat-card" style="flex:1;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--blue)">8</div><div style="font-size:10px;color:var(--muted)">Batters</div></div>
+                  <div class="stat-card" style="flex:1;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--red)">10</div><div style="font-size:10px;color:var(--muted)">Bowlers</div></div>
+                  <div class="stat-card" style="flex:1;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--purple)">4</div><div style="font-size:10px;color:var(--muted)">AR</div></div>
+                  <div class="stat-card" style="flex:1;padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--green)">2</div><div style="font-size:10px;color:var(--muted)">WK</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ WEB: AUDIT LOG ══════ -->
+<div class="section-title">🖥️ Web — Audit Log Full View</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Web — Auction Audit Log</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere</div>
+        <span style="color:var(--muted);font-size:13px">/ TechCup 2026 / Audit Log</span>
+      </div>
+      <div class="web-layout">
+        <div class="web-sidebar">
+          <div class="web-nav-item">📊 Summary</div>
+          <div class="web-nav-item active">📋 Audit Log</div>
+          <div class="web-nav-item">📤 Exports</div>
+        </div>
+        <div class="web-main">
+          <!-- Filter bar -->
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" style="color:var(--text)">All Actions</button>
+            <button class="btn btn-gold btn-sm">BID_PLACED</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--green)">PLAYER_SOLD</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--muted)">PLAYER_UP</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red)">BID_UNDONE</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--purple)">FORCE_ASSIGNED</button>
+            <input style="background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-size:12px;margin-left:auto" placeholder="Search player / franchise...">
+          </div>
+          <!-- Audit table -->
+          <div style="background:var(--slate);border-radius:14px;overflow:hidden">
+            <table class="w-table">
+              <thead><tr><th>Seq #</th><th>Action</th><th>Player</th><th>Franchise</th><th>Amount</th><th>Actor</th><th>Time</th><th>Payload</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><span style="font-family:'JetBrains Mono',monospace;color:var(--muted)">#284</span></td>
+                  <td><span class="chip" style="background:rgba(34,197,94,.12);color:var(--green)">PLAYER_SOLD</span></td>
+                  <td>Anjali Kumar</td>
+                  <td>Thunder Strikers</td>
+                  <td class="amount">₹12,500</td>
+                  <td style="color:var(--muted)">Priya</td>
+                  <td style="color:var(--muted)">7:42 PM</td>
+                  <td><button class="btn btn-ghost btn-sm">JSON</button></td>
+                </tr>
+                <tr>
+                  <td><span style="font-family:'JetBrains Mono',monospace;color:var(--muted)">#283</span></td>
+                  <td><span class="chip" style="background:rgba(245,158,11,.12);color:var(--gold)">BID_PLACED</span></td>
+                  <td>Anjali Kumar</td>
+                  <td>Thunder Strikers</td>
+                  <td class="amount">₹12,500</td>
+                  <td style="color:var(--muted)">Priya</td>
+                  <td style="color:var(--muted)">7:41 PM</td>
+                  <td><button class="btn btn-ghost btn-sm">JSON</button></td>
+                </tr>
+                <tr>
+                  <td><span style="font-family:'JetBrains Mono',monospace;color:var(--muted)">#281</span></td>
+                  <td><span class="chip" style="background:rgba(239,68,68,.12);color:var(--red)">BID_UNDONE</span></td>
+                  <td>Anjali Kumar</td>
+                  <td>Royal Blazers</td>
+                  <td class="amount" style="color:var(--red)">₹9,500</td>
+                  <td style="color:var(--muted)">Priya</td>
+                  <td style="color:var(--muted)">7:40 PM</td>
+                  <td><button class="btn btn-ghost btn-sm">JSON</button></td>
+                </tr>
+                <tr>
+                  <td><span style="font-family:'JetBrains Mono',monospace;color:var(--muted)">#279</span></td>
+                  <td><span class="chip" style="background:rgba(168,85,247,.12);color:var(--purple)">FORCE_ASSIGNED</span></td>
+                  <td>Sam Patel</td>
+                  <td>Lightning Kings</td>
+                  <td class="amount">₹0</td>
+                  <td style="color:var(--muted)">Rahul (admin)</td>
+                  <td style="color:var(--muted)">7:35 PM</td>
+                  <td><button class="btn btn-ghost btn-sm">JSON</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px">284 total events · All 15+ action types · SSE replay uses sequenceNumber &gt; Last-Event-ID</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

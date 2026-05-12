@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthResponse {
 
- String? get accessToken; String? get refreshToken; String? get userId; ProfileStatus? get profileStatus; bool get isNewUser; String? get profileId;
+ String? get accessToken; String? get refreshToken; String? get userId; String? get phone; String? get name; ProfileStatus? get profileStatus; bool get isNewUser; String? get profileId;
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AuthResponseCopyWith<AuthResponse> get copyWith => _$AuthResponseCopyWithImpl<A
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.profileStatus, profileStatus) || other.profileStatus == profileStatus)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.profileId, profileId) || other.profileId == profileId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.name, name) || other.name == name)&&(identical(other.profileStatus, profileStatus) || other.profileStatus == profileStatus)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.profileId, profileId) || other.profileId == profileId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,userId,profileStatus,isNewUser,profileId);
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,userId,phone,name,profileStatus,isNewUser,profileId);
 
 @override
 String toString() {
-  return 'AuthResponse(accessToken: $accessToken, refreshToken: $refreshToken, userId: $userId, profileStatus: $profileStatus, isNewUser: $isNewUser, profileId: $profileId)';
+  return 'AuthResponse(accessToken: $accessToken, refreshToken: $refreshToken, userId: $userId, phone: $phone, name: $name, profileStatus: $profileStatus, isNewUser: $isNewUser, profileId: $profileId)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $AuthResponseCopyWith<$Res>  {
   factory $AuthResponseCopyWith(AuthResponse value, $Res Function(AuthResponse) _then) = _$AuthResponseCopyWithImpl;
 @useResult
 $Res call({
- String? accessToken, String? refreshToken, String? userId, ProfileStatus? profileStatus, bool isNewUser, String? profileId
+ String? accessToken, String? refreshToken, String? userId, String? phone, String? name, ProfileStatus? profileStatus, bool isNewUser, String? profileId
 });
 
 
@@ -65,11 +65,13 @@ class _$AuthResponseCopyWithImpl<$Res>
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = freezed,Object? refreshToken = freezed,Object? userId = freezed,Object? profileStatus = freezed,Object? isNewUser = null,Object? profileId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = freezed,Object? refreshToken = freezed,Object? userId = freezed,Object? phone = freezed,Object? name = freezed,Object? profileStatus = freezed,Object? isNewUser = null,Object? profileId = freezed,}) {
   return _then(_self.copyWith(
 accessToken: freezed == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String?,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String?,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,profileStatus: freezed == profileStatus ? _self.profileStatus : profileStatus // ignore: cast_nullable_to_non_nullable
 as ProfileStatus?,isNewUser: null == isNewUser ? _self.isNewUser : isNewUser // ignore: cast_nullable_to_non_nullable
 as bool,profileId: freezed == profileId ? _self.profileId : profileId // ignore: cast_nullable_to_non_nullable
@@ -158,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken,  String? userId,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken,  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
-return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_that.name,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
   return orElse();
 
 }
@@ -179,10 +181,10 @@ return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.profileS
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken,  String? userId,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken,  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse():
-return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_that.name,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +201,10 @@ return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.profileS
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? accessToken,  String? refreshToken,  String? userId,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? accessToken,  String? refreshToken,  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
-return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
+return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_that.name,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
   return null;
 
 }
@@ -214,12 +216,14 @@ return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.profileS
 @JsonSerializable()
 
 class _AuthResponse extends AuthResponse {
-  const _AuthResponse({this.accessToken, this.refreshToken, this.userId, this.profileStatus, this.isNewUser = false, this.profileId}): super._();
+  const _AuthResponse({this.accessToken, this.refreshToken, this.userId, this.phone, this.name, this.profileStatus, this.isNewUser = false, this.profileId}): super._();
   factory _AuthResponse.fromJson(Map<String, dynamic> json) => _$AuthResponseFromJson(json);
 
 @override final  String? accessToken;
 @override final  String? refreshToken;
 @override final  String? userId;
+@override final  String? phone;
+@override final  String? name;
 @override final  ProfileStatus? profileStatus;
 @override@JsonKey() final  bool isNewUser;
 @override final  String? profileId;
@@ -237,16 +241,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.profileStatus, profileStatus) || other.profileStatus == profileStatus)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.profileId, profileId) || other.profileId == profileId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.refreshToken, refreshToken) || other.refreshToken == refreshToken)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.name, name) || other.name == name)&&(identical(other.profileStatus, profileStatus) || other.profileStatus == profileStatus)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.profileId, profileId) || other.profileId == profileId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,userId,profileStatus,isNewUser,profileId);
+int get hashCode => Object.hash(runtimeType,accessToken,refreshToken,userId,phone,name,profileStatus,isNewUser,profileId);
 
 @override
 String toString() {
-  return 'AuthResponse(accessToken: $accessToken, refreshToken: $refreshToken, userId: $userId, profileStatus: $profileStatus, isNewUser: $isNewUser, profileId: $profileId)';
+  return 'AuthResponse(accessToken: $accessToken, refreshToken: $refreshToken, userId: $userId, phone: $phone, name: $name, profileStatus: $profileStatus, isNewUser: $isNewUser, profileId: $profileId)';
 }
 
 
@@ -257,7 +261,7 @@ abstract mixin class _$AuthResponseCopyWith<$Res> implements $AuthResponseCopyWi
   factory _$AuthResponseCopyWith(_AuthResponse value, $Res Function(_AuthResponse) _then) = __$AuthResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String? accessToken, String? refreshToken, String? userId, ProfileStatus? profileStatus, bool isNewUser, String? profileId
+ String? accessToken, String? refreshToken, String? userId, String? phone, String? name, ProfileStatus? profileStatus, bool isNewUser, String? profileId
 });
 
 
@@ -274,11 +278,13 @@ class __$AuthResponseCopyWithImpl<$Res>
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = freezed,Object? refreshToken = freezed,Object? userId = freezed,Object? profileStatus = freezed,Object? isNewUser = null,Object? profileId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = freezed,Object? refreshToken = freezed,Object? userId = freezed,Object? phone = freezed,Object? name = freezed,Object? profileStatus = freezed,Object? isNewUser = null,Object? profileId = freezed,}) {
   return _then(_AuthResponse(
 accessToken: freezed == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String?,refreshToken: freezed == refreshToken ? _self.refreshToken : refreshToken // ignore: cast_nullable_to_non_nullable
 as String?,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String?,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,profileStatus: freezed == profileStatus ? _self.profileStatus : profileStatus // ignore: cast_nullable_to_non_nullable
 as ProfileStatus?,isNewUser: null == isNewUser ? _self.isNewUser : isNewUser // ignore: cast_nullable_to_non_nullable
 as bool,profileId: freezed == profileId ? _self.profileId : profileId // ignore: cast_nullable_to_non_nullable

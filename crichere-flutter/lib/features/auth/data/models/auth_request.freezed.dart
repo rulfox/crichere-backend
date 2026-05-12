@@ -807,7 +807,7 @@ as String,
 /// @nodoc
 mixin _$ClaimRequest {
 
- String get name; PlayingRole get playingRole;
+ String get name; PlayingRole get playingRole; ExperienceLevel get experienceLevel; BattingStyle get battingStyle; BowlingType get bowlingType; String? get city; int? get jerseyNumber;
 /// Create a copy of ClaimRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -820,16 +820,16 @@ $ClaimRequestCopyWith<ClaimRequest> get copyWith => _$ClaimRequestCopyWithImpl<C
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClaimRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.playingRole, playingRole) || other.playingRole == playingRole));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ClaimRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.playingRole, playingRole) || other.playingRole == playingRole)&&(identical(other.experienceLevel, experienceLevel) || other.experienceLevel == experienceLevel)&&(identical(other.battingStyle, battingStyle) || other.battingStyle == battingStyle)&&(identical(other.bowlingType, bowlingType) || other.bowlingType == bowlingType)&&(identical(other.city, city) || other.city == city)&&(identical(other.jerseyNumber, jerseyNumber) || other.jerseyNumber == jerseyNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,playingRole);
+int get hashCode => Object.hash(runtimeType,name,playingRole,experienceLevel,battingStyle,bowlingType,city,jerseyNumber);
 
 @override
 String toString() {
-  return 'ClaimRequest(name: $name, playingRole: $playingRole)';
+  return 'ClaimRequest(name: $name, playingRole: $playingRole, experienceLevel: $experienceLevel, battingStyle: $battingStyle, bowlingType: $bowlingType, city: $city, jerseyNumber: $jerseyNumber)';
 }
 
 
@@ -840,7 +840,7 @@ abstract mixin class $ClaimRequestCopyWith<$Res>  {
   factory $ClaimRequestCopyWith(ClaimRequest value, $Res Function(ClaimRequest) _then) = _$ClaimRequestCopyWithImpl;
 @useResult
 $Res call({
- String name, PlayingRole playingRole
+ String name, PlayingRole playingRole, ExperienceLevel experienceLevel, BattingStyle battingStyle, BowlingType bowlingType, String? city, int? jerseyNumber
 });
 
 
@@ -857,11 +857,16 @@ class _$ClaimRequestCopyWithImpl<$Res>
 
 /// Create a copy of ClaimRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? playingRole = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? playingRole = null,Object? experienceLevel = null,Object? battingStyle = null,Object? bowlingType = null,Object? city = freezed,Object? jerseyNumber = freezed,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,playingRole: null == playingRole ? _self.playingRole : playingRole // ignore: cast_nullable_to_non_nullable
-as PlayingRole,
+as PlayingRole,experienceLevel: null == experienceLevel ? _self.experienceLevel : experienceLevel // ignore: cast_nullable_to_non_nullable
+as ExperienceLevel,battingStyle: null == battingStyle ? _self.battingStyle : battingStyle // ignore: cast_nullable_to_non_nullable
+as BattingStyle,bowlingType: null == bowlingType ? _self.bowlingType : bowlingType // ignore: cast_nullable_to_non_nullable
+as BowlingType,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,jerseyNumber: freezed == jerseyNumber ? _self.jerseyNumber : jerseyNumber // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -946,10 +951,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  PlayingRole playingRole)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  PlayingRole playingRole,  ExperienceLevel experienceLevel,  BattingStyle battingStyle,  BowlingType bowlingType,  String? city,  int? jerseyNumber)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ClaimRequest() when $default != null:
-return $default(_that.name,_that.playingRole);case _:
+return $default(_that.name,_that.playingRole,_that.experienceLevel,_that.battingStyle,_that.bowlingType,_that.city,_that.jerseyNumber);case _:
   return orElse();
 
 }
@@ -967,10 +972,10 @@ return $default(_that.name,_that.playingRole);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  PlayingRole playingRole)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  PlayingRole playingRole,  ExperienceLevel experienceLevel,  BattingStyle battingStyle,  BowlingType bowlingType,  String? city,  int? jerseyNumber)  $default,) {final _that = this;
 switch (_that) {
 case _ClaimRequest():
-return $default(_that.name,_that.playingRole);case _:
+return $default(_that.name,_that.playingRole,_that.experienceLevel,_that.battingStyle,_that.bowlingType,_that.city,_that.jerseyNumber);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -987,10 +992,10 @@ return $default(_that.name,_that.playingRole);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  PlayingRole playingRole)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  PlayingRole playingRole,  ExperienceLevel experienceLevel,  BattingStyle battingStyle,  BowlingType bowlingType,  String? city,  int? jerseyNumber)?  $default,) {final _that = this;
 switch (_that) {
 case _ClaimRequest() when $default != null:
-return $default(_that.name,_that.playingRole);case _:
+return $default(_that.name,_that.playingRole,_that.experienceLevel,_that.battingStyle,_that.bowlingType,_that.city,_that.jerseyNumber);case _:
   return null;
 
 }
@@ -1002,11 +1007,16 @@ return $default(_that.name,_that.playingRole);case _:
 @JsonSerializable()
 
 class _ClaimRequest implements ClaimRequest {
-  const _ClaimRequest({required this.name, required this.playingRole});
+  const _ClaimRequest({required this.name, required this.playingRole, required this.experienceLevel, required this.battingStyle, required this.bowlingType, this.city, this.jerseyNumber});
   factory _ClaimRequest.fromJson(Map<String, dynamic> json) => _$ClaimRequestFromJson(json);
 
 @override final  String name;
 @override final  PlayingRole playingRole;
+@override final  ExperienceLevel experienceLevel;
+@override final  BattingStyle battingStyle;
+@override final  BowlingType bowlingType;
+@override final  String? city;
+@override final  int? jerseyNumber;
 
 /// Create a copy of ClaimRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -1021,16 +1031,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClaimRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.playingRole, playingRole) || other.playingRole == playingRole));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ClaimRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.playingRole, playingRole) || other.playingRole == playingRole)&&(identical(other.experienceLevel, experienceLevel) || other.experienceLevel == experienceLevel)&&(identical(other.battingStyle, battingStyle) || other.battingStyle == battingStyle)&&(identical(other.bowlingType, bowlingType) || other.bowlingType == bowlingType)&&(identical(other.city, city) || other.city == city)&&(identical(other.jerseyNumber, jerseyNumber) || other.jerseyNumber == jerseyNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,playingRole);
+int get hashCode => Object.hash(runtimeType,name,playingRole,experienceLevel,battingStyle,bowlingType,city,jerseyNumber);
 
 @override
 String toString() {
-  return 'ClaimRequest(name: $name, playingRole: $playingRole)';
+  return 'ClaimRequest(name: $name, playingRole: $playingRole, experienceLevel: $experienceLevel, battingStyle: $battingStyle, bowlingType: $bowlingType, city: $city, jerseyNumber: $jerseyNumber)';
 }
 
 
@@ -1041,7 +1051,7 @@ abstract mixin class _$ClaimRequestCopyWith<$Res> implements $ClaimRequestCopyWi
   factory _$ClaimRequestCopyWith(_ClaimRequest value, $Res Function(_ClaimRequest) _then) = __$ClaimRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String name, PlayingRole playingRole
+ String name, PlayingRole playingRole, ExperienceLevel experienceLevel, BattingStyle battingStyle, BowlingType bowlingType, String? city, int? jerseyNumber
 });
 
 
@@ -1058,11 +1068,16 @@ class __$ClaimRequestCopyWithImpl<$Res>
 
 /// Create a copy of ClaimRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? playingRole = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? playingRole = null,Object? experienceLevel = null,Object? battingStyle = null,Object? bowlingType = null,Object? city = freezed,Object? jerseyNumber = freezed,}) {
   return _then(_ClaimRequest(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,playingRole: null == playingRole ? _self.playingRole : playingRole // ignore: cast_nullable_to_non_nullable
-as PlayingRole,
+as PlayingRole,experienceLevel: null == experienceLevel ? _self.experienceLevel : experienceLevel // ignore: cast_nullable_to_non_nullable
+as ExperienceLevel,battingStyle: null == battingStyle ? _self.battingStyle : battingStyle // ignore: cast_nullable_to_non_nullable
+as BattingStyle,bowlingType: null == bowlingType ? _self.bowlingType : bowlingType // ignore: cast_nullable_to_non_nullable
+as BowlingType,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,jerseyNumber: freezed == jerseyNumber ? _self.jerseyNumber : jerseyNumber // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

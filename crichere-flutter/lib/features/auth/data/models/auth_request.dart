@@ -37,6 +37,11 @@ abstract class ClaimRequest with _$ClaimRequest {
   const factory ClaimRequest({
     required String name,
     required PlayingRole playingRole,
+    required ExperienceLevel experienceLevel,
+    required BattingStyle battingStyle,
+    required BowlingType bowlingType,
+    String? city,
+    int? jerseyNumber,
   }) = _ClaimRequest;
 
   factory ClaimRequest.fromJson(Map<String, dynamic> json) => _$ClaimRequestFromJson(json);

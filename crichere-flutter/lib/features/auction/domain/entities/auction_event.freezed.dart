@@ -43,6 +43,18 @@ AuctionEvent _$AuctionEventFromJson(
           return PlayerForceAssigned.fromJson(
             json
           );
+                case 'timerStarted':
+          return TimerStarted.fromJson(
+            json
+          );
+                case 'timerPaused':
+          return TimerPaused.fromJson(
+            json
+          );
+                case 'timerReset':
+          return TimerReset.fromJson(
+            json
+          );
                 case 'roundStarted':
           return RoundStarted.fromJson(
             json
@@ -113,7 +125,7 @@ extension AuctionEventPatterns on AuctionEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PlayerUp value)?  playerUp,TResult Function( BidPlaced value)?  bidPlaced,TResult Function( PlayerSold value)?  playerSold,TResult Function( BidUndone value)?  bidUndone,TResult Function( SoldReverted value)?  soldReverted,TResult Function( PlayerUnsold value)?  playerUnsold,TResult Function( PlayerForceAssigned value)?  playerForceAssigned,TResult Function( RoundStarted value)?  roundStarted,TResult Function( AuctionStarted value)?  auctionStarted,TResult Function( AuctionCompleted value)?  auctionCompleted,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PlayerUp value)?  playerUp,TResult Function( BidPlaced value)?  bidPlaced,TResult Function( PlayerSold value)?  playerSold,TResult Function( BidUndone value)?  bidUndone,TResult Function( SoldReverted value)?  soldReverted,TResult Function( PlayerUnsold value)?  playerUnsold,TResult Function( PlayerForceAssigned value)?  playerForceAssigned,TResult Function( TimerStarted value)?  timerStarted,TResult Function( TimerPaused value)?  timerPaused,TResult Function( TimerReset value)?  timerReset,TResult Function( RoundStarted value)?  roundStarted,TResult Function( AuctionStarted value)?  auctionStarted,TResult Function( AuctionCompleted value)?  auctionCompleted,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
@@ -123,7 +135,10 @@ return playerSold(_that);case BidUndone() when bidUndone != null:
 return bidUndone(_that);case SoldReverted() when soldReverted != null:
 return soldReverted(_that);case PlayerUnsold() when playerUnsold != null:
 return playerUnsold(_that);case PlayerForceAssigned() when playerForceAssigned != null:
-return playerForceAssigned(_that);case RoundStarted() when roundStarted != null:
+return playerForceAssigned(_that);case TimerStarted() when timerStarted != null:
+return timerStarted(_that);case TimerPaused() when timerPaused != null:
+return timerPaused(_that);case TimerReset() when timerReset != null:
+return timerReset(_that);case RoundStarted() when roundStarted != null:
 return roundStarted(_that);case AuctionStarted() when auctionStarted != null:
 return auctionStarted(_that);case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted(_that);case _:
@@ -144,7 +159,7 @@ return auctionCompleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PlayerUp value)  playerUp,required TResult Function( BidPlaced value)  bidPlaced,required TResult Function( PlayerSold value)  playerSold,required TResult Function( BidUndone value)  bidUndone,required TResult Function( SoldReverted value)  soldReverted,required TResult Function( PlayerUnsold value)  playerUnsold,required TResult Function( PlayerForceAssigned value)  playerForceAssigned,required TResult Function( RoundStarted value)  roundStarted,required TResult Function( AuctionStarted value)  auctionStarted,required TResult Function( AuctionCompleted value)  auctionCompleted,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PlayerUp value)  playerUp,required TResult Function( BidPlaced value)  bidPlaced,required TResult Function( PlayerSold value)  playerSold,required TResult Function( BidUndone value)  bidUndone,required TResult Function( SoldReverted value)  soldReverted,required TResult Function( PlayerUnsold value)  playerUnsold,required TResult Function( PlayerForceAssigned value)  playerForceAssigned,required TResult Function( TimerStarted value)  timerStarted,required TResult Function( TimerPaused value)  timerPaused,required TResult Function( TimerReset value)  timerReset,required TResult Function( RoundStarted value)  roundStarted,required TResult Function( AuctionStarted value)  auctionStarted,required TResult Function( AuctionCompleted value)  auctionCompleted,}){
 final _that = this;
 switch (_that) {
 case PlayerUp():
@@ -154,7 +169,10 @@ return playerSold(_that);case BidUndone():
 return bidUndone(_that);case SoldReverted():
 return soldReverted(_that);case PlayerUnsold():
 return playerUnsold(_that);case PlayerForceAssigned():
-return playerForceAssigned(_that);case RoundStarted():
+return playerForceAssigned(_that);case TimerStarted():
+return timerStarted(_that);case TimerPaused():
+return timerPaused(_that);case TimerReset():
+return timerReset(_that);case RoundStarted():
 return roundStarted(_that);case AuctionStarted():
 return auctionStarted(_that);case AuctionCompleted():
 return auctionCompleted(_that);}
@@ -171,7 +189,7 @@ return auctionCompleted(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PlayerUp value)?  playerUp,TResult? Function( BidPlaced value)?  bidPlaced,TResult? Function( PlayerSold value)?  playerSold,TResult? Function( BidUndone value)?  bidUndone,TResult? Function( SoldReverted value)?  soldReverted,TResult? Function( PlayerUnsold value)?  playerUnsold,TResult? Function( PlayerForceAssigned value)?  playerForceAssigned,TResult? Function( RoundStarted value)?  roundStarted,TResult? Function( AuctionStarted value)?  auctionStarted,TResult? Function( AuctionCompleted value)?  auctionCompleted,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PlayerUp value)?  playerUp,TResult? Function( BidPlaced value)?  bidPlaced,TResult? Function( PlayerSold value)?  playerSold,TResult? Function( BidUndone value)?  bidUndone,TResult? Function( SoldReverted value)?  soldReverted,TResult? Function( PlayerUnsold value)?  playerUnsold,TResult? Function( PlayerForceAssigned value)?  playerForceAssigned,TResult? Function( TimerStarted value)?  timerStarted,TResult? Function( TimerPaused value)?  timerPaused,TResult? Function( TimerReset value)?  timerReset,TResult? Function( RoundStarted value)?  roundStarted,TResult? Function( AuctionStarted value)?  auctionStarted,TResult? Function( AuctionCompleted value)?  auctionCompleted,}){
 final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
@@ -181,7 +199,10 @@ return playerSold(_that);case BidUndone() when bidUndone != null:
 return bidUndone(_that);case SoldReverted() when soldReverted != null:
 return soldReverted(_that);case PlayerUnsold() when playerUnsold != null:
 return playerUnsold(_that);case PlayerForceAssigned() when playerForceAssigned != null:
-return playerForceAssigned(_that);case RoundStarted() when roundStarted != null:
+return playerForceAssigned(_that);case TimerStarted() when timerStarted != null:
+return timerStarted(_that);case TimerPaused() when timerPaused != null:
+return timerPaused(_that);case TimerReset() when timerReset != null:
+return timerReset(_that);case RoundStarted() when roundStarted != null:
 return roundStarted(_that);case AuctionStarted() when auctionStarted != null:
 return auctionStarted(_that);case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted(_that);case _:
@@ -201,16 +222,19 @@ return auctionCompleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)?  playerUp,TResult Function( String franchiseId,  String franchiseName,  int amount)?  bidPlaced,TResult Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult Function()?  bidUndone,TResult Function()?  soldReverted,TResult Function( String playerId)?  playerUnsold,TResult Function( String playerId,  String franchiseId,  String franchiseName)?  playerForceAssigned,TResult Function( int roundNumber)?  roundStarted,TResult Function()?  auctionStarted,TResult Function()?  auctionCompleted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice,  int? bidIncrement)?  playerUp,TResult Function( String franchiseId,  String franchiseName,  int amount,  int? nextMinimumBid)?  bidPlaced,TResult Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult Function()?  bidUndone,TResult Function()?  soldReverted,TResult Function( String playerId)?  playerUnsold,TResult Function( String playerId,  String franchiseId,  String franchiseName)?  playerForceAssigned,TResult Function( int remainingSeconds)?  timerStarted,TResult Function( int remainingSeconds)?  timerPaused,TResult Function( int remainingSeconds)?  timerReset,TResult Function( int roundNumber)?  roundStarted,TResult Function()?  auctionStarted,TResult Function()?  auctionCompleted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
-return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice);case BidPlaced() when bidPlaced != null:
-return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount);case PlayerSold() when playerSold != null:
+return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice,_that.bidIncrement);case BidPlaced() when bidPlaced != null:
+return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount,_that.nextMinimumBid);case PlayerSold() when playerSold != null:
 return playerSold(_that.playerId,_that.franchiseId,_that.amount);case BidUndone() when bidUndone != null:
 return bidUndone();case SoldReverted() when soldReverted != null:
 return soldReverted();case PlayerUnsold() when playerUnsold != null:
 return playerUnsold(_that.playerId);case PlayerForceAssigned() when playerForceAssigned != null:
-return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case RoundStarted() when roundStarted != null:
+return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case TimerStarted() when timerStarted != null:
+return timerStarted(_that.remainingSeconds);case TimerPaused() when timerPaused != null:
+return timerPaused(_that.remainingSeconds);case TimerReset() when timerReset != null:
+return timerReset(_that.remainingSeconds);case RoundStarted() when roundStarted != null:
 return roundStarted(_that.roundNumber);case AuctionStarted() when auctionStarted != null:
 return auctionStarted();case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted();case _:
@@ -231,16 +255,19 @@ return auctionCompleted();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)  playerUp,required TResult Function( String franchiseId,  String franchiseName,  int amount)  bidPlaced,required TResult Function( String playerId,  String franchiseId,  int amount)  playerSold,required TResult Function()  bidUndone,required TResult Function()  soldReverted,required TResult Function( String playerId)  playerUnsold,required TResult Function( String playerId,  String franchiseId,  String franchiseName)  playerForceAssigned,required TResult Function( int roundNumber)  roundStarted,required TResult Function()  auctionStarted,required TResult Function()  auctionCompleted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice,  int? bidIncrement)  playerUp,required TResult Function( String franchiseId,  String franchiseName,  int amount,  int? nextMinimumBid)  bidPlaced,required TResult Function( String playerId,  String franchiseId,  int amount)  playerSold,required TResult Function()  bidUndone,required TResult Function()  soldReverted,required TResult Function( String playerId)  playerUnsold,required TResult Function( String playerId,  String franchiseId,  String franchiseName)  playerForceAssigned,required TResult Function( int remainingSeconds)  timerStarted,required TResult Function( int remainingSeconds)  timerPaused,required TResult Function( int remainingSeconds)  timerReset,required TResult Function( int roundNumber)  roundStarted,required TResult Function()  auctionStarted,required TResult Function()  auctionCompleted,}) {final _that = this;
 switch (_that) {
 case PlayerUp():
-return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice);case BidPlaced():
-return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount);case PlayerSold():
+return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice,_that.bidIncrement);case BidPlaced():
+return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount,_that.nextMinimumBid);case PlayerSold():
 return playerSold(_that.playerId,_that.franchiseId,_that.amount);case BidUndone():
 return bidUndone();case SoldReverted():
 return soldReverted();case PlayerUnsold():
 return playerUnsold(_that.playerId);case PlayerForceAssigned():
-return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case RoundStarted():
+return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case TimerStarted():
+return timerStarted(_that.remainingSeconds);case TimerPaused():
+return timerPaused(_that.remainingSeconds);case TimerReset():
+return timerReset(_that.remainingSeconds);case RoundStarted():
 return roundStarted(_that.roundNumber);case AuctionStarted():
 return auctionStarted();case AuctionCompleted():
 return auctionCompleted();}
@@ -257,16 +284,19 @@ return auctionCompleted();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)?  playerUp,TResult? Function( String franchiseId,  String franchiseName,  int amount)?  bidPlaced,TResult? Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult? Function()?  bidUndone,TResult? Function()?  soldReverted,TResult? Function( String playerId)?  playerUnsold,TResult? Function( String playerId,  String franchiseId,  String franchiseName)?  playerForceAssigned,TResult? Function( int roundNumber)?  roundStarted,TResult? Function()?  auctionStarted,TResult? Function()?  auctionCompleted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice,  int? bidIncrement)?  playerUp,TResult? Function( String franchiseId,  String franchiseName,  int amount,  int? nextMinimumBid)?  bidPlaced,TResult? Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult? Function()?  bidUndone,TResult? Function()?  soldReverted,TResult? Function( String playerId)?  playerUnsold,TResult? Function( String playerId,  String franchiseId,  String franchiseName)?  playerForceAssigned,TResult? Function( int remainingSeconds)?  timerStarted,TResult? Function( int remainingSeconds)?  timerPaused,TResult? Function( int remainingSeconds)?  timerReset,TResult? Function( int roundNumber)?  roundStarted,TResult? Function()?  auctionStarted,TResult? Function()?  auctionCompleted,}) {final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
-return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice);case BidPlaced() when bidPlaced != null:
-return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount);case PlayerSold() when playerSold != null:
+return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice,_that.bidIncrement);case BidPlaced() when bidPlaced != null:
+return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount,_that.nextMinimumBid);case PlayerSold() when playerSold != null:
 return playerSold(_that.playerId,_that.franchiseId,_that.amount);case BidUndone() when bidUndone != null:
 return bidUndone();case SoldReverted() when soldReverted != null:
 return soldReverted();case PlayerUnsold() when playerUnsold != null:
 return playerUnsold(_that.playerId);case PlayerForceAssigned() when playerForceAssigned != null:
-return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case RoundStarted() when roundStarted != null:
+return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case TimerStarted() when timerStarted != null:
+return timerStarted(_that.remainingSeconds);case TimerPaused() when timerPaused != null:
+return timerPaused(_that.remainingSeconds);case TimerReset() when timerReset != null:
+return timerReset(_that.remainingSeconds);case RoundStarted() when roundStarted != null:
 return roundStarted(_that.roundNumber);case AuctionStarted() when auctionStarted != null:
 return auctionStarted();case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted();case _:
@@ -281,13 +311,14 @@ return auctionCompleted();case _:
 @JsonSerializable()
 
 class PlayerUp extends AuctionEvent {
-  const PlayerUp({required this.playerId, required this.playerName, this.playerPhotoUrl, required this.basePrice, final  String? $type}): $type = $type ?? 'playerUp',super._();
+  const PlayerUp({required this.playerId, required this.playerName, this.playerPhotoUrl, required this.basePrice, this.bidIncrement, final  String? $type}): $type = $type ?? 'playerUp',super._();
   factory PlayerUp.fromJson(Map<String, dynamic> json) => _$PlayerUpFromJson(json);
 
  final  String playerId;
  final  String playerName;
  final  String? playerPhotoUrl;
  final  int basePrice;
+ final  int? bidIncrement;
 
 @JsonKey(name: 'runtimeType')
 final String $type;
@@ -306,16 +337,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlayerUp&&(identical(other.playerId, playerId) || other.playerId == playerId)&&(identical(other.playerName, playerName) || other.playerName == playerName)&&(identical(other.playerPhotoUrl, playerPhotoUrl) || other.playerPhotoUrl == playerPhotoUrl)&&(identical(other.basePrice, basePrice) || other.basePrice == basePrice));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlayerUp&&(identical(other.playerId, playerId) || other.playerId == playerId)&&(identical(other.playerName, playerName) || other.playerName == playerName)&&(identical(other.playerPhotoUrl, playerPhotoUrl) || other.playerPhotoUrl == playerPhotoUrl)&&(identical(other.basePrice, basePrice) || other.basePrice == basePrice)&&(identical(other.bidIncrement, bidIncrement) || other.bidIncrement == bidIncrement));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,playerId,playerName,playerPhotoUrl,basePrice);
+int get hashCode => Object.hash(runtimeType,playerId,playerName,playerPhotoUrl,basePrice,bidIncrement);
 
 @override
 String toString() {
-  return 'AuctionEvent.playerUp(playerId: $playerId, playerName: $playerName, playerPhotoUrl: $playerPhotoUrl, basePrice: $basePrice)';
+  return 'AuctionEvent.playerUp(playerId: $playerId, playerName: $playerName, playerPhotoUrl: $playerPhotoUrl, basePrice: $basePrice, bidIncrement: $bidIncrement)';
 }
 
 
@@ -326,7 +357,7 @@ abstract mixin class $PlayerUpCopyWith<$Res> implements $AuctionEventCopyWith<$R
   factory $PlayerUpCopyWith(PlayerUp value, $Res Function(PlayerUp) _then) = _$PlayerUpCopyWithImpl;
 @useResult
 $Res call({
- String playerId, String playerName, String? playerPhotoUrl, int basePrice
+ String playerId, String playerName, String? playerPhotoUrl, int basePrice, int? bidIncrement
 });
 
 
@@ -343,13 +374,14 @@ class _$PlayerUpCopyWithImpl<$Res>
 
 /// Create a copy of AuctionEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? playerId = null,Object? playerName = null,Object? playerPhotoUrl = freezed,Object? basePrice = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? playerId = null,Object? playerName = null,Object? playerPhotoUrl = freezed,Object? basePrice = null,Object? bidIncrement = freezed,}) {
   return _then(PlayerUp(
 playerId: null == playerId ? _self.playerId : playerId // ignore: cast_nullable_to_non_nullable
 as String,playerName: null == playerName ? _self.playerName : playerName // ignore: cast_nullable_to_non_nullable
 as String,playerPhotoUrl: freezed == playerPhotoUrl ? _self.playerPhotoUrl : playerPhotoUrl // ignore: cast_nullable_to_non_nullable
 as String?,basePrice: null == basePrice ? _self.basePrice : basePrice // ignore: cast_nullable_to_non_nullable
-as int,
+as int,bidIncrement: freezed == bidIncrement ? _self.bidIncrement : bidIncrement // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -360,12 +392,13 @@ as int,
 @JsonSerializable()
 
 class BidPlaced extends AuctionEvent {
-  const BidPlaced({required this.franchiseId, required this.franchiseName, required this.amount, final  String? $type}): $type = $type ?? 'bidPlaced',super._();
+  const BidPlaced({required this.franchiseId, required this.franchiseName, required this.amount, this.nextMinimumBid, final  String? $type}): $type = $type ?? 'bidPlaced',super._();
   factory BidPlaced.fromJson(Map<String, dynamic> json) => _$BidPlacedFromJson(json);
 
  final  String franchiseId;
  final  String franchiseName;
  final  int amount;
+ final  int? nextMinimumBid;
 
 @JsonKey(name: 'runtimeType')
 final String $type;
@@ -384,16 +417,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is BidPlaced&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.amount, amount) || other.amount == amount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BidPlaced&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.nextMinimumBid, nextMinimumBid) || other.nextMinimumBid == nextMinimumBid));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,amount);
+int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,amount,nextMinimumBid);
 
 @override
 String toString() {
-  return 'AuctionEvent.bidPlaced(franchiseId: $franchiseId, franchiseName: $franchiseName, amount: $amount)';
+  return 'AuctionEvent.bidPlaced(franchiseId: $franchiseId, franchiseName: $franchiseName, amount: $amount, nextMinimumBid: $nextMinimumBid)';
 }
 
 
@@ -404,7 +437,7 @@ abstract mixin class $BidPlacedCopyWith<$Res> implements $AuctionEventCopyWith<$
   factory $BidPlacedCopyWith(BidPlaced value, $Res Function(BidPlaced) _then) = _$BidPlacedCopyWithImpl;
 @useResult
 $Res call({
- String franchiseId, String franchiseName, int amount
+ String franchiseId, String franchiseName, int amount, int? nextMinimumBid
 });
 
 
@@ -421,12 +454,13 @@ class _$BidPlacedCopyWithImpl<$Res>
 
 /// Create a copy of AuctionEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? amount = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? amount = null,Object? nextMinimumBid = freezed,}) {
   return _then(BidPlaced(
 franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
 as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as int,
+as int,nextMinimumBid: freezed == nextMinimumBid ? _self.nextMinimumBid : nextMinimumBid // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -732,6 +766,225 @@ playerId: null == playerId ? _self.playerId : playerId // ignore: cast_nullable_
 as String,franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
 as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
 as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class TimerStarted extends AuctionEvent {
+  const TimerStarted({required this.remainingSeconds, final  String? $type}): $type = $type ?? 'timerStarted',super._();
+  factory TimerStarted.fromJson(Map<String, dynamic> json) => _$TimerStartedFromJson(json);
+
+ final  int remainingSeconds;
+
+@JsonKey(name: 'runtimeType')
+final String $type;
+
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TimerStartedCopyWith<TimerStarted> get copyWith => _$TimerStartedCopyWithImpl<TimerStarted>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$TimerStartedToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TimerStarted&&(identical(other.remainingSeconds, remainingSeconds) || other.remainingSeconds == remainingSeconds));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,remainingSeconds);
+
+@override
+String toString() {
+  return 'AuctionEvent.timerStarted(remainingSeconds: $remainingSeconds)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TimerStartedCopyWith<$Res> implements $AuctionEventCopyWith<$Res> {
+  factory $TimerStartedCopyWith(TimerStarted value, $Res Function(TimerStarted) _then) = _$TimerStartedCopyWithImpl;
+@useResult
+$Res call({
+ int remainingSeconds
+});
+
+
+
+
+}
+/// @nodoc
+class _$TimerStartedCopyWithImpl<$Res>
+    implements $TimerStartedCopyWith<$Res> {
+  _$TimerStartedCopyWithImpl(this._self, this._then);
+
+  final TimerStarted _self;
+  final $Res Function(TimerStarted) _then;
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? remainingSeconds = null,}) {
+  return _then(TimerStarted(
+remainingSeconds: null == remainingSeconds ? _self.remainingSeconds : remainingSeconds // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class TimerPaused extends AuctionEvent {
+  const TimerPaused({required this.remainingSeconds, final  String? $type}): $type = $type ?? 'timerPaused',super._();
+  factory TimerPaused.fromJson(Map<String, dynamic> json) => _$TimerPausedFromJson(json);
+
+ final  int remainingSeconds;
+
+@JsonKey(name: 'runtimeType')
+final String $type;
+
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TimerPausedCopyWith<TimerPaused> get copyWith => _$TimerPausedCopyWithImpl<TimerPaused>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$TimerPausedToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TimerPaused&&(identical(other.remainingSeconds, remainingSeconds) || other.remainingSeconds == remainingSeconds));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,remainingSeconds);
+
+@override
+String toString() {
+  return 'AuctionEvent.timerPaused(remainingSeconds: $remainingSeconds)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TimerPausedCopyWith<$Res> implements $AuctionEventCopyWith<$Res> {
+  factory $TimerPausedCopyWith(TimerPaused value, $Res Function(TimerPaused) _then) = _$TimerPausedCopyWithImpl;
+@useResult
+$Res call({
+ int remainingSeconds
+});
+
+
+
+
+}
+/// @nodoc
+class _$TimerPausedCopyWithImpl<$Res>
+    implements $TimerPausedCopyWith<$Res> {
+  _$TimerPausedCopyWithImpl(this._self, this._then);
+
+  final TimerPaused _self;
+  final $Res Function(TimerPaused) _then;
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? remainingSeconds = null,}) {
+  return _then(TimerPaused(
+remainingSeconds: null == remainingSeconds ? _self.remainingSeconds : remainingSeconds // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class TimerReset extends AuctionEvent {
+  const TimerReset({required this.remainingSeconds, final  String? $type}): $type = $type ?? 'timerReset',super._();
+  factory TimerReset.fromJson(Map<String, dynamic> json) => _$TimerResetFromJson(json);
+
+ final  int remainingSeconds;
+
+@JsonKey(name: 'runtimeType')
+final String $type;
+
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TimerResetCopyWith<TimerReset> get copyWith => _$TimerResetCopyWithImpl<TimerReset>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$TimerResetToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TimerReset&&(identical(other.remainingSeconds, remainingSeconds) || other.remainingSeconds == remainingSeconds));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,remainingSeconds);
+
+@override
+String toString() {
+  return 'AuctionEvent.timerReset(remainingSeconds: $remainingSeconds)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TimerResetCopyWith<$Res> implements $AuctionEventCopyWith<$Res> {
+  factory $TimerResetCopyWith(TimerReset value, $Res Function(TimerReset) _then) = _$TimerResetCopyWithImpl;
+@useResult
+$Res call({
+ int remainingSeconds
+});
+
+
+
+
+}
+/// @nodoc
+class _$TimerResetCopyWithImpl<$Res>
+    implements $TimerResetCopyWith<$Res> {
+  _$TimerResetCopyWithImpl(this._self, this._then);
+
+  final TimerReset _self;
+  final $Res Function(TimerReset) _then;
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? remainingSeconds = null,}) {
+  return _then(TimerReset(
+remainingSeconds: null == remainingSeconds ? _self.remainingSeconds : remainingSeconds // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Crichere — S4: Live Auction Room</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0A0F1E;--slate:#1A2236;--card:#1E2A3A;--border:#2A3A50;--green:#22C55E;--gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;--purple:#A855F7;--cyan:#06B6D4;--text:#E2E8F0;--muted:#64748B;--dim:#94A3B8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#060B14;font-family:'DM Sans',sans-serif;color:var(--text);padding:32px 24px}
+h1{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green);margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:40px}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;color:var(--gold);margin:40px 0 20px;border-bottom:1px solid var(--border);padding-bottom:8px}
+.screens-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin-bottom:48px}
+.label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.mobile{width:375px;background:var(--navy);border-radius:40px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.mobile-bar{height:44px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border)}
+.m-body{padding:16px;position:relative;min-height:500px}
+.web{width:1200px;background:var(--navy);border-radius:16px;border:2px solid var(--border);overflow:hidden;flex-shrink:0}
+.web-topbar{height:56px;background:#0D1626;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px}
+.web-logo{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--green);font-size:18px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.chip-live{background:rgba(239,68,68,.15);color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s infinite}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+.btn-green{background:var(--green);color:#000}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}
+.btn-gold{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}
+.amount{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);font-weight:700}
+.purse-bar{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.purse-fill{height:100%;border-radius:4px}
+.pc-ar{background:linear-gradient(135deg,rgba(168,85,247,.14),rgba(168,85,247,.03));border:1.5px solid rgba(168,85,247,.35)}
+.pc-bat{background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(59,130,246,.03));border:1.5px solid rgba(59,130,246,.35)}
+.pc-bowl{background:linear-gradient(135deg,rgba(239,68,68,.14),rgba(239,68,68,.03));border:1.5px solid rgba(239,68,68,.35)}
+.av{width:72px;height:72px;border-radius:20px;display:grid;place-items:center;font-size:28px;font-weight:700;margin:0 auto 10px}
+.av-ar{background:rgba(168,85,247,.2);color:var(--purple);border:2px solid rgba(168,85,247,.4)}
+.av-bat{background:rgba(59,130,246,.2);color:var(--blue);border:2px solid rgba(59,130,246,.4)}
+.av-bowl{background:rgba(239,68,68,.2);color:var(--red);border:2px solid rgba(239,68,68,.4)}
+.av-sm{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:16px;font-weight:700;flex-shrink:0}
+.player-card{border-radius:20px;padding:18px;margin-bottom:14px;text-align:center}
+.player-name{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700}
+.bid-box{background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.35);border-radius:16px;padding:14px;text-align:center;margin-bottom:14px}
+.bid-num{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--gold)}
+.bid-lbl{font-size:10px;color:var(--muted);margin-bottom:4px}
+.bid-who{font-size:12px;color:var(--dim);margin-top:4px}
+.bid-row{padding:9px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.inc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.inc-btn{background:var(--slate);border:1px solid var(--border);border-radius:8px;padding:10px 0;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);text-align:center}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:20;border-radius:38px;padding:0 20px}
+.grayscale{filter:grayscale(1);opacity:.4}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 1s linear infinite}
+.section-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.section-hdr h3{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600}
+.web-three-col{display:grid;grid-template-columns:260px 1fr 260px;min-height:500px}
+</style>
+</head>
+<body>
+<h1>S4 — Live Auction Room</h1>
+<p class="subtitle">Mobile viewer (all role types) · Franchise bidding · SOLD/UNSOLD/Round overlays · SSE disconnect · Web 3-col viewer</p>
+
+<div class="section-title">📱 Mobile — Viewer: All Player Role Cards</div>
+<div class="screens-row">
+
+  <div>
+    <div class="label">All-rounder up (purple)</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="background:var(--slate);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600">Round 1</div>
+          <div class="chip chip-live pulse">● LIVE</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)">#142</div>
+        </div>
+        <div class="player-card pc-ar">
+          <div class="av av-ar">AK</div>
+          <div class="player-name">Anjali Kumar</div>
+          <div style="display:flex;justify-content:center;gap:6px;margin-top:6px;flex-wrap:wrap">
+            <span class="chip" style="background:rgba(168,85,247,.12);color:var(--purple)">ALL-ROUNDER</span>
+            <span class="chip" style="background:rgba(59,130,246,.1);color:var(--blue)">RHB</span>
+            <span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted)">Off Spin</span>
+          </div>
+          <div style="margin-top:12px;background:rgba(0,0,0,.2);border-radius:10px;padding:8px">
+            <div style="font-size:10px;color:var(--muted)">BASE PRICE</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim)">₹500</div>
+          </div>
+        </div>
+        <div class="bid-box">
+          <div class="bid-lbl">CURRENT BID</div>
+          <div class="bid-num">₹9,500</div>
+          <div class="bid-who">⚡ Thunder Strikers leading</div>
+        </div>
+        <div class="section-hdr"><h3>Bid History</h3><span style="font-size:10px;color:var(--muted)">Auto-scroll</span></div>
+        <div style="background:var(--slate);border-radius:12px;overflow:hidden">
+          <div class="bid-row"><span style="font-weight:700;color:var(--gold)">Thunder Strikers</span><span class="amount" style="font-size:14px">₹9,500</span></div>
+          <div class="bid-row" style="opacity:.7"><span>Lightning Kings</span><span class="amount">₹8,500</span></div>
+          <div class="bid-row" style="opacity:.5"><span>Royal Blazers</span><span class="amount">₹7,000</span></div>
+          <div class="bid-row" style="border:none;opacity:.35"><span>Thunder Strikers</span><span class="amount">₹5,500</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Batter up (blue) + My purse widget</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="background:var(--slate);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600">Round 1</div>
+          <div class="chip chip-live pulse">● LIVE</div>
+        </div>
+        <div class="player-card pc-bat">
+          <div class="av av-bat">SP</div>
+          <div class="player-name">Sam Patel</div>
+          <div style="display:flex;justify-content:center;gap:6px;margin-top:6px">
+            <span class="chip" style="background:rgba(59,130,246,.12);color:var(--blue)">BATTER</span>
+            <span class="chip" style="background:rgba(6,182,212,.1);color:var(--cyan)">LHB</span>
+            <span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted)">Professional</span>
+          </div>
+          <div style="margin-top:12px;background:rgba(0,0,0,.2);border-radius:10px;padding:8px">
+            <div style="font-size:10px;color:var(--muted)">BASE PRICE</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim)">₹1,000</div>
+          </div>
+        </div>
+        <div class="bid-box">
+          <div class="bid-lbl">CURRENT BID</div>
+          <div class="bid-num">₹5,500</div>
+          <div class="bid-who">Phoenix XI leading</div>
+        </div>
+        <div style="background:var(--slate);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:6px">MY TEAM — Thunder Strikers</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span>Purse remaining</span><span class="amount">₹25,800</span></div>
+          <div class="purse-bar"><div class="purse-fill" style="width:52%;background:var(--green)"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">8/15 slots · 7 remaining</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Bowler up (red) — No bids yet</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="background:var(--slate);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600">Round 1</div>
+          <div class="chip chip-live pulse">● LIVE</div>
+        </div>
+        <div class="player-card pc-bowl">
+          <div class="av av-bowl">MK</div>
+          <div class="player-name">Mohan Kumar</div>
+          <div style="display:flex;justify-content:center;gap:6px;margin-top:6px">
+            <span class="chip" style="background:rgba(239,68,68,.12);color:var(--red)">BOWLER</span>
+            <span class="chip" style="background:rgba(100,116,139,.12);color:var(--muted)">RA Fast</span>
+          </div>
+          <div style="margin-top:12px;background:rgba(0,0,0,.2);border-radius:10px;padding:8px">
+            <div style="font-size:10px;color:var(--muted)">BASE PRICE</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--dim)">₹500</div>
+          </div>
+        </div>
+        <div style="background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.2);border-radius:16px;padding:18px;text-align:center;margin-bottom:14px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">OPENING BID</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--gold)">₹500</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:6px">Waiting for first bid…</div>
+          <div style="width:8px;height:8px;background:var(--gold);border-radius:50%;margin:8px auto 0;animation:pulse 1s infinite"></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);text-align:center">SSE PLAYER_UP event · State: UP_FOR_BIDDING</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-title">📱 Mobile — Franchise Owner Bidding Panel</div>
+<div class="screens-row">
+
+  <div>
+    <div class="label">Active bid — Outbid state</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="background:var(--slate);border-radius:8px;padding:5px 10px;font-size:12px">Round 1</div>
+          <div class="chip chip-live pulse">● LIVE</div>
+        </div>
+        <div class="pc-ar" style="border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:12px">
+          <div class="av-sm av-ar">AK</div>
+          <div style="flex:1"><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">Anjali Kumar</div><div style="font-size:11px;color:var(--muted)">All-rounder · Advanced</div></div>
+          <span class="chip" style="background:rgba(168,85,247,.12);color:var(--purple)">AR</span>
+        </div>
+        <div class="bid-box">
+          <div class="bid-lbl">CURRENT BID</div>
+          <div class="bid-num">₹9,500</div>
+          <div class="bid-who" style="color:var(--red)">Thunder Strikers — NOT YOU</div>
+        </div>
+        <div style="background:var(--slate);border-radius:10px;padding:10px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Lightning Kings</span><span class="amount">₹28,500</span></div>
+          <div class="purse-bar"><div class="purse-fill" style="width:57%;background:var(--green)"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px">5/15 slots</div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;margin-bottom:7px">PLACE YOUR BID</div>
+        <div class="inc-grid">
+          <div class="inc-btn">+500</div><div class="inc-btn">+1K</div><div class="inc-btn">+2K</div><div class="inc-btn">+5K</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1;background:var(--slate);border:1.5px solid var(--gold);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold);text-align:center">₹10,000</div>
+          <button class="btn btn-ghost btn-sm">Custom</button>
+        </div>
+        <button class="btn btn-gold" style="width:100%;padding:14px;font-size:15px">🔨 BID ₹10,000</button>
+        <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:5px">POST /auctions/{id}/bid · Online-only · No queue</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Leading bid state</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="background:var(--slate);border-radius:8px;padding:5px 10px;font-size:12px">Round 1</div>
+          <div class="chip chip-live pulse">● LIVE</div>
+        </div>
+        <div class="pc-ar" style="border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:12px">
+          <div class="av-sm av-ar">AK</div>
+          <div><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">Anjali Kumar</div><div style="font-size:11px;color:var(--muted)">All-rounder</div></div>
+        </div>
+        <div style="background:rgba(34,197,94,.08);border:1.5px solid rgba(34,197,94,.35);border-radius:16px;padding:16px;text-align:center;margin-bottom:12px">
+          <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">⭐ YOU'RE LEADING</div>
+          <div class="bid-num">₹10,000</div>
+          <div style="font-size:12px;color:var(--green);margin-top:4px">Lightning Kings</div>
+        </div>
+        <div style="background:var(--slate);border-radius:10px;padding:10px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Your purse</span><span class="amount">₹18,500</span></div>
+          <div class="purse-bar"><div class="purse-fill" style="width:37%;background:var(--gold)"></div></div>
+        </div>
+        <div class="inc-grid">
+          <div class="inc-btn">+500</div><div class="inc-btn">+1K</div><div class="inc-btn">+2K</div><div class="inc-btn">+5K</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="flex:1;color:var(--green);border-color:rgba(34,197,94,.3)">Hold</button>
+          <button class="btn btn-gold" style="flex:2">🔨 BID ₹10,500</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Purse depleted — Bid locked</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="background:var(--slate);border-radius:8px;padding:5px 10px;font-size:12px">Round 1</div>
+          <div class="chip chip-live pulse">● LIVE</div>
+        </div>
+        <div class="pc-bat" style="border-radius:14px;padding:12px;display:flex;gap:10px;align-items:center;margin-bottom:12px">
+          <div class="av-sm av-bat">SP</div>
+          <div><div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700">Sam Patel</div><div style="font-size:11px;color:var(--muted)">Batter</div></div>
+        </div>
+        <div class="bid-box"><div class="bid-lbl">CURRENT BID</div><div class="bid-num">₹7,500</div></div>
+        <div style="background:rgba(239,68,68,.06);border:1.5px solid rgba(239,68,68,.3);border-radius:12px;padding:12px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span style="color:var(--red);font-weight:600">⚠ Purse remaining</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--red)">₹1,200</span>
+          </div>
+          <div class="purse-bar"><div class="purse-fill" style="width:2%;background:var(--red)"></div></div>
+          <div style="font-size:11px;color:var(--red);margin-top:5px">Next bid ₹8,000 exceeds purse</div>
+        </div>
+        <div class="inc-grid" style="margin-bottom:10px">
+          <div class="inc-btn" style="opacity:.2;cursor:not-allowed">+500</div>
+          <div class="inc-btn" style="opacity:.2;cursor:not-allowed">+1K</div>
+          <div class="inc-btn" style="opacity:.2;cursor:not-allowed">+2K</div>
+          <div class="inc-btn" style="opacity:.2;cursor:not-allowed">+5K</div>
+        </div>
+        <button disabled style="width:100%;padding:13px;border-radius:8px;background:rgba(100,116,139,.12);color:var(--muted);border:1px solid var(--border);font-size:14px;font-weight:600;cursor:not-allowed">🔒 Insufficient Purse</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-title">📱 Mobile — SOLD, UNSOLD, Round & SSE Overlays</div>
+<div class="screens-row">
+
+  <div>
+    <div class="label">SOLD! Overlay with confetti</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="grayscale" style="padding:8px"><div style="height:220px;background:var(--slate);border-radius:16px;margin-bottom:8px"></div><div style="height:80px;background:var(--slate);border-radius:12px"></div></div>
+        <div class="overlay" style="background:rgba(10,15,30,.88);backdrop-filter:blur(6px)">
+          <div style="text-align:center;width:100%">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;color:var(--green);letter-spacing:4px;text-shadow:0 0 30px rgba(34,197,94,.5)">SOLD!</div>
+            <div style="font-size:38px;margin:4px 0">🔨</div>
+            <div style="background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(245,158,11,.07));border:2px solid var(--green);border-radius:20px;padding:18px;margin-top:6px">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700">Anjali Kumar</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:12px">All-rounder</div>
+              <div style="background:rgba(34,197,94,.08);border-radius:12px;padding:10px;margin-bottom:10px">
+                <div style="font-size:10px;color:var(--muted);margin-bottom:3px">PURCHASED BY</div>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--green)">Thunder Strikers</div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-bottom:3px">FINAL PRICE</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:40px;font-weight:700;color:var(--gold)">₹12,500</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:5px">Purse: ₹50K → ₹37.5K · POST /auctions/{id}/player/sold</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">UNSOLD Overlay</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="grayscale" style="padding:8px"><div style="height:220px;background:var(--slate);border-radius:16px;margin-bottom:8px"></div><div style="height:80px;background:var(--slate);border-radius:12px"></div></div>
+        <div class="overlay" style="background:rgba(10,15,30,.85);backdrop-filter:blur(4px)">
+          <div style="text-align:center;width:100%">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:44px;font-weight:700;color:var(--muted);letter-spacing:3px">UNSOLD</div>
+            <div style="font-size:38px;margin:6px 0">🔕</div>
+            <div style="background:rgba(100,116,139,.08);border:2px solid var(--border);border-radius:20px;padding:18px;margin-top:6px">
+              <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700">Kiran Chandran</div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Batter · Base ₹500</div>
+              <div style="background:var(--slate);border-radius:12px;padding:12px">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:3px">NO BIDS RECEIVED</div>
+                <div style="font-size:13px">Goes to Round 2 pool</div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-top:8px">POST /auctions/{id}/player/unsold · State → UNSOLD</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Round Complete overlay</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="overlay" style="background:rgba(10,15,30,.9);backdrop-filter:blur(8px)">
+          <div style="text-align:center;width:100%;padding:0 16px">
+            <div style="font-size:50px;margin-bottom:8px">🏁</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--gold)">Round 1 Complete</div>
+            <div style="font-size:13px;color:var(--muted);margin:6px 0 16px">Main auction round finished</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+              <div style="background:rgba(34,197,94,.08);border-radius:12px;padding:14px"><div style="font-size:32px;font-weight:700;color:var(--green)">82</div><div style="font-size:11px;color:var(--muted)">Sold</div></div>
+              <div style="background:rgba(100,116,139,.08);border-radius:12px;padding:14px"><div style="font-size:32px;font-weight:700;color:var(--muted)">38</div><div style="font-size:11px;color:var(--muted)">Unsold→R2</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Round 2 starts soon · Unsold players re-enter pool</div>
+            <button class="btn btn-ghost" style="width:100%">View Round Summary</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">SSE Disconnected — Reconnecting</div>
+    <div class="mobile">
+      <div class="mobile-bar">9:41 AM</div>
+      <div class="m-body">
+        <div class="grayscale" style="padding:8px"><div style="height:220px;background:var(--slate);border-radius:16px;margin-bottom:8px"></div><div style="height:60px;background:var(--slate);border-radius:12px"></div></div>
+        <div class="overlay" style="background:rgba(10,15,30,.85);backdrop-filter:blur(8px)">
+          <div style="text-align:center;padding:0 20px">
+            <div style="font-size:40px;margin-bottom:10px">📡</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px">Connection Lost</div>
+            <div class="spinner" style="margin:10px auto"></div>
+            <div style="font-size:13px;color:var(--muted);margin:10px 0">Reconnecting…<br>Attempt 2 · Next in 4s</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Backoff: 2s→4s→8s→30s cap · Unlimited retries</div>
+            <button class="btn btn-ghost btn-sm">Retry now</button>
+            <div style="font-size:10px;color:var(--border);margin-top:10px">On reconnect: GET /state → re-attach SSE<br>with Last-Event-ID = currentSeq</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-title">🖥️ Web — Auction Viewer (3-Column Layout)</div>
+<div class="screens-row">
+  <div>
+    <div class="label">Web — Full 3-col viewer with purse leaderboard</div>
+    <div class="web">
+      <div class="web-topbar">
+        <div class="web-logo">🏏 Crichere</div>
+        <div class="chip chip-live pulse" style="font-size:13px;padding:5px 14px">● LIVE — TechCup 2026 · Round 1</div>
+        <div style="margin-left:auto;display:flex;gap:16px;align-items:center">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">SSE #142</span>
+          <span style="font-size:12px;color:var(--green)">🟢 Connected</span>
+        </div>
+      </div>
+      <div class="web-three-col">
+        <!-- LEFT: Player pool -->
+        <div style="border-right:1px solid var(--border);padding:16px">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.5px;margin-bottom:12px">PLAYER POOL (92 remaining)</div>
+          <div class="pc-ar" style="border-radius:11px;padding:11px;margin-bottom:6px">
+            <div style="font-weight:700;font-size:13px">Anjali Kumar <span class="chip chip-live" style="font-size:9px;padding:2px 6px">NOW</span></div>
+            <div style="font-size:11px;color:var(--purple);margin-top:2px">All-rounder · Base ₹500</div>
+          </div>
+          <div style="background:var(--slate);border-radius:10px;padding:10px;margin-bottom:5px;opacity:.75"><div style="font-size:13px;font-weight:600">Sam Patel</div><div style="font-size:11px;color:var(--blue)">Batter · ₹1,000</div></div>
+          <div style="background:var(--slate);border-radius:10px;padding:10px;margin-bottom:5px;opacity:.55"><div style="font-size:13px;font-weight:600">Mohan Kumar</div><div style="font-size:11px;color:var(--red)">Bowler · ₹500</div></div>
+          <div style="background:var(--slate);border-radius:10px;padding:10px;margin-bottom:5px;opacity:.4"><div style="font-size:13px;font-weight:600">Priya Nair</div><div style="font-size:11px;color:var(--purple)">AR · ₹750</div></div>
+          <div style="background:var(--slate);border-radius:10px;padding:10px;opacity:.25"><div style="font-size:13px;font-weight:600">Rahul Singh</div><div style="font-size:11px;color:var(--green)">WK · ₹500</div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">+87 more</div>
+        </div>
+        <!-- CENTER -->
+        <div style="padding:20px;display:flex;flex-direction:column;align-items:center">
+          <div class="player-card pc-ar" style="width:100%;max-width:360px">
+            <div class="av av-ar" style="width:88px;height:88px;border-radius:22px;font-size:32px">AK</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700">Anjali Kumar</div>
+            <div style="display:flex;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <span class="chip" style="background:rgba(168,85,247,.12);color:var(--purple);font-size:12px">ALL-ROUNDER</span>
+              <span class="chip" style="background:rgba(59,130,246,.1);color:var(--blue);font-size:12px">Right Hand</span>
+              <span class="chip" style="background:rgba(100,116,139,.1);color:var(--muted);font-size:12px">Off Spin · Advanced</span>
+            </div>
+          </div>
+          <div style="background:rgba(245,158,11,.08);border:2px solid rgba(245,158,11,.4);border-radius:20px;padding:20px;width:100%;max-width:360px;text-align:center;margin-bottom:16px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">CURRENT BID</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:52px;font-weight:700;color:var(--gold)">₹9,500</div>
+            <div style="font-size:14px;color:var(--dim);margin-top:6px">⚡ Thunder Strikers</div>
+          </div>
+          <div style="width:100%;max-width:360px">
+            <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px">BID HISTORY</div>
+            <div style="background:var(--slate);border-radius:12px;overflow:hidden">
+              <div class="bid-row"><span style="font-weight:700;color:var(--gold)">Thunder Strikers</span><span class="amount" style="font-size:14px">₹9,500</span></div>
+              <div class="bid-row" style="opacity:.7"><span style="font-size:13px">Lightning Kings</span><span class="amount">₹8,500</span></div>
+              <div class="bid-row" style="border:none;opacity:.5"><span style="font-size:13px">Royal Blazers</span><span class="amount">₹7,000</span></div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--border);margin-top:12px;text-align:center;line-height:1.8">GET /auctions/{id}/state → snapshot on load<br>GET /auctions/{id}/events → SSE StreamProvider<br>Client discards seq ≤ localSeq · 95th-pctile &lt;500ms on 4G</div>
+        </div>
+        <!-- RIGHT: Purse leaderboard -->
+        <div style="border-left:1px solid var(--border);padding:16px">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.5px;margin-bottom:12px">FRANCHISE PURSES</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:11px;padding:11px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;font-weight:700;color:var(--gold)">⭐ Thunder Strikers</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--gold)">₹43K</span></div>
+              <div class="purse-bar"><div class="purse-fill" style="width:86%;background:var(--gold)"></div></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">4/15 · LEADING BID</div>
+            </div>
+            <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:11px;padding:11px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;font-weight:700">★ Lightning Kings</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--green)">₹31K</span></div>
+              <div class="purse-bar"><div class="purse-fill" style="width:62%;background:var(--green)"></div></div>
+              <div style="font-size:10px;color:var(--green);margin-top:3px">5/15 · YOUR TEAM</div>
+            </div>
+            <div style="background:var(--slate);border-radius:11px;padding:11px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;font-weight:600">Royal Blazers</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue)">₹22K</span></div>
+              <div class="purse-bar"><div class="purse-fill" style="width:44%;background:var(--blue)"></div></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">6/15</div>
+            </div>
+            <div style="background:var(--slate);border-radius:11px;padding:11px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;font-weight:600">Phoenix XI</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--purple)">₹18K</span></div>
+              <div class="purse-bar"><div class="purse-fill" style="width:36%;background:var(--purple)"></div></div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px">7/15</div>
+            </div>
+            <div style="background:var(--slate);border-radius:11px;padding:11px;opacity:.4">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;color:var(--red)">Wind Warriors</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red)">₹0</span></div>
+              <div class="purse-bar"><div class="purse-fill" style="width:0%;background:var(--red)"></div></div>
+              <div style="font-size:10px;color:var(--red);margin-top:3px">🔒 Purse depleted</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

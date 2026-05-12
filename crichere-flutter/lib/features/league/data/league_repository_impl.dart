@@ -5,6 +5,9 @@ import '../../franchise/domain/entities/franchise.dart';
 import '../domain/repositories/league_repository.dart';
 import 'league_api.dart';
 import 'models/league_request.dart';
+import '../../financials/domain/entities/fee_entities.dart';
+import '../../financials/domain/entities/forfeit_entities.dart';
+import '../domain/entities/waitlist_entities.dart';
 import 'package:drift/drift.dart';
 import 'dart:io';
 
@@ -82,5 +85,72 @@ class LeagueRepositoryImpl implements LeagueRepository {
   @override
   Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId) async {
     return await _api.getLeaguePlayers(leagueId);
+  }
+
+  // Fees
+  @override
+  Future<List<FeeObligation>> getFeeObligations(String leagueId) async {
+    return await _api.getFeeObligations(leagueId);
+  }
+
+  @override
+  Future<FeePayment> recordPayment(String leagueId, String obligationId, int amount, String paymentMode, String? notes) async {
+    return await _api.recordPayment(leagueId, obligationId, {
+      'amount': amount,
+      'paymentMode': paymentMode,
+      'notes': notes,
+    });
+  }
+
+  @override
+  Future<void> waiveFee(String leagueId, String obligationId, int refundAmount, String? notes) async {
+    await _api.waiveFee(leagueId, obligationId, {
+      'refundAmount': refundAmount,
+      'notes': notes,
+    });
+  }
+
+  // Forfeits
+  @override
+  Future<List<ForfeitRequest>> getForfeitRequests(String leagueId) async {
+    return await _api.getForfeitRequests(leagueId);
+  }
+
+  @override
+  Future<ForfeitRequest> submitForfeit(String leagueId, String entityId, String type, String reason) async {
+    return await _api.submitForfeit(leagueId, {
+      'entityId': entityId,
+      'type': type,
+      'reason': reason,
+    });
+  }
+
+  @override
+  Future<void> approveForfeit(String leagueId, String requestId, int refundAmount, bool promoteNext) async {
+    await _api.approveForfeit(leagueId, requestId, {
+      'refundAmount': refundAmount,
+      'promoteNext': promoteNext,
+    });
+  }
+
+  // Waitlist
+  @override
+  Future<List<WaitlistEntry>> getWaitlist(String leagueId) async {
+    return await _api.getWaitlist(leagueId);
+  }
+
+  @override
+  Future<WaitlistEntry> joinWaitlist(String leagueId) async {
+    return await _api.joinWaitlist(leagueId);
+  }
+
+  @override
+  Future<void> promoteFromWaitlist(String leagueId, String entryId) async {
+    await _api.promoteFromWaitlist(leagueId, entryId);
+  }
+
+  @override
+  Future<void> withdrawFromWaitlist(String leagueId, String entryId) async {
+    await _api.withdrawFromWaitlist(leagueId, entryId);
   }
 }

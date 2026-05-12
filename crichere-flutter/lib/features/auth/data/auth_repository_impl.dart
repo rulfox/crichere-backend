@@ -27,8 +27,24 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> claimProfile(String name, PlayingRole playingRole) async {
-    await _api.claimProfile(ClaimRequest(name: name, playingRole: playingRole));
+  Future<void> claimProfile({
+    required String name,
+    required PlayingRole playingRole,
+    required ExperienceLevel experienceLevel,
+    required BattingStyle battingStyle,
+    required BowlingType bowlingType,
+    String? city,
+    String? jerseyNumber,
+  }) async {
+    await _api.claimProfile(ClaimRequest(
+      name: name,
+      playingRole: playingRole,
+      experienceLevel: experienceLevel,
+      battingStyle: battingStyle,
+      bowlingType: bowlingType,
+      city: city,
+      jerseyNumber: int.tryParse(jerseyNumber ?? ''),
+    ));
   }
 
   @override

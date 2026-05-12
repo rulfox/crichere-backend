@@ -12,6 +12,8 @@ abstract class AuthResponse with _$AuthResponse {
     String? accessToken,
     String? refreshToken,
     String? userId,
+    String? phone,
+    String? name,
     ProfileStatus? profileStatus,
     @Default(false) bool isNewUser,
     String? profileId,

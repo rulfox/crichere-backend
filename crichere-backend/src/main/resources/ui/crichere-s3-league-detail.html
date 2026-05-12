@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crichere · S3 — League Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0A0F1E;--navym:#0F172A;--slate:#1A2236;--slate2:#1E293B;--slate3:#243047;--slate4:#2D3A52;--green:#22C55E;--gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;--purp:#A855F7;--cyan:#06B6D4;--tx:#F1F5F9;--txm:#CBD5E1;--txd:#94A3B8;--txf:#64748B;--bdr:rgba(148,163,184,.1);--bdr2:rgba(148,163,184,.18)}
+body{font-family:'DM Sans',sans-serif;background:#060C1A;color:var(--tx);min-height:100vh}
+.topnav{position:sticky;top:0;z-index:50;background:rgba(6,12,26,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold)}
+.sec-title{font-size:11px;font-weight:600;color:var(--txf)}
+.nav-pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.pill{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bdr2);background:transparent;color:var(--txd);transition:all .15s}
+.pill.act,.pill:hover{background:var(--gold);color:#1a0f00;border-color:var(--gold)}
+.canvas{padding:32px 24px 80px;display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start}
+.sw{display:none;animation:fi .25s ease}.sw.show{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.frame-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--txf);text-align:center;margin-top:10px;font-family:'Rajdhani',sans-serif}
+.phone{width:375px;min-height:812px;background:var(--navy);border-radius:44px;border:2px solid var(--slate4);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);flex-shrink:0}
+.ph-notch{height:44px;background:var(--navym);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.notch-pill{width:90px;height:10px;background:#060c1a;border-radius:5px}
+.web-frame{width:1200px;background:var(--navym);border-radius:14px;border:1.5px solid var(--slate4);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6);flex-shrink:0}
+.web-chrome{height:36px;background:var(--slate2);display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid var(--bdr)}
+.wdot{width:10px;height:10px;border-radius:50%}
+.wurl{flex:1;height:18px;background:var(--navy);border-radius:4px;margin:0 8px;display:flex;align-items:center;padding:0 10px;font-size:10px;color:var(--txf);font-family:'JetBrains Mono',monospace}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.8)}}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1.4s infinite;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700}
+.b-gold{background:rgba(245,158,11,.12);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.b-green{background:rgba(34,197,94,.12);color:#4ADE80;border:1px solid rgba(34,197,94,.28)}
+.b-blue{background:rgba(59,130,246,.12);color:#93C5FD;border:1px solid rgba(59,130,246,.28)}
+.b-red{background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.28)}
+.b-gray{background:rgba(100,116,139,.12);color:var(--txd);border:1px solid rgba(100,116,139,.22)}
+.b-purp{background:rgba(168,85,247,.12);color:#D8B4FE;border:1px solid rgba(168,85,247,.28)}
+.b-cyan{background:rgba(6,182,212,.12);color:#67E8F9;border:1px solid rgba(6,182,212,.28)}
+.card{background:var(--slate);border:1px solid var(--bdr);border-radius:14px;overflow:hidden}
+.slbl{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--txf);font-family:'Rajdhani',sans-serif}
+.tab{padding:11px 14px;font-size:11px;font-weight:600;color:var(--txf);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .2s}
+.tab.act{color:var(--gold);border-bottom-color:var(--gold)}
+.tabbar{display:flex;border-bottom:1px solid var(--bdr);background:var(--navym);overflow-x:auto}
+.purse-wrap{background:var(--slate4);border-radius:4px;height:7px;overflow:hidden}
+.purse-fill{height:100%;border-radius:4px}
+.bnav{display:flex;border-top:1px solid var(--bdr);background:var(--navym)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px;cursor:pointer}
+.bni span:first-child{font-size:18px}
+.bni-lbl{font-size:9px;font-weight:600;font-family:'Rajdhani',sans-serif;color:var(--txf)}
+.bni.act .bni-lbl{color:var(--gold)}
+/* Fee status chips */
+.fee-unpaid{background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.3);padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;display:inline-flex;align-items:center}
+.fee-partial{background:rgba(245,158,11,.12);color:#FCD34D;border:1px solid rgba(245,158,11,.3);padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;display:inline-flex;align-items:center}
+.fee-paid{background:rgba(34,197,94,.12);color:#4ADE80;border:1px solid rgba(34,197,94,.28);padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;display:inline-flex;align-items:center}
+.fee-waived{background:rgba(100,116,139,.12);color:var(--txd);border:1px solid rgba(100,116,139,.22);padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;display:inline-flex;align-items:center}
+.sidebar{width:220px;background:var(--navy);border-right:1px solid var(--bdr)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-left:3px solid transparent;font-size:13px;color:var(--txd)}
+.nav-item.act{background:rgba(245,158,11,.07);border-left-color:var(--gold);color:var(--tx);font-weight:600}
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;display:none}
+.modal-backdrop.show{display:flex}
+.modal{background:var(--slate2);border:1px solid var(--bdr2);border-radius:18px;padding:24px;width:400px;max-width:90vw;box-shadow:0 40px 80px rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <span class="logo">🏏 CRICHERE</span>
+  <span class="sec-title">Section 3 — League Detail</span>
+  <div class="nav-pills">
+    <button class="pill act" onclick="show('player-view')">Player View</button>
+    <button class="pill" onclick="show('join-register')">Join / Register</button>
+    <button class="pill" onclick="show('admin-view')">Admin View</button>
+    <button class="pill" onclick="show('admin-fees')">Admin Fees Tab ★</button>
+    <button class="pill" onclick="show('web-admin')">Web Admin View</button>
+    <button class="pill" onclick="show('web-fees')">Web Fees Tab ★</button>
+  </div>
+</div>
+
+<div class="canvas">
+
+<!-- ═══ PLAYER VIEW — MOBILE ═══ -->
+<div class="sw show" id="sw-player-view">
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd)">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <!-- Hero banner -->
+        <div style="height:110px;background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(59,130,246,.18),var(--slate));display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid var(--bdr)">
+          <div style="font-size:44px">🏏</div>
+          <div style="position:absolute;top:12px;left:14px;cursor:pointer;font-size:16px;color:var(--txd)">← Back</div>
+          <div style="position:absolute;top:12px;right:14px;display:flex;gap:6px"><span class="badge b-red" style="gap:5px"><div class="live-dot" style="width:5px;height:5px"></div>Live</span><span class="badge b-gold">T20</span></div>
+        </div>
+        <!-- Info -->
+        <div style="padding:14px 16px 10px;border-bottom:1px solid var(--bdr)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:3px">TechCup 2026</div>
+          <div style="font-size:11px;color:var(--txd);margin-bottom:12px">By Rahul Kumar · Mumbai · Auction Live</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+            <div class="card" style="padding:9px 7px;text-align:center;border-radius:10px"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">8</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Franchises</div></div>
+            <div class="card" style="padding:9px 7px;text-align:center;border-radius:10px"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">120</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Players</div></div>
+            <div class="card" style="padding:9px 7px;text-align:center;border-radius:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--gold)">₹50k</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Purse</div></div>
+          </div>
+          <!-- PRIMARY CTA: Enter auction room (registered player) -->
+          <button style="width:100%;padding:13px;background:var(--green);color:#0a2010;border:none;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:7px">🚪 Enter Auction Room</button>
+        </div>
+        <!-- Tabs -->
+        <div class="tabbar" id="pt-tabs">
+          <div class="tab act" onclick="ptab('overview',this)">Overview</div>
+          <div class="tab" onclick="ptab('players',this)">Players</div>
+          <div class="tab" onclick="ptab('franchises',this)">Franchises</div>
+          <div class="tab" onclick="ptab('rules',this)">Rules</div>
+        </div>
+        <div style="flex:1;padding:12px 14px;overflow-y:auto" id="pt-content">
+          <div id="pt-overview">
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <div class="card" style="padding:12px 13px"><div style="font-size:12px;font-weight:600;margin-bottom:9px">League Details</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Format</div><span class="badge b-gold">T20</span></div><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Order mode</div><div style="font-size:11px">🎲 Random</div></div><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Players/team</div><div style="font-size:11px">15</div></div><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Waitlist</div><div style="font-size:11px;color:var(--green)">⚡ Auto-promote</div></div></div></div>
+              <div class="card" style="padding:12px 13px;border-color:rgba(34,197,94,.25)"><div style="font-size:12px;font-weight:600;margin-bottom:4px">Your Status</div><div style="font-size:11px;color:var(--green);margin-bottom:6px">✓ Registered · Sold to Thunder Strikers</div><div class="purse-wrap" style="margin-bottom:3px"><div class="purse-fill" style="width:23%;background:var(--gold)"></div></div><div style="font-size:9px;color:var(--txf)">Auction 23% complete · Round 1/3</div></div>
+              <div class="card" style="padding:12px 13px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">Auction Progress</div><div class="purse-wrap" style="margin-bottom:4px"><div class="purse-fill" style="width:23%;background:var(--gold)"></div></div><div style="font-size:10px;color:var(--txf)">23 of 120 players auctioned</div></div>
+            </div>
+          </div>
+          <div id="pt-players" style="display:none">
+            <div style="display:flex;gap:7px;margin-bottom:10px"><input placeholder="🔍 Search..." style="flex:1;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 12px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:12px"><select style="width:100px;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 10px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:11px"><option>All roles</option></select></div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div class="card" style="padding:10px 12px;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:rgba(168,85,247,.18);border:2px solid rgba(168,85,247,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#D8B4FE">AS</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Anjali Sharma</div><span class="badge b-gold" style="font-size:8px;margin-top:3px">▲ Up for bid</span></div><span class="badge b-purp" style="font-size:8px">AR</span></div>
+              <div class="card" style="padding:10px 12px;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:rgba(59,130,246,.18);border:2px solid rgba(59,130,246,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#93C5FD">SP</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Sam Patel</div><span class="badge b-gray" style="font-size:8px;margin-top:3px">Available</span></div><span class="badge b-blue" style="font-size:8px">BAT</span></div>
+              <div class="card" style="padding:10px 12px;display:flex;gap:10px;align-items:center;opacity:.7"><div style="width:36px;height:36px;border-radius:50%;background:rgba(34,197,94,.18);border:2px solid rgba(34,197,94,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green)">MK</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Manish Kumar</div><span class="badge b-green" style="font-size:8px;margin-top:3px">✓ Sold ₹1,800</span></div><span class="badge b-green" style="font-size:8px">WK</span></div>
+            </div>
+          </div>
+          <div id="pt-franchises" style="display:none">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="card" style="padding:11px 12px;display:flex;gap:10px;align-items:center;border-color:rgba(245,158,11,.3)"><div style="width:38px;height:38px;border-radius:50%;background:rgba(59,130,246,.18);border:2px solid rgba(59,130,246,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#93C5FD">TS</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Thunder Strikers</div><div style="font-size:10px;color:var(--txf)">Vikram Mehta · 4/15 slots</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)">₹43k</div></div>
+              <div class="card" style="padding:11px 12px;display:flex;gap:10px;align-items:center"><div style="width:38px;height:38px;border-radius:50%;background:rgba(34,197,94,.18);border:2px solid rgba(34,197,94,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green)">FC</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Fire Comets</div><div style="font-size:10px;color:var(--txf)">Sunita Rao · 5/15 slots</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#FBBF24">₹31k</div></div>
+            </div>
+          </div>
+          <div id="pt-rules" style="display:none">
+            <div class="card" style="padding:13px 14px;display:flex;gap:12px;align-items:center;cursor:pointer;border-color:rgba(245,158,11,.25);margin-bottom:10px">
+              <span style="font-size:30px">📄</span>
+              <div><div style="font-weight:600;font-size:13px">TechCup 2026 Rules</div><div style="font-size:10px;color:var(--txf);margin-top:2px">PDF · 2.1 MB · GET /leagues/{id} → rulesUrl</div></div>
+              <span style="font-size:14px;color:var(--gold);margin-left:auto">↓</span>
+            </div>
+            <div class="card" style="padding:12px 13px"><div style="font-size:11px;font-weight:600;margin-bottom:6px">Key Rules</div><div style="font-size:11px;color:var(--txd);line-height:1.8">• Purse: ₹50,000 per franchise<br>• 15 players per team<br>• mustSellAll: OFF<br>• 3 rounds<br>• Base prices: Cat A=₹1k, B=₹500</div></div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni"><span>⌂</span><div class="bni-lbl">Home</div></div>
+          <div class="bni"><span>🔍</span><div class="bni-lbl">Discover</div></div>
+          <div class="bni"><span>🔔</span><div class="bni-lbl">Alerts</div></div>
+          <div class="bni"><span>👤</span><div class="bni-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-A · LEAGUE DETAIL · Player View (Registered) · Mobile</div>
+  </div>
+</div>
+
+<!-- ═══ JOIN / REGISTER — MISSING FEATURE ═══ -->
+<div class="sw" id="sw-join-register">
+  <!-- Mobile: unregistered player view + join flow -->
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd)">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <div style="height:110px;background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(245,158,11,.1),var(--slate));display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid var(--bdr)">
+          <div style="font-size:44px">🏏</div>
+          <div style="position:absolute;top:12px;left:14px;cursor:pointer;font-size:16px;color:var(--txd)">← Back</div>
+          <div style="position:absolute;top:12px;right:14px"><span class="badge b-blue">T20</span></div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid var(--bdr)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:3px">Premier Office League</div>
+          <div style="font-size:11px;color:var(--txd);margin-bottom:12px">By Kiran Joshi · Pune · Registration Open</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+            <div class="card" style="padding:9px 7px;text-align:center;border-radius:10px"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">6</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Franchises</div></div>
+            <div class="card" style="padding:9px 7px;text-align:center;border-radius:10px"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">72/90</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Players</div></div>
+            <div class="card" style="padding:9px 7px;text-align:center;border-radius:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--gold)">₹40k</div><div style="font-size:9px;color:var(--txf);margin-top:2px">Purse</div></div>
+          </div>
+          <!-- PLAYER REGISTRATION CTA — missing from previous designs -->
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.25);border-radius:14px;padding:13px 14px;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">✓ Registration Open · 18 slots remaining</div>
+            <div style="font-size:11px;color:var(--txd);margin-bottom:10px">Player fee: ₹500 · Min to register: ₹500 · Cash only (V1)</div>
+            <button onclick="document.getElementById('register-modal').classList.add('show')" style="width:100%;padding:13px;background:var(--green);color:#0a2010;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer">🏏 Register as Player  ·  POST /players/register</button>
+          </div>
+          <!-- Waitlist CTA (shown if league is full) -->
+          <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.22);border-radius:14px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:11px;font-weight:600;color:var(--gold)">League nearly full?</div><div style="font-size:10px;color:var(--txf)">Join the waitlist · 3 people waiting</div></div>
+            <button onclick="document.getElementById('waitlist-modal').classList.add('show')" style="padding:8px 14px;background:transparent;color:var(--gold);border:1px solid rgba(245,158,11,.4);border-radius:9px;font-size:11px;font-weight:700;cursor:pointer">Join Waitlist</button>
+          </div>
+        </div>
+        <div class="tabbar"><div class="tab act">Overview</div><div class="tab">Players</div><div class="tab">Franchises</div><div class="tab">Rules</div></div>
+        <div style="flex:1;padding:12px 14px;overflow-y:auto">
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div class="card" style="padding:12px 13px"><div style="font-size:12px;font-weight:600;margin-bottom:8px">Registration Details</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Player fee</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)">₹500</div></div><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Min to play</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)">₹500</div></div><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Payment</div><div style="font-size:11px">Cash (V1)</div></div><div><div style="font-size:9px;color:var(--txf);margin-bottom:3px">Auction date</div><div style="font-size:11px">Jun 15, 2026</div></div></div></div>
+            <div class="card" style="padding:12px 13px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">Waitlist Info</div><div style="font-size:11px;color:var(--txd);line-height:1.7">Mode: <span style="color:var(--green)">AUTO_PROMOTE</span><br>3 people waiting · If someone forfeits, you get promoted automatically.</div></div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni"><span>⌂</span><div class="bni-lbl">Home</div></div>
+          <div class="bni act"><span>🔍</span><div class="bni-lbl">Discover</div></div>
+          <div class="bni"><span>🔔</span><div class="bni-lbl">Alerts</div></div>
+          <div class="bni"><span>👤</span><div class="bni-lbl">Profile</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-B · LEAGUE DETAIL (Unregistered) + Join CTA · Mobile</div>
+  </div>
+
+  <!-- Register modal preview -->
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd)">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="min-height:768px;background:var(--navy);position:relative">
+        <!-- Backdrop -->
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:10;display:flex;align-items:flex-end">
+          <div style="width:100%;background:var(--slate2);border-radius:20px 20px 0 0;padding:20px 20px 28px;border-top:1px solid var(--bdr2)">
+            <div style="width:36px;height:4px;background:var(--slate4);border-radius:2px;margin:0 auto 16px"></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px">Register as Player</div>
+            <div style="font-size:11px;color:var(--txd);margin-bottom:16px">Premier Office League · POST /api/v1/players/register</div>
+            <!-- Pre-filled info -->
+            <div class="card" style="padding:12px 13px;margin-bottom:12px;border-color:rgba(34,197,94,.22)">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--txf)">Your profile</span><span class="badge b-green" style="font-size:8px">Active</span></div>
+              <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(168,85,247,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#D8B4FE">AS</div>
+                <div><div style="font-size:13px;font-weight:600">Anjali Sharma</div><div style="font-size:10px;color:var(--txf)">All-rounder · Right-hand bat · Off spin</div></div>
+              </div>
+            </div>
+            <!-- Category selection -->
+            <div style="margin-bottom:12px">
+              <div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:7px;font-family:'Rajdhani',sans-serif">PLAYER CATEGORY (for base price)</div>
+              <div style="display:flex;gap:6px">
+                <div style="flex:1;padding:8px 4px;text-align:center;background:rgba(245,158,11,.18);border:1.5px solid rgba(245,158,11,.5);border-radius:9px;font-size:11px;font-weight:700;color:var(--gold);cursor:pointer">Cat A ✓<br><span style="font-size:9px;color:var(--txf);font-weight:400">₹1,000</span></div>
+                <div style="flex:1;padding:8px 4px;text-align:center;background:var(--slate3);border:1.5px solid var(--bdr);border-radius:9px;font-size:11px;color:var(--txd);cursor:pointer">Cat B<br><span style="font-size:9px;color:var(--txf)">₹500</span></div>
+                <div style="flex:1;padding:8px 4px;text-align:center;background:var(--slate3);border:1.5px solid var(--bdr);border-radius:9px;font-size:11px;color:var(--txd);cursor:pointer">Cat C<br><span style="font-size:9px;color:var(--txf)">₹250</span></div>
+              </div>
+            </div>
+            <!-- Fee info -->
+            <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:11px 13px;margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--txd)">Registration fee</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)">₹500</span></div>
+              <div style="font-size:10px;color:var(--txf)">Cash payment · Admin will record · FeeObligation created</div>
+            </div>
+            <button style="width:100%;padding:14px;background:var(--green);color:#0a2010;border:none;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">✓ Confirm Registration</button>
+            <button style="width:100%;padding:12px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:13px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-C · REGISTER MODAL (Bottom sheet) · POST /players/register</div>
+  </div>
+
+  <!-- Waitlist join modal -->
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd)">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="min-height:768px;background:var(--navy);position:relative">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:10;display:flex;align-items:flex-end">
+          <div style="width:100%;background:var(--slate2);border-radius:20px 20px 0 0;padding:20px 20px 28px;border-top:1px solid var(--bdr2)">
+            <div style="width:36px;height:4px;background:var(--slate4);border-radius:2px;margin:0 auto 16px"></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px">Join Waiting List</div>
+            <div style="font-size:11px;color:var(--txd);margin-bottom:16px">Premier Office League · POST /leagues/{id}/waiting-list</div>
+            <div class="card" style="padding:12px 13px;margin-bottom:14px">
+              <div style="font-size:11px;font-weight:600;margin-bottom:6px">Queue Status</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div><div style="font-size:9px;color:var(--txf);margin-bottom:2px">Current position</div><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold)">#4</div></div>
+                <div><div style="font-size:9px;color:var(--txf);margin-bottom:2px">Promotion mode</div><div style="font-size:11px;color:var(--green)">⚡ Auto-promote</div></div>
+              </div>
+              <div style="font-size:10px;color:var(--txf);margin-top:8px;line-height:1.6">You'll be automatically promoted when a slot opens. We'll notify you via push notification.</div>
+            </div>
+            <button style="width:100%;padding:14px;background:var(--gold);color:#1a0f00;border:none;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px">Join Waitlist at #4</button>
+            <button style="width:100%;padding:12px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:13px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-D · JOIN WAITLIST MODAL · POST /leagues/{id}/waiting-list</div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN VIEW — MOBILE ═══ -->
+<div class="sw" id="sw-admin-view">
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd)">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <div style="padding:12px 16px 10px;border-bottom:1px solid var(--bdr)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+            <div><div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700">TechCup 2026</div><div style="display:flex;gap:5px;margin-top:4px"><span class="badge b-gold">T20</span><span class="badge b-red" style="gap:5px"><div class="live-dot" style="width:5px;height:5px"></div>Auction Live</span></div></div>
+            <button style="padding:8px 14px;background:var(--gold);color:#1a0f00;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">🔨 Auction</button>
+          </div>
+        </div>
+        <div class="tabbar" id="at-tabs">
+          <div class="tab act" onclick="atab('players',this)">Players</div>
+          <div class="tab" onclick="atab('franchises',this)">Franchises</div>
+          <div class="tab" onclick="atab('fees',this)">Fees ⚡</div>
+          <div class="tab" onclick="atab('rounds',this)">Rounds</div>
+          <div class="tab" onclick="atab('forfeits',this)">Forfeits</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:10px 13px" id="at-content">
+          <div id="at-players">
+            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap"><input placeholder="🔍 Search..." style="flex:1;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:8px 11px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:12px;min-width:80px"><button style="padding:7px 11px;background:var(--gold);color:#1a0f00;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer">↑ CSV</button><button style="padding:7px 11px;background:var(--green);color:#0a2010;border:none;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer">+ Add</button></div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div class="card" style="padding:11px 12px;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:rgba(168,85,247,.18);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#D8B4FE">AS</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Anjali Sharma</div><div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap"><span class="badge b-purp" style="font-size:8px">AR</span><span class="badge b-gold" style="font-size:8px">Up</span><span class="fee-paid" style="font-size:8px">Paid</span></div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txd)">₹500</div><div style="font-size:11px;color:var(--txf);margin-top:4px;cursor:pointer">✎</div></div></div>
+              <div class="card" style="padding:11px 12px;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:rgba(59,130,246,.18);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#93C5FD">SP</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Sam Patel</div><div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap"><span class="badge b-blue" style="font-size:8px">BAT</span><span class="badge b-gray" style="font-size:8px">Available</span><span class="fee-unpaid" style="font-size:8px">Unpaid</span></div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txd)">₹1k</div><div style="font-size:11px;color:var(--txf);margin-top:4px;cursor:pointer">✎</div></div></div>
+              <div class="card" style="padding:11px 12px;display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#FCA5A5">RV</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Rohit Verma</div><div style="display:flex;gap:4px;margin-top:3px;flex-wrap:wrap"><span class="badge b-red" style="font-size:8px">BOWL</span><span class="fee-partial" style="font-size:8px">Partial</span></div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txd)">₹500</div><button style="font-size:9px;padding:3px 7px;background:var(--gold);color:#1a0f00;border:none;border-radius:6px;cursor:pointer;margin-top:4px">Pay</button></div></div>
+            </div>
+          </div>
+          <div id="at-franchises" style="display:none">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="card" style="padding:12px 13px;border-color:rgba(245,158,11,.28)"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div style="display:flex;gap:9px;align-items:center"><div style="width:36px;height:36px;border-radius:50%;background:rgba(59,130,246,.18);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#93C5FD">TS</div><div><div style="font-size:13px;font-weight:600">Thunder Strikers</div><div style="font-size:10px;color:var(--txf)">Vikram Mehta</div></div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--green)">₹43k</div><div style="font-size:9px;color:var(--txf)">4/15 slots</div></div></div><div style="background:var(--slate4);border-radius:4px;height:6px;overflow:hidden;margin-bottom:7px"><div style="height:100%;width:86%;background:var(--green);border-radius:4px"></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px"><button style="padding:7px 4px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:8px;font-size:10px;cursor:pointer">Squad</button><button style="padding:7px 4px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:8px;font-size:10px;cursor:pointer">Invite</button><button style="padding:7px 4px;background:var(--gold);color:#1a0f00;border:none;border-radius:8px;font-size:10px;font-weight:700;cursor:pointer">Pre-assign</button></div></div>
+            </div>
+          </div>
+          <div id="at-fees" style="display:none">
+            <!-- This is the detailed fees view — see S3-admin-fees for full screen -->
+            <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.22);border-radius:12px;padding:11px 12px;margin-bottom:12px;text-align:center">
+              <div style="font-size:12px;font-weight:700;color:var(--gold)">📋 See full Fees tab →</div>
+              <div style="font-size:10px;color:var(--txf);margin-top:3px">Switch to "Admin Fees Tab" for complete fee management</div>
+            </div>
+          </div>
+          <div id="at-rounds" style="display:none">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div class="card" style="padding:12px 13px;border-color:rgba(239,68,68,.3)"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">Round 1</div><span class="badge b-red" style="gap:5px"><div class="live-dot" style="width:5px;height:5px"></div>Live</span></div><div style="font-size:11px;color:var(--txd);margin-bottom:8px">All · RANDOM · 120 players</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><button style="padding:9px;background:rgba(245,158,11,.12);color:var(--gold);border:1px solid rgba(245,158,11,.3);border-radius:9px;font-size:11px;font-weight:700;cursor:pointer">⏸ Pause</button><button style="padding:9px;background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3);border-radius:9px;font-size:11px;font-weight:700;cursor:pointer">✓ Complete</button></div></div>
+              <div class="card" style="padding:12px 13px;opacity:.7"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700">Round 2</div><span class="badge b-gray">Pending</span></div><div style="font-size:11px;color:var(--txd)">Unsold players only</div></div>
+            </div>
+          </div>
+          <div id="at-forfeits" style="display:none">
+            <div class="card" style="padding:12px 13px;border-color:rgba(239,68,68,.3)">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div style="font-size:13px;font-weight:600">Anjali Sharma</div><span class="badge b-red">Pending</span></div>
+              <div style="font-size:11px;color:var(--txd);background:rgba(239,68,68,.06);border-radius:8px;padding:8px 10px;margin-bottom:9px">"Medical emergency. Requesting full refund of ₹500."</div>
+              <select style="width:100%;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:9px;padding:8px 10px;color:var(--tx);font-size:11px;margin-bottom:8px"><option>Full refund · ₹500</option><option>Partial refund</option><option>No refund</option></select>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px"><button style="padding:10px;background:var(--green);color:#0a2010;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">✓ Approve</button><button style="padding:10px;background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.3);border-radius:9px;font-size:12px;font-weight:600;cursor:pointer">✕ Reject</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="bnav">
+          <div class="bni"><span>⌂</span><div class="bni-lbl">Home</div></div>
+          <div class="bni act"><span>🏆</span><div class="bni-lbl">Leagues</div></div>
+          <div class="bni"><span>🔔</span><div class="bni-lbl">Alerts</div></div>
+          <div class="bni"><span>⚙</span><div class="bni-lbl">Admin</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-E · LEAGUE ADMIN (Players / Franchises / Fees / Rounds / Forfeits)</div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN FEES TAB — FULL SCREEN (KEY MISSING FEATURE) ═══ -->
+<div class="sw" id="sw-admin-fees">
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd)">9:41</span><div class="notch-pill"></div><span style="font-size:10px;color:var(--txd)">▲●■</span></div>
+      <div style="display:flex;flex-direction:column;min-height:768px;background:var(--navy)">
+        <div style="padding:12px 16px 10px;border-bottom:1px solid var(--bdr)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:2px">Fee Management</div>
+          <div style="font-size:11px;color:var(--txd)">TechCup 2026 · PLAYER_FEE + FRANCHISE_FEE · Cash V1</div>
+        </div>
+        <!-- Summary bar -->
+        <div style="padding:10px 14px;background:var(--navym);border-bottom:1px solid var(--bdr)">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+            <div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--green)">₹32.5k</div><div style="font-size:9px;color:var(--txf)">Collected</div></div>
+            <div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--red)">₹7.5k</div><div style="font-size:9px;color:var(--txf)">Pending</div></div>
+            <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--blue)">81%</div><div style="font-size:9px;color:var(--txf)">Collection rate</div></div>
+          </div>
+          <div style="background:var(--slate4);border-radius:4px;height:7px;overflow:hidden"><div style="height:100%;width:81%;background:var(--green);border-radius:4px"></div></div>
+        </div>
+        <!-- Tabs: Player fees vs Franchise fees -->
+        <div class="tabbar" id="fee-tabs">
+          <div class="tab act" onclick="feetab('player-fees',this)">Player Fees (4)</div>
+          <div class="tab" onclick="feetab('franchise-fees',this)">Franchise Fees (2)</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:10px 13px" id="fee-content">
+          <!-- PLAYER FEES -->
+          <div id="player-fees">
+            <div style="font-size:9px;color:var(--txf);margin-bottom:8px;line-height:1.6">FeeObligation · feeType=PLAYER_FEE<br>GET /leagues/{id}/fee-obligations · POST /leagues/{id}/fee-obligations/{id}/payments</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <!-- PAID -->
+              <div class="card" style="padding:11px 12px;border-color:rgba(34,197,94,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+                  <div style="display:flex;gap:9px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:rgba(168,85,247,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#D8B4FE">AS</div><div><div style="font-size:12px;font-weight:600">Anjali Sharma</div><div style="font-size:10px;color:var(--txf)">All-rounder</div></div></div>
+                  <span class="fee-paid">✓ Paid</span>
+                </div>
+                <div style="background:var(--slate4);border-radius:4px;height:6px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:100%;background:var(--green);border-radius:4px"></div></div>
+                <div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--txf)">₹500 of ₹500 · Cash</span><span style="font-size:9px;color:var(--txf)">auctionEligible ✓</span></div>
+              </div>
+              <!-- UNPAID -->
+              <div class="card" style="padding:11px 12px;border-color:rgba(239,68,68,.28)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+                  <div style="display:flex;gap:9px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#93C5FD">SP</div><div><div style="font-size:12px;font-weight:600">Sam Patel</div><div style="font-size:10px;color:var(--txf)">Batter</div></div></div>
+                  <span class="fee-unpaid">Unpaid</span>
+                </div>
+                <div style="background:var(--slate4);border-radius:4px;height:6px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:0%;background:var(--red);border-radius:4px"></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:10px;color:var(--txf)">₹0 of ₹500 · auctionEligible: NO</span>
+                  <button onclick="document.getElementById('pay-modal').classList.add('show')" style="padding:5px 11px;background:var(--gold);color:#1a0f00;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">💰 Record</button>
+                </div>
+              </div>
+              <!-- PARTIAL -->
+              <div class="card" style="padding:11px 12px;border-color:rgba(245,158,11,.28)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+                  <div style="display:flex;gap:9px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#FCA5A5">RV</div><div><div style="font-size:12px;font-weight:600">Rohit Verma</div><div style="font-size:10px;color:var(--txf)">Bowler</div></div></div>
+                  <span class="fee-partial">Partial</span>
+                </div>
+                <div style="background:var(--slate4);border-radius:4px;height:6px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:50%;background:var(--gold);border-radius:4px"></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <span style="font-size:10px;color:var(--txf)">₹500 of ₹1,000 · min met ✓</span>
+                  <div style="display:flex;gap:5px">
+                    <button onclick="document.getElementById('pay-modal').classList.add('show')" style="padding:5px 9px;background:var(--gold);color:#1a0f00;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">+₹500</button>
+                    <button style="padding:5px 9px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:10px;cursor:pointer">Waive</button>
+                  </div>
+                </div>
+              </div>
+              <!-- WAIVED -->
+              <div class="card" style="padding:11px 12px;opacity:.6">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">
+                  <div style="display:flex;gap:9px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:rgba(100,116,139,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--txd)">PG</div><div><div style="font-size:12px;font-weight:600">Priya Gupta</div></div></div>
+                  <span class="fee-waived">Waived</span>
+                </div>
+                <div style="font-size:10px;color:var(--txf)">Terminal state · Approved forfeit · ₹500 refunded</div>
+              </div>
+            </div>
+          </div>
+          <!-- FRANCHISE FEES -->
+          <div id="franchise-fees" style="display:none">
+            <div style="font-size:9px;color:var(--txf);margin-bottom:8px;line-height:1.6">FeeObligation · feeType=FRANCHISE_FEE<br>GET /leagues/{id}/fee-obligations · POST .../payments</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <!-- PAID -->
+              <div class="card" style="padding:11px 12px;border-color:rgba(34,197,94,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+                  <div style="display:flex;gap:9px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#93C5FD">TS</div><div><div style="font-size:12px;font-weight:600">Thunder Strikers</div><div style="font-size:10px;color:var(--txf)">Vikram Mehta · Owner</div></div></div>
+                  <span class="fee-paid">✓ Paid</span>
+                </div>
+                <div style="background:var(--slate4);border-radius:4px;height:6px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:100%;background:var(--green);border-radius:4px"></div></div>
+                <div style="font-size:10px;color:var(--txf)">₹10,000 of ₹10,000 · Cash · Franchise active</div>
+              </div>
+              <!-- UNPAID -->
+              <div class="card" style="padding:11px 12px;border-color:rgba(239,68,68,.28)">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+                  <div style="display:flex;gap:9px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold)">SR</div><div><div style="font-size:12px;font-weight:600">Sky Raiders</div><div style="font-size:10px;color:var(--txf)">Ankit Jha · Owner</div></div></div>
+                  <span class="fee-unpaid">Unpaid</span>
+                </div>
+                <div style="background:var(--slate4);border-radius:4px;height:6px;overflow:hidden;margin-bottom:5px"><div style="height:100%;width:0%;background:var(--red);border-radius:4px"></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div><div style="font-size:10px;color:var(--txf)">₹0 of ₹10,000 · Min: ₹5,000</div><div style="font-size:9px;color:var(--red)">Franchise suspended until min paid</div></div>
+                  <button onclick="document.getElementById('pay-modal').classList.add('show')" style="padding:5px 11px;background:var(--gold);color:#1a0f00;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">💰 Record</button>
+                </div>
+              </div>
+            </div>
+            <!-- Bulk record button -->
+            <div style="margin-top:12px;padding:11px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.18);border-radius:12px;text-align:center;cursor:pointer">
+              <div style="font-size:12px;font-weight:600;color:var(--gold)">+ Record Multiple Payments</div>
+              <div style="font-size:10px;color:var(--txf);margin-top:2px">POST /leagues/{id}/fee-obligations/{id}/payments</div>
+            </div>
+          </div>
+        </div>
+        <!-- Record payment bottom CTA -->
+        <div style="padding:10px 13px;border-top:1px solid var(--bdr)">
+          <button onclick="document.getElementById('pay-modal').classList.add('show')" style="width:100%;padding:13px;background:var(--gold);color:#1a0f00;border:none;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer">💰 Record Payment</button>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-F · FEE MANAGEMENT (Player + Franchise fees) ★ KEY SCREEN</div>
+  </div>
+
+  <!-- Record Payment Modal -->
+  <div>
+    <div class="phone">
+      <div class="ph-notch"><span style="font-size:11px;color:var(--txd)">9:41</span><div class="notch-pill"></div></div>
+      <div style="min-height:768px;background:var(--navy);position:relative">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,.7);z-index:10;display:flex;align-items:flex-end">
+          <div style="width:100%;background:var(--slate2);border-radius:20px 20px 0 0;padding:20px 20px 32px;border-top:1px solid var(--bdr2)">
+            <div style="width:36px;height:4px;background:var(--slate4);border-radius:2px;margin:0 auto 18px"></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px">Record Payment</div>
+            <div style="font-size:11px;color:var(--txd);margin-bottom:18px">POST /leagues/{id}/fee-obligations/{id}/payments</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div>
+                <div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">PLAYER / FRANCHISE</div>
+                <select style="width:100%;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:11px;padding:11px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px"><option>Sam Patel — Player fee ₹500 due</option><option>Sky Raiders — Franchise fee ₹10k due</option><option>Rohit Verma — ₹500 remaining</option></select>
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">AMOUNT (₹) — Whole INR integers only</div>
+                <input type="number" value="500" style="width:100%;background:var(--slate3);border:1.5px solid rgba(245,158,11,.5);border-radius:11px;padding:11px 13px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700">
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">PAYMENT MODE</div>
+                <div style="display:flex;gap:8px">
+                  <div style="flex:1;padding:11px;text-align:center;background:rgba(245,158,11,.18);border:1.5px solid rgba(245,158,11,.5);border-radius:11px;font-size:13px;font-weight:700;color:var(--gold);cursor:pointer">💵 Cash ✓</div>
+                  <div style="flex:1;padding:11px;text-align:center;background:var(--slate3);border:1.5px solid var(--bdr);border-radius:11px;font-size:13px;color:var(--txd);cursor:pointer">💳 Online</div>
+                </div>
+                <div style="font-size:10px;color:var(--txf);margin-top:5px">V1: Cash only · Razorpay in V2</div>
+              </div>
+              <div>
+                <div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">NOTES (optional)</div>
+                <textarea style="width:100%;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:11px;padding:11px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13px;resize:none;height:60px" placeholder="Payment reference, date, etc."></textarea>
+              </div>
+            </div>
+            <button style="width:100%;padding:14px;background:var(--green);color:#0a2010;border:none;border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:16px">✓ Record ₹500 Payment</button>
+            <div style="font-size:9px;color:var(--txf);text-align:center;margin-top:8px">Creates FeePayment record · Updates paidAmount · Checks minimumToRegister</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-G · RECORD PAYMENT MODAL · FeePayment entity</div>
+  </div>
+</div>
+
+<!-- ═══ WEB ADMIN VIEW ═══ -->
+<div class="sw" id="sw-web-admin">
+  <div>
+    <div class="web-frame">
+      <div class="web-chrome">
+        <div class="wdot" style="background:#FC8181"></div><div class="wdot" style="background:#FCD34D"></div><div class="wdot" style="background:#4ADE80"></div>
+        <div class="wurl">crichere.app/leagues/techcup-2026/admin</div>
+        <span class="badge b-red" style="margin-left:auto;font-size:8px;gap:5px"><div class="live-dot" style="width:5px;height:5px"></div>Auction Live</span>
+      </div>
+      <div style="display:grid;grid-template-columns:220px 1fr;min-height:664px">
+        <!-- Sidebar -->
+        <div class="sidebar" style="background:var(--navy);border-right:1px solid var(--bdr)">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--bdr)">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;margin-bottom:2px">TechCup 2026</div>
+            <div style="display:flex;gap:5px"><span class="badge b-gold" style="font-size:8px">T20</span><span class="badge b-red" style="gap:4px;font-size:8px"><div class="live-dot" style="width:4px;height:4px"></div>Live</span></div>
+          </div>
+          <div style="padding:8px 0">
+            <div class="nav-item act" style="font-size:12px">👥 Players</div>
+            <div class="nav-item" style="font-size:12px">🏟️ Franchises</div>
+            <div class="nav-item" style="font-size:12px;color:var(--gold)">💰 Fees ★</div>
+            <div class="nav-item" style="font-size:12px">🔄 Rounds</div>
+            <div class="nav-item" style="font-size:12px">📋 Forfeits <span class="badge b-red" style="margin-left:auto;font-size:8px">2</span></div>
+            <div class="nav-item" style="font-size:12px">⏳ Waitlist</div>
+            <div class="nav-item" style="font-size:12px">📊 Audit Log</div>
+          </div>
+          <div style="margin-top:auto;padding:12px 16px;border-top:1px solid var(--bdr)">
+            <button style="width:100%;padding:10px;background:var(--gold);color:#1a0f00;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif">🔨 Open Auctioneer</button>
+          </div>
+        </div>
+        <!-- Players table -->
+        <div style="background:var(--navy);padding:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--txd)">PLAYERS · 120 total</div>
+            <div style="display:flex;gap:8px">
+              <input placeholder="🔍 Search..." style="background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:7px 13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:12px;width:200px">
+              <select style="background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:7px 11px;color:var(--tx);font-size:12px"><option>All roles</option></select>
+              <select style="background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:7px 11px;color:var(--tx);font-size:12px"><option>All fees</option><option>Unpaid</option><option>Partial</option></select>
+              <button style="padding:7px 13px;background:var(--gold);color:#1a0f00;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">↑ Bulk Import</button>
+            </div>
+          </div>
+          <div class="card" style="overflow:hidden;border-radius:12px">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr;padding:9px 16px;font-size:10px;color:var(--txf);font-weight:700;letter-spacing:.5px;border-bottom:1px solid var(--bdr);background:var(--slate2)"><span>PLAYER</span><span>ROLE</span><span>CATEGORY</span><span>BASE PRICE</span><span>AUCTION STATE</span><span>FEE STATUS</span><span>ACTIONS</span></div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:flex;align-items:center;gap:9px"><div style="width:30px;height:30px;border-radius:50%;background:rgba(168,85,247,.18);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#D8B4FE">AS</div><div><div style="font-size:13px;font-weight:600">Anjali Sharma</div><div style="font-size:10px;color:var(--txf)">+91 98765 43210</div></div></div>
+              <span class="badge b-purp" style="font-size:9px">AR</span>
+              <span class="badge b-gold" style="font-size:9px">Cat A</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txd)">₹500</span>
+              <span class="badge b-gold" style="font-size:9px">▲ Up for bid</span>
+              <span class="fee-paid" style="font-size:9px">✓ Paid</span>
+              <div style="display:flex;gap:5px"><button style="padding:5px 9px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:10px;cursor:pointer">Edit</button><button style="padding:5px 9px;background:transparent;color:var(--gold);border:1px solid rgba(245,158,11,.3);border-radius:7px;font-size:10px;cursor:pointer">⭐ Pre-assign</button></div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:flex;align-items:center;gap:9px"><div style="width:30px;height:30px;border-radius:50%;background:rgba(59,130,246,.18);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#93C5FD">SP</div><div><div style="font-size:13px;font-weight:600">Sam Patel</div><div style="font-size:10px;color:var(--txf)">+91 98765 43211</div></div></div>
+              <span class="badge b-blue" style="font-size:9px">BAT</span>
+              <span class="badge b-blue" style="font-size:9px">Cat B</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txd)">₹1,000</span>
+              <span class="badge b-gray" style="font-size:9px">Available</span>
+              <span class="fee-unpaid" style="font-size:9px">Unpaid</span>
+              <div style="display:flex;gap:5px"><button style="padding:5px 9px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:10px;cursor:pointer">Edit</button><button style="padding:5px 9px;background:var(--gold);color:#1a0f00;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">💰 Pay</button></div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1.2fr 1.5fr;padding:12px 16px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:flex;align-items:center;gap:9px"><div style="width:30px;height:30px;border-radius:50%;background:rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#FCA5A5">RV</div><div><div style="font-size:13px;font-weight:600">Rohit Verma</div><div style="font-size:10px;color:var(--txf)">+91 98765 43212</div></div></div>
+              <span class="badge b-red" style="font-size:9px">BOWL</span>
+              <span class="badge b-gold" style="font-size:9px">Cat A</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--txd)">₹500</span>
+              <span class="badge b-cyan" style="font-size:9px">Pre-assigned</span>
+              <span class="fee-partial" style="font-size:9px">Partial</span>
+              <div style="display:flex;gap:5px"><button style="padding:5px 9px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:10px;cursor:pointer">Edit</button><button style="padding:5px 9px;background:var(--gold);color:#1a0f00;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer">+₹500</button><button style="padding:5px 9px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:7px;font-size:10px;cursor:pointer">Waive</button></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:10px;color:var(--txf)">117 more players · Fee filter: GET /leagues/{id}/fee-obligations · Sorted by status (Unpaid first)</div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-H · LEAGUE ADMIN (Players + Fee Status inline) · Web 1440px</div>
+  </div>
+</div>
+
+<!-- ═══ WEB FEES TAB ═══ -->
+<div class="sw" id="sw-web-fees">
+  <div>
+    <div class="web-frame">
+      <div class="web-chrome">
+        <div class="wdot" style="background:#FC8181"></div><div class="wdot" style="background:#FCD34D"></div><div class="wdot" style="background:#4ADE80"></div>
+        <div class="wurl">crichere.app/leagues/techcup-2026/admin/fees</div>
+        <span class="badge b-gold" style="margin-left:auto;font-size:8px">Fee Management ★</span>
+      </div>
+      <div style="display:grid;grid-template-columns:220px 1fr;min-height:664px">
+        <div style="background:var(--navy);border-right:1px solid var(--bdr);padding:8px 0">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--bdr);margin-bottom:6px"><div style="font-size:14px;font-weight:700;margin-bottom:2px">TechCup 2026</div><div class="badge b-red" style="gap:4px;font-size:8px"><div class="live-dot" style="width:4px;height:4px"></div>Auction Live</div></div>
+          <div class="nav-item" style="font-size:12px">👥 Players</div>
+          <div class="nav-item" style="font-size:12px">🏟️ Franchises</div>
+          <div class="nav-item act" style="font-size:12px;color:var(--gold)">💰 Fees ★</div>
+          <div class="nav-item" style="font-size:12px">🔄 Rounds</div>
+          <div class="nav-item" style="font-size:12px">📋 Forfeits</div>
+          <div class="nav-item" style="font-size:12px">⏳ Waitlist</div>
+        </div>
+        <div style="background:var(--navy);padding:18px">
+          <!-- Summary stats -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px">
+            <div class="card" style="padding:13px;border-radius:12px"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:5px">TOTAL EXPECTED</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--gold)">₹40,000</div></div>
+            <div class="card" style="padding:13px;border-radius:12px"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:5px">COLLECTED</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--green)">₹32,500</div></div>
+            <div class="card" style="padding:13px;border-radius:12px;border-color:rgba(239,68,68,.28)"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:5px">PENDING</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--red)">₹7,500</div></div>
+            <div class="card" style="padding:13px;border-radius:12px"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:5px">COLLECTION RATE</div><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--blue)">81%</div></div>
+            <div class="card" style="padding:13px;border-radius:12px"><div style="font-size:10px;color:var(--txf);font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:5px">WAIVED</div><div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--txd)">₹500</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <!-- PLAYER FEES TABLE -->
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--txd)">PLAYER FEES · feeType=PLAYER_FEE</div>
+                <button style="padding:7px 14px;background:var(--gold);color:#1a0f00;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">+ Record Payment</button>
+              </div>
+              <div class="card" style="overflow:hidden;border-radius:12px">
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:8px 14px;font-size:10px;color:var(--txf);font-weight:700;letter-spacing:.4px;border-bottom:1px solid var(--bdr);background:var(--slate2)"><span>PLAYER</span><span>AMOUNT</span><span>PAID</span><span>STATUS</span></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+                  <div style="font-size:12px;font-weight:600">Anjali Sharma</div>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px">₹500</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green)">₹500</span>
+                  <span class="fee-paid" style="font-size:8px">✓ Paid</span>
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04);background:rgba(239,68,68,.04)">
+                  <div><div style="font-size:12px;font-weight:600">Sam Patel</div><div style="font-size:9px;color:var(--red)">auctionEligible: NO</div></div>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px">₹500</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red)">₹0</span>
+                  <span class="fee-unpaid" style="font-size:8px">Unpaid</span>
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+                  <div style="font-size:12px;font-weight:600">Rohit Verma</div>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px">₹1,000</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold)">₹500</span>
+                  <span class="fee-partial" style="font-size:8px">Partial</span>
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;align-items:center;opacity:.55">
+                  <div style="font-size:12px;font-weight:600">Priya Gupta</div>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px">₹500</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txd)">₹500↵</span>
+                  <span class="fee-waived" style="font-size:8px">Waived</span>
+                </div>
+              </div>
+              <div style="margin-top:8px;font-size:10px;color:var(--txf)">minimumToRegister checked on each payment · WAIVED = terminal state</div>
+            </div>
+            <!-- FRANCHISE FEES TABLE -->
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--txd)">FRANCHISE FEES · feeType=FRANCHISE_FEE</div>
+                <button style="padding:7px 14px;background:var(--gold);color:#1a0f00;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">+ Record Payment</button>
+              </div>
+              <div class="card" style="overflow:hidden;border-radius:12px">
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:8px 14px;font-size:10px;color:var(--txf);font-weight:700;letter-spacing:.4px;border-bottom:1px solid var(--bdr);background:var(--slate2)"><span>FRANCHISE</span><span>AMOUNT</span><span>PAID</span><span>STATUS</span></div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;align-items:center;border-bottom:1px solid rgba(255,255,255,.04)">
+                  <div><div style="font-size:12px;font-weight:600">Thunder Strikers</div><div style="font-size:10px;color:var(--txf)">Vikram Mehta</div></div>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px">₹10,000</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green)">₹10,000</span>
+                  <span class="fee-paid" style="font-size:8px">✓ Paid</span>
+                </div>
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;align-items:center;background:rgba(239,68,68,.04)">
+                  <div><div style="font-size:12px;font-weight:600">Sky Raiders</div><div style="font-size:9px;color:var(--red)">Suspended until min paid</div></div>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px">₹10,000</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red)">₹0</span>
+                  <span class="fee-unpaid" style="font-size:8px">Unpaid</span>
+                </div>
+              </div>
+              <!-- Payment history panel -->
+              <div class="card" style="padding:13px;border-radius:12px;margin-top:12px">
+                <div style="font-size:11px;font-weight:700;color:var(--txd);margin-bottom:9px;font-family:'Rajdhani',sans-serif">PAYMENT HISTORY · FeePayment records</div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-size:12px;font-weight:600">Anjali Sharma</div><div style="font-size:10px;color:var(--txf)">Cash · Rahul (Admin) · 2 days ago</div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)">₹500</div><div style="font-size:9px;color:var(--txf)">PLAYER_FEE</div></div></div>
+                  <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bdr)"><div><div style="font-size:12px;font-weight:600">Thunder Strikers</div><div style="font-size:10px;color:var(--txf)">Cash · Rahul (Admin) · 3 days ago</div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)">₹10,000</div><div style="font-size:9px;color:var(--txf)">FRANCHISE_FEE</div></div></div>
+                  <div style="display:flex;justify-content:space-between;padding:7px 0"><div><div style="font-size:12px;font-weight:600">Rohit Verma</div><div style="font-size:10px;color:var(--txf)">Cash · Rahul (Admin) · 4 days ago</div></div><div style="text-align:right"><div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--green)">₹500</div><div style="font-size:9px;color:var(--txf)">PLAYER_FEE</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S3-I · FEE MANAGEMENT (Player + Franchise) ★ Web 1440px — KEY MISSING FEATURE</div>
+  </div>
+</div>
+
+</div><!-- /canvas -->
+
+<!-- Record payment modal (global) -->
+<div id="pay-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px">Record Payment</div>
+    <div style="font-size:11px;color:var(--txd);margin-bottom:18px">POST /leagues/{id}/fee-obligations/{id}/payments</div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px">
+      <div><div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">OBLIGATION</div><select style="width:100%;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:10px 12px;color:var(--tx);font-size:13px"><option>Sam Patel — Player fee ₹500 due</option><option>Sky Raiders — Franchise fee ₹10k due</option></select></div>
+      <div><div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">AMOUNT (₹)</div><input type="number" value="500" style="width:100%;background:var(--slate3);border:1.5px solid rgba(245,158,11,.5);border-radius:10px;padding:10px 13px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700"></div>
+      <div><div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">PAYMENT MODE</div><div style="display:flex;gap:8px"><div style="flex:1;padding:10px;text-align:center;background:rgba(245,158,11,.15);border:1.5px solid rgba(245,158,11,.5);border-radius:10px;font-size:13px;font-weight:700;color:var(--gold);cursor:pointer">💵 Cash ✓</div><div style="flex:1;padding:10px;text-align:center;background:var(--slate3);border:1.5px solid var(--bdr);border-radius:10px;font-size:13px;color:var(--txd);cursor:pointer">💳 Online (V2)</div></div></div>
+      <div><div style="font-size:9px;font-weight:700;color:var(--txf);letter-spacing:.8px;margin-bottom:6px">NOTES</div><input placeholder="Reference, date, etc." style="width:100%;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:10px;padding:10px 12px;color:var(--tx);font-size:13px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="document.getElementById('pay-modal').classList.remove('show')" style="padding:13px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+      <button style="padding:13px;background:var(--green);color:#0a2010;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer">✓ Record ₹500</button>
+    </div>
+  </div>
+</div>
+
+<div id="register-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px">Register as Player</div>
+    <div style="font-size:11px;color:var(--txd);margin-bottom:16px">Premier Office League · POST /api/v1/players/register</div>
+    <div class="card" style="padding:12px 13px;margin-bottom:14px;border-color:rgba(34,197,94,.22)"><div style="display:flex;align-items:center;gap:9px"><div style="width:32px;height:32px;border-radius:50%;background:rgba(168,85,247,.18);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#D8B4FE">AS</div><div><div style="font-size:13px;font-weight:600">Anjali Sharma</div><div style="font-size:10px;color:var(--txf)">All-rounder · Active profile</div></div></div></div>
+    <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:11px 13px;margin-bottom:16px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:var(--txd)">Registration fee</span><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--gold)">₹500</span></div><div style="font-size:10px;color:var(--txf)">Cash · Admin will record · FeeObligation created automatically</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="document.getElementById('register-modal').classList.remove('show')" style="padding:13px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+      <button style="padding:13px;background:var(--green);color:#0a2010;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer">✓ Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="waitlist-modal" class="modal-backdrop" onclick="if(event.target===this)this.classList.remove('show')">
+  <div class="modal">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px">Join Waiting List</div>
+    <div style="font-size:11px;color:var(--txd);margin-bottom:16px">Premier Office League · POST /leagues/{id}/waiting-list</div>
+    <div class="card" style="padding:13px;margin-bottom:14px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div><div style="font-size:9px;color:var(--txf)">Position</div><div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--gold)">#4</div></div><div><div style="font-size:9px;color:var(--txf)">Mode</div><div style="font-size:12px;color:var(--green);font-weight:600;margin-top:4px">⚡ Auto-promote</div></div></div><div style="font-size:10px;color:var(--txf);margin-top:8px;line-height:1.6">Auto-promoted when a forfeit is approved. Push notification sent.</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="document.getElementById('waitlist-modal').classList.remove('show')" style="padding:13px;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+      <button style="padding:13px;background:var(--gold);color:#1a0f00;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer">Join at #4</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id){document.querySelectorAll('.sw').forEach(s=>s.classList.remove('show'));document.querySelectorAll('.pill').forEach(p=>p.classList.remove('act'));document.getElementById('sw-'+id)?.classList.add('show');event.target.classList.add('act');window.scrollTo(0,0);}
+function ptab(t,el){['overview','players','franchises','rules'].forEach(x=>{const e=document.getElementById('pt-'+x);if(e)e.style.display='none'});document.getElementById('pt-'+t).style.display='block';document.querySelectorAll('#pt-tabs .tab').forEach(x=>x.classList.remove('act'));el.classList.add('act');}
+function atab(t,el){['players','franchises','fees','rounds','forfeits'].forEach(x=>{const e=document.getElementById('at-'+x);if(e)e.style.display='none'});document.getElementById('at-'+t).style.display='block';document.querySelectorAll('#at-tabs .tab').forEach(x=>x.classList.remove('act'));el.classList.add('act');}
+function feetab(t,el){['player-fees','franchise-fees'].forEach(x=>{const e=document.getElementById(x);if(e)e.style.display='none'});document.getElementById(t).style.display='block';document.querySelectorAll('#fee-tabs .tab').forEach(x=>x.classList.remove('act'));el.classList.add('act');}
+</script>
+</body></html>

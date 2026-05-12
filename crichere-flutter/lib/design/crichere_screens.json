@@ -1,0 +1,797 @@
+{
+  "app": "Crichere",
+  "description": "Cricket league management and live auction platform",
+  "platform": "Flutter (Android, iOS, Web)",
+  "theme": "dark",
+  "primary_color": "#F59E0B",
+  "background": "#060C1A",
+  "token_file": "crichere_design_tokens.dart",
+  "screens": [
+    {
+      "id": "s1",
+      "name": "S1 Auth",
+      "route": "/auth",
+      "widget": "AuthScreen",
+      "platforms": [
+        "mobile",
+        "web"
+      ],
+      "colors_used": [
+        "gold",
+        "green",
+        "blue",
+        "textPrimary"
+      ],
+      "sub_screens": [
+        "Splash",
+        "PhoneEntry",
+        "OtpVerify",
+        "ProfileClaim",
+        "NewProfileSetup",
+        "WebAuth"
+      ],
+      "headings": [],
+      "buttons": [
+        "GET STARTED →",
+        "🔒 Send OTP",
+        "Verify & Continue →",
+        "Try Again",
+        "📲 Resend New OTP",
+        "✓ Confirm & Activate Profile",
+        "Continue to Cricket Profile →",
+        "Verify & Enter →"
+      ],
+      "badges": [
+        "Android",
+        "iOS",
+        "Web",
+        "🏏 Batter",
+        "🎳 Bowler",
+        "⭐ All-rounder ✓",
+        "🧤 Keeper",
+        "Beginner",
+        "Intermediate ✓",
+        "Advanced"
+      ],
+      "sample_text_content": [
+        "Crichere · S1 Auth — Mobile + Web",
+        "CRICHERE",
+        "Your league. Your auction. Live.",
+        "India's #1 cricket auction platform",
+        "500+ leagues · 50k+ players",
+        "v1.0.0 · ap-south-1",
+        "S1-A · SPLASH · MOBILE 375×812",
+        "9:41",
+        "Sign In",
+        "Enter your Indian mobile number",
+        "MOBILE NUMBER",
+        "🇮🇳",
+        "+91",
+        "98765 43210",
+        "Format: ^[6-9]\\d{9}$ · 6-digit OTP · Valid 5 min · Max 5 req/hr",
+        "✓ OTP-only authentication",
+        "No passwords. JWT 1h access + 30d refresh tokens.",
+        "Stored securely in Keychain (iOS) / Keystore (Android).",
+        "POST /api/v1/auth/otp/send",
+        "New to cricket leagues?"
+      ]
+    },
+    {
+      "id": "s2",
+      "name": "S2 Home & Discover",
+      "route": "/home",
+      "widget": "HomeScreen",
+      "platforms": [
+        "mobile",
+        "web"
+      ],
+      "colors_used": [
+        "gold",
+        "green",
+        "red",
+        "blue",
+        "textPrimary"
+      ],
+      "sub_screens": [
+        "PlayerHome",
+        "AdminHome",
+        "Discover",
+        "WebDashboard",
+        "Notifications"
+      ],
+      "headings": [],
+      "buttons": [
+        "🚪 Enter Auction Room",
+        "+ Create",
+        "⚙ Manage",
+        "🔨 Auction",
+        "✎ Edit",
+        "↑ Publish",
+        "🚪 Enter Room",
+        "Register →",
+        "Join",
+        "+ Create League"
+      ],
+      "badges": [
+        "T20",
+        "T10",
+        "Upcoming",
+        "4 fees due",
+        "Draft",
+        "Completed",
+        "All",
+        "Live Now",
+        "Open",
+        "Unpaid"
+      ],
+      "sample_text_content": [
+        "Crichere · S2 — Home & Discover",
+        "9:41",
+        "Good evening,",
+        "Anjali Sharma",
+        "AS",
+        "LIVE NOW",
+        "TechCup 2026",
+        "Round 1 · Player 23 of 120 · 47 viewers",
+        "₹2k",
+        "Top sale",
+        "Leagues",
+        "Live",
+        "MY LEAGUES",
+        "See all →",
+        "8 franchises · 120 players",
+        "✓ Sold to Thunder Strikers · ₹2,000",
+        "Auction 23% complete",
+        "Premier Office League",
+        "6 franchises · 90 players",
+        "⏱ Auction in 7 days · Purse ₹40,000"
+      ]
+    },
+    {
+      "id": "s3",
+      "name": "S3 League Detail",
+      "route": "/league/:id",
+      "widget": "LeagueDetailScreen",
+      "platforms": [
+        "mobile"
+      ],
+      "colors_used": [
+        "gold",
+        "red",
+        "blue",
+        "green"
+      ],
+      "sub_screens": [
+        "Overview",
+        "Players",
+        "Franchises",
+        "Schedule"
+      ],
+      "headings": [],
+      "buttons": [
+        "🚪 Enter Auction Room",
+        "🏏 Register as Player  ·  POST /players/register",
+        "Join Waitlist",
+        "✓ Confirm Registration",
+        "Cancel",
+        "Join Waitlist at #4",
+        "🔨 Auction",
+        "↑ CSV",
+        "+ Add",
+        "Pay"
+      ],
+      "badges": [
+        "Live",
+        "T20",
+        "▲ Up for bid",
+        "AR",
+        "Available",
+        "BAT",
+        "✓ Sold ₹1,800",
+        "WK",
+        "Active",
+        "Auction Live"
+      ],
+      "sample_text_content": [
+        "Crichere · S3 — League Detail",
+        "9:41",
+        "← Back",
+        "TechCup 2026",
+        "By Rahul Kumar · Mumbai · Auction Live",
+        "Franchises",
+        "120",
+        "Players",
+        "₹50k",
+        "Purse",
+        "Overview",
+        "Rules",
+        "League Details",
+        "Format",
+        "Order mode",
+        "🎲 Random",
+        "Players/team",
+        "15",
+        "Waitlist",
+        "⚡ Auto-promote"
+      ]
+    },
+    {
+      "id": "s4",
+      "name": "S4 Live Auction Room",
+      "route": "/auction/:id/room",
+      "widget": "AuctionRoomScreen",
+      "platforms": [
+        "mobile",
+        "web"
+      ],
+      "colors_used": [
+        "gold",
+        "red",
+        "green",
+        "blue"
+      ],
+      "sub_screens": [
+        "TimerNormal",
+        "TimerWarning",
+        "TimerExpired",
+        "DynamicBidButtons",
+        "AllRoles"
+      ],
+      "headings": [
+        "S4 — Live Auction Room",
+        "Countdown timer (3 states) · Dynamic bid increment buttons · All role cards · SOLD/UNSOLD/Round overlays · Web 3-col viewer",
+        "📱 Mobile — Countdown Timer: All 3 States",
+        "📱 Mobile — Dynamic Bid Buttons: Category-Specific Increments",
+        "📱 Mobile — Viewer: Player Role Cards (All Types)",
+        "Bid History",
+        "📱 Mobile — SOLD, UNSOLD, Round & SSE Overlays",
+        "🖥️ Web — Auction Viewer with Timer (3-Column)"
+      ],
+      "buttons": [
+        "+₹2,000",
+        "+₹4,000",
+        "+₹6,000",
+        "Custom",
+        "🔨 BID ₹11,500",
+        "+₹1,000",
+        "+₹3,000",
+        "🔨 BID ₹6,500",
+        "View Round Summary",
+        "Retry now"
+      ],
+      "badges": [
+        "● LIVE",
+        "UP",
+        "Tag B",
+        "★ Tag A",
+        "ALL-ROUNDER",
+        "RHB",
+        "BATTER",
+        "LHB",
+        "BOWLER",
+        "RA Fast"
+      ],
+      "sample_text_content": [
+        "Crichere — S4: Live Auction Room (Updated)",
+        "Updated",
+        "Timer — State A · Normal (42s)",
+        "9:41 AM",
+        "Round 1",
+        "AK",
+        "Anjali Kumar",
+        "All-rounder · Tag A · Base ₹500",
+        "42",
+        "SECS",
+        "Timer Running",
+        "60s round · Anti-snipe: 10s",
+        "POST /auctions/{id}/timer/start",
+        "CURRENT BID",
+        "₹9,500",
+        "Thunder Strikers leading",
+        "Min bid",
+        "₹11,500",
+        "Increment: +₹2,000",
+        "Increment from: AuctionRoundBidIncrement → Tag A overrides category default"
+      ]
+    },
+    {
+      "id": "s5",
+      "name": "S5 Auctioneer Command Center",
+      "route": "/auction/:id/command",
+      "widget": "AuctioneerCommandScreen",
+      "platforms": [
+        "mobile",
+        "web"
+      ],
+      "colors_used": [
+        "gold",
+        "green",
+        "red"
+      ],
+      "sub_screens": [
+        "AuctioneerMobile",
+        "AuctioneerWeb"
+      ],
+      "headings": [
+        "S5 — Auctioneer Command Center",
+        "Timer controls (start/stop/anti-snipe) · Dynamic increment badge · Round management · Full web command center · Undo/Force-assign modals",
+        "📱 Mobile — Auctioneer Panel: Timer Integration",
+        "🖥️ Web — Full Auctioneer Command Center",
+        "Franchise Purses",
+        "Recent Actions",
+        "🖥️ Web — Undo Sold Modal + Force Assign Modal"
+      ],
+      "buttons": [
+        "⏸ Pause",
+        "⏹ Stop",
+        "Record",
+        "🔨 SOLD",
+        "UNSOLD",
+        "Undo Last Bid",
+        "Settings",
+        "Complete Round 1",
+        "Configure Increments & Timer",
+        "Skip"
+      ],
+      "badges": [
+        "★ Tag A",
+        "UP",
+        "LIVE",
+        "PENDING",
+        "All",
+        "BAT",
+        "BOWL",
+        "AR",
+        "NOW",
+        "ALL-ROUNDER"
+      ],
+      "sample_text_content": [
+        "Crichere — S5: Auctioneer Command Center (Updated)",
+        "Updated",
+        "Auctioneer Mobile — Timer running (normal)",
+        "9:41 AM",
+        "Auctioneer",
+        "● LIVE",
+        "AK",
+        "Anjali Kumar",
+        "AR · Base ₹500",
+        "42",
+        "60s",
+        "LEADING BID · Min next: ₹11,500",
+        "₹9,500",
+        "Thunder Strikers · Increment: +₹2,000 (Tag A)",
+        "RECORD BID FOR FRANCHISE",
+        "⭐ Thunder",
+        "₹43K left",
+        "Lightning",
+        "₹31K left",
+        "Blazers"
+      ]
+    },
+    {
+      "id": "s6",
+      "name": "S6 League Admin & Setup",
+      "route": "/league/:id/setup",
+      "widget": "LeagueSetupScreen",
+      "platforms": [
+        "mobile"
+      ],
+      "colors_used": [
+        "gold",
+        "green",
+        "textPrimary"
+      ],
+      "sub_screens": [
+        "BasicInfo",
+        "AuctionRules",
+        "PlayerPool"
+      ],
+      "headings": [
+        "S6 — League Admin & Setup",
+        "Create/Edit league · Bulk CSV import · Auction initialize · Franchise management · Pre-assignment · Mobile + Web",
+        "📱 Mobile — Create League Flow",
+        "Create League",
+        "Auction Rules",
+        "Review & Publish",
+        "📱 Mobile — Bulk CSV Import + Pre-assignment",
+        "Import Players",
+        "Pre-assign Players",
+        "Start Auction"
+      ],
+      "buttons": [
+        "Next: Auction Rules →",
+        "Next: Review & Publish →",
+        "Save as Draft",
+        "🚀 Publish League",
+        "Confirm Import (118 players)",
+        "Remove",
+        "+ Add Pre-assignment",
+        "🏏 GO LIVE — Start Auction",
+        "Edit League",
+        "🚀 Start Auction"
+      ],
+      "badges": [
+        "ACTIVE",
+        "PENDING",
+        "LIVE",
+        "AUCTION_LIVE"
+      ],
+      "sample_text_content": [
+        "Crichere — S6: League Admin & Setup",
+        "Create League — Step 1 (Basic Info)",
+        "9:41 AM",
+        "Step 1 of 3 · Basic Info",
+        "🖼️",
+        "Upload banner (10MB max · JPG/PNG)",
+        "LEAGUE LOGO",
+        "Tap to upload · PNG/JPG · 10MB",
+        "LEAGUE NAME",
+        "FORMAT",
+        "T20",
+        "T10",
+        "ODI",
+        "DESCRIPTION",
+        "Annual tech company cricket league",
+        "POST /leagues · POST /storage/presigned-url for logo/banner",
+        "Create League — Step 2 (Auction Rules)",
+        "Step 2 of 3",
+        "FRANCHISES",
+        "PLAYERS/TEAM"
+      ]
+    },
+    {
+      "id": "s7",
+      "name": "S7 Fees Forfeits & Waitlist",
+      "route": "/league/:id/fees",
+      "widget": "FeesScreen",
+      "platforms": [
+        "mobile"
+      ],
+      "colors_used": [
+        "gold",
+        "red",
+        "green",
+        "blue"
+      ],
+      "sub_screens": [
+        "FeeSummary",
+        "ForfeitRules",
+        "Waitlist"
+      ],
+      "headings": [
+        "S7 — Fees, Forfeits & Waitlist",
+        "Mobile + Web · Full screens for fee collection, forfeit management, waitlist administration",
+        "📱 Mobile — Fee Obligations (Player view)",
+        "My Fee Obligation",
+        "Payment History",
+        "📱 Mobile — Admin: Record Payment Modal + Waive",
+        "Fee Management",
+        "💳 Record Payment",
+        "Waive Fee",
+        "📱 Mobile — Forfeit Request Flow (Player + Admin)"
+      ],
+      "buttons": [
+        "📞 Contact Admin",
+        "Cancel",
+        "Record ₹750",
+        "Waive & Record Refund",
+        "Submit Forfeit Request",
+        "Review & Approve",
+        "Reject",
+        "Approve — Status → WAIVED",
+        "Withdraw from Queue",
+        "Remove"
+      ],
+      "badges": [
+        "PARTIALLY PAID",
+        "FULLY PAID",
+        "UNPAID",
+        "PARTIAL",
+        "PENDING",
+        "Next up",
+        "PAID",
+        "3 Pending",
+        "APPROVED",
+        "REJECTED"
+      ],
+      "sample_text_content": [
+        "Crichere — S7: Fees, Forfeits & Waitlist",
+        "My Fee — PARTIALLY_PAID",
+        "9:41 AM",
+        "TechCup 2026 · Player Fee",
+        "₹750",
+        "of ₹1,500 total · ₹750 remaining",
+        "Paid: ₹750",
+        "Min to register: ₹500 ✓",
+        "Due: ₹750",
+        "✓ Minimum ₹500 paid — you're auction eligible",
+        "Cash payment",
+        "Recorded by Rahul · 3 days ago",
+        "+₹750",
+        "Need to pay remaining ₹750?",
+        "Contact league admin to record payment.",
+        "V1 cash payments only.",
+        "My Fee — PAID",
+        "₹1,500",
+        "Fully settled · Auction eligible",
+        "Cash — Final payment"
+      ]
+    },
+    {
+      "id": "s8",
+      "name": "S8 Post-Auction & Exports",
+      "route": "/auction/:id/results",
+      "widget": "PostAuctionScreen",
+      "platforms": [
+        "mobile"
+      ],
+      "colors_used": [
+        "gold",
+        "green",
+        "blue",
+        "textPrimary"
+      ],
+      "sub_screens": [
+        "Summary",
+        "FranchiseSquads",
+        "UnsoldPlayers",
+        "Export"
+      ],
+      "headings": [
+        "S8 — Post-Auction Summary & Exports",
+        "Mobile + Web · Summary dashboards, audit log, PDF/image exports",
+        "📱 Mobile — Post-Auction Summary Tabs",
+        "Auction Summary",
+        "Top Buys 🏆",
+        "Purse Usage",
+        "📱 Mobile — Auction Audit Log",
+        "Audit Log",
+        "Squad (15)",
+        "🖥️ Web — Post-Auction Summary Dashboard"
+      ],
+      "buttons": [
+        "View all 24 unsold →",
+        "📱 Share Squad Image (WhatsApp)",
+        "📄 Download Squad PDF",
+        "📊 Full Auction PDF Report",
+        "📱 WhatsApp Image",
+        "📄 PDF",
+        "📄 Export PDF",
+        "Squad",
+        "All Actions",
+        "PLAYER_UP"
+      ],
+      "badges": [
+        "UNSOLD"
+      ],
+      "sample_text_content": [
+        "Crichere — S8: Post-Auction & Exports",
+        "Summary — Overview",
+        "9:41 AM",
+        "TechCup 2026 · Completed",
+        "Overview",
+        "Squads",
+        "Unsold",
+        "Share",
+        "96",
+        "Players Sold",
+        "₹8.4L",
+        "Total Spent",
+        "24",
+        "Franchises",
+        "#1",
+        "AK",
+        "Anjali Kumar",
+        "Thunder Strikers",
+        "₹12,500",
+        "#2"
+      ]
+    },
+    {
+      "id": "s9",
+      "name": "S9 Profile Squad & Settings",
+      "route": "/profile",
+      "widget": "ProfileScreen",
+      "platforms": [
+        "mobile"
+      ],
+      "colors_used": [
+        "gold",
+        "textPrimary",
+        "textDim"
+      ],
+      "sub_screens": [
+        "MyProfile",
+        "MySquad",
+        "Settings"
+      ],
+      "headings": [
+        "S9 — Profile, Franchise Squad & Settings",
+        "Mobile + Web · Player profile, cricket stats, franchise squad, app settings",
+        "📱 Mobile — Player Profile (Own + Public)",
+        "Player Profile",
+        "📱 Mobile — Franchise Squad (Owner view)",
+        "Thunder Strikers",
+        "Team Members",
+        "📱 Mobile — App Settings",
+        "Settings",
+        "Notifications"
+      ],
+      "buttons": [
+        "Edit",
+        "✏️",
+        "Save Profile",
+        "📱 Share",
+        "📄 PDF",
+        "Invite",
+        "📋 Copy",
+        "📱 WhatsApp",
+        "Remove"
+      ],
+      "badges": [
+        "ALL-ROUNDER",
+        "ACTIVE",
+        "LIVE",
+        "COMPLETED",
+        "BATTER",
+        "YOU"
+      ],
+      "sample_text_content": [
+        "Crichere — S9: Profile, Squad & Settings",
+        "My Profile — View",
+        "9:41 AM",
+        "My Profile",
+        "AK",
+        "Anjali Kumar",
+        "BATTING",
+        "Right Hand",
+        "BOWLING",
+        "Off Spin",
+        "EXPERIENCE",
+        "Advanced",
+        "JERSEY",
+        "#7",
+        "CITY",
+        "Kochi, Kerala",
+        "Leagues",
+        "Auction History",
+        "TechCup 2026",
+        "Thunder Strikers · Sold ₹12,500"
+      ]
+    },
+    {
+      "id": "s10",
+      "name": "S10 UI States & Platform Admin",
+      "route": "/admin",
+      "widget": "PlatformAdminScreen",
+      "platforms": [
+        "mobile",
+        "web"
+      ],
+      "colors_used": [
+        "slate2",
+        "slate3",
+        "textFaint"
+      ],
+      "sub_screens": [
+        "LoadingShimmer",
+        "EmptyState",
+        "ErrorState",
+        "AdminDashboard"
+      ],
+      "headings": [
+        "S10 — UI States & Platform Admin",
+        "Loading states, error states, connectivity loss, empty states · Platform admin web dashboard",
+        "📱 Mobile — Shimmer Loading States",
+        "📱 Mobile — Connectivity & SSE Disconnect States",
+        "📱 Mobile — Empty States & Errors",
+        "🖥️ Web — Platform Admin Dashboard",
+        "🖥️ Web — Platform Metrics (Prometheus)",
+        "📱 Mobile — SSE Reconnection Guard: Exact 2-Step Sequence"
+      ],
+      "buttons": [
+        "Retry now",
+        "+500",
+        "+1K",
+        "+2K",
+        "BID",
+        "🔒 Insufficient Purse",
+        "Discover Leagues →",
+        "↺ Retry",
+        "View Summary",
+        "Share"
+      ],
+      "badges": [
+        "SUSPENDED",
+        "● AUCTION LIVE",
+        "COMPLETED"
+      ],
+      "sample_text_content": [
+        "Crichere — S10: UI States & Platform Admin",
+        "Shimmer — League list",
+        "9:41 AM",
+        "Shows if data > 300ms · max 10 items · 10s timeout → error",
+        "Shimmer — Auction player card",
+        "SSE Disconnected (auction room)",
+        "Round 1",
+        "● LIVE",
+        "Connection Lost",
+        "Reconnecting with exponential backoff",
+        "2s → 4s → 8s → 30s cap",
+        "Attempt 2/∞ · Next in 4s",
+        "On reconnect: GET /auctions/{id}/state",
+        "then re-attach SSE with Last-Event-ID",
+        "Offline — Bid blocked (SnackBar)",
+        "AK",
+        "Anjali Kumar",
+        "All-rounder",
+        "₹9,500",
+        "Thunder Strikers leading"
+      ]
+    },
+    {
+      "id": "s11",
+      "name": "S11 Franchise Invite Onboarding",
+      "route": "/invite/:token",
+      "widget": "FranchiseInviteScreen",
+      "platforms": [
+        "mobile"
+      ],
+      "colors_used": [
+        "green",
+        "gold",
+        "textPrimary"
+      ],
+      "sub_screens": [
+        "InviteLanding",
+        "FranchiseDetailsForm",
+        "ConfirmJoin"
+      ],
+      "headings": [
+        "S11 — Franchise Invite Onboarding",
+        "Receiver-side deep-link flow · No-auth landing → OTP login → Accept → Success · Error states",
+        "📱 Mobile — Invite Acceptance Happy Path",
+        "📱 Mobile — Invite Error States",
+        "🖥️ Web — Admin: Invite Management Panel"
+      ],
+      "buttons": [
+        "Log in to Accept →",
+        "Claim Team — Thunder Strikers",
+        "Decline",
+        "Go to My Team →",
+        "Go to Home",
+        "Complete My Profile →",
+        "Generate Invite Link",
+        "📋 Copy",
+        "📱 Share",
+        "Revoke"
+      ],
+      "badges": [
+        "PENDING",
+        "ACCEPTED"
+      ],
+      "sample_text_content": [
+        "Crichere — S11: Franchise Invite Onboarding",
+        "Screen 1 — Landing (no auth required)",
+        "9:41 AM",
+        "🏏 Crichere",
+        "🏟️",
+        "You've been invited to own",
+        "Thunder Strikers",
+        "TechCup 2026 · T20",
+        "₹50,000",
+        "Starting purse",
+        "15",
+        "Player slots",
+        "Invited by",
+        "Rahul Kumar",
+        "Expires: May 17, 2026 · 6 days left",
+        "Already have an account? Log in",
+        "New to Crichere? We'll set you up",
+        "POST /invites/validate → called on deep-link open",
+        "Returns: franchise, league, invitedBy, expiresAt",
+        "requiresAccount: true — no auth needed to VIEW this screen"
+      ]
+    }
+  ]
+}

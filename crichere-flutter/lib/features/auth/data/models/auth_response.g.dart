@@ -11,6 +11,8 @@ _AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) =>
       accessToken: json['accessToken'] as String?,
       refreshToken: json['refreshToken'] as String?,
       userId: json['userId'] as String?,
+      phone: json['phone'] as String?,
+      name: json['name'] as String?,
       profileStatus: $enumDecodeNullable(
         _$ProfileStatusEnumMap,
         json['profileStatus'],
@@ -24,6 +26,8 @@ Map<String, dynamic> _$AuthResponseToJson(_AuthResponse instance) =>
       'accessToken': instance.accessToken,
       'refreshToken': instance.refreshToken,
       'userId': instance.userId,
+      'phone': instance.phone,
+      'name': instance.name,
       'profileStatus': _$ProfileStatusEnumMap[instance.profileStatus],
       'isNewUser': instance.isNewUser,
       'profileId': instance.profileId,

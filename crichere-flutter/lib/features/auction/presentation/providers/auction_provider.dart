@@ -8,6 +8,7 @@ import '../../data/auction_api.dart';
 import '../../data/auction_repository_impl.dart';
 import '../../domain/repositories/auction_repository.dart';
 import '../../domain/entities/auction_event.dart';
+import '../../domain/entities/auction_summary.dart';
 
 part 'auction_provider.g.dart';
 
@@ -52,4 +53,9 @@ AuctionApi auctionApi(Ref ref) {
 AuctionRepository auctionRepository(Ref ref) {
   final api = ref.watch(auctionApiProvider);
   return AuctionRepositoryImpl(api);
+}
+
+@riverpod
+Future<AuctionSummary> getAuctionSummary(Ref ref, String auctionId) {
+  return ref.watch(auctionRepositoryProvider).getAuctionSummary(auctionId);
 }

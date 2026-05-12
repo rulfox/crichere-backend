@@ -1,3 +1,4 @@
+import '../domain/entities/auction_summary.dart';
 import '../domain/repositories/auction_repository.dart';
 import 'auction_api.dart';
 
@@ -5,6 +6,11 @@ class AuctionRepositoryImpl implements AuctionRepository {
   final AuctionApi _api;
 
   AuctionRepositoryImpl(this._api);
+
+  @override
+  Future<AuctionSummary> getAuctionSummary(String auctionId) async {
+    return await _api.getAuctionSummary(auctionId);
+  }
 
   @override
   Future<void> putRandomPlayer(String auctionId) async {
@@ -59,5 +65,20 @@ class AuctionRepositoryImpl implements AuctionRepository {
       'franchiseId': franchiseId,
       'type': type,
     });
+  }
+
+  @override
+  Future<void> startTimer(String auctionId, int seconds) async {
+    await _api.startTimer(auctionId, {'remainingSeconds': seconds});
+  }
+
+  @override
+  Future<void> pauseTimer(String auctionId, int seconds) async {
+    await _api.pauseTimer(auctionId, {'remainingSeconds': seconds});
+  }
+
+  @override
+  Future<void> resetTimer(String auctionId, int seconds) async {
+    await _api.resetTimer(auctionId, {'remainingSeconds': seconds});
   }
 }

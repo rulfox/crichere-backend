@@ -20,7 +20,9 @@ class AuthGuard extends AutoRouteGuard {
       }
     } else {
       // Not authenticated
-      if (resolver.route.name == PhoneEntryRoute.name || resolver.route.name == OtpRoute.name) {
+      if (resolver.route.name == PhoneEntryRoute.name || 
+          resolver.route.name == OtpRoute.name ||
+          resolver.route.name == FranchiseInviteRoute.name) {
         resolver.next(true);
       } else {
         router.replaceAll([const PhoneEntryRoute()]);

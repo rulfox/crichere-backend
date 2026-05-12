@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
+import '../domain/entities/auction_summary.dart';
 
 part 'auction_api.g.dart';
 
@@ -9,6 +10,9 @@ abstract class AuctionApi {
 
   @GET("/auctions/{id}/state")
   Future<dynamic> getAuctionState(@Path("id") String auctionId);
+
+  @GET("/auctions/{id}/summary")
+  Future<AuctionSummary> getAuctionSummary(@Path("id") String auctionId);
 
   @POST('/auctions/{id}/players/next')
   Future<void> putRandomPlayer(@Path('id') String auctionId);
@@ -36,4 +40,13 @@ abstract class AuctionApi {
 
   @POST('/auctions/{id}/pre-assign')
   Future<void> preAssign(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
+
+  @POST('/auctions/{id}/timer/start')
+  Future<void> startTimer(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
+
+  @POST('/auctions/{id}/timer/pause')
+  Future<void> pauseTimer(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
+
+  @POST('/auctions/{id}/timer/reset')
+  Future<void> resetTimer(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
 }

@@ -31,12 +31,25 @@ _ClaimRequest _$ClaimRequestFromJson(Map<String, dynamic> json) =>
     _ClaimRequest(
       name: json['name'] as String,
       playingRole: $enumDecode(_$PlayingRoleEnumMap, json['playingRole']),
+      experienceLevel: $enumDecode(
+        _$ExperienceLevelEnumMap,
+        json['experienceLevel'],
+      ),
+      battingStyle: $enumDecode(_$BattingStyleEnumMap, json['battingStyle']),
+      bowlingType: $enumDecode(_$BowlingTypeEnumMap, json['bowlingType']),
+      city: json['city'] as String?,
+      jerseyNumber: (json['jerseyNumber'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ClaimRequestToJson(_ClaimRequest instance) =>
     <String, dynamic>{
       'name': instance.name,
       'playingRole': _$PlayingRoleEnumMap[instance.playingRole]!,
+      'experienceLevel': _$ExperienceLevelEnumMap[instance.experienceLevel]!,
+      'battingStyle': _$BattingStyleEnumMap[instance.battingStyle]!,
+      'bowlingType': _$BowlingTypeEnumMap[instance.bowlingType]!,
+      'city': instance.city,
+      'jerseyNumber': instance.jerseyNumber,
     };
 
 const _$PlayingRoleEnumMap = {
@@ -44,6 +57,28 @@ const _$PlayingRoleEnumMap = {
   PlayingRole.bowler: 'BOWLER',
   PlayingRole.allRounder: 'ALL_ROUNDER',
   PlayingRole.wicketKeeper: 'WICKET_KEEPER',
+};
+
+const _$ExperienceLevelEnumMap = {
+  ExperienceLevel.local: 'LOCAL',
+  ExperienceLevel.district: 'DISTRICT',
+  ExperienceLevel.state: 'STATE',
+  ExperienceLevel.national: 'NATIONAL',
+};
+
+const _$BattingStyleEnumMap = {
+  BattingStyle.rightHand: 'RIGHT_HAND',
+  BattingStyle.leftHand: 'LEFT_HAND',
+};
+
+const _$BowlingTypeEnumMap = {
+  BowlingType.fast: 'FAST',
+  BowlingType.mediumFast: 'MEDIUM_FAST',
+  BowlingType.medium: 'MEDIUM',
+  BowlingType.offSpin: 'OFF_SPIN',
+  BowlingType.legSpin: 'LEG_SPIN',
+  BowlingType.slowLeftArm: 'SLOW_LEFT_ARM',
+  BowlingType.slowLeftArmOrthodox: 'SLOW_LEFT_ARM_ORTHODOX',
 };
 
 _UserBasicInfoRequest _$UserBasicInfoRequestFromJson(
@@ -96,29 +131,7 @@ Map<String, dynamic> _$CricketProfileRequestToJson(
   'state': instance.state,
 };
 
-const _$BattingStyleEnumMap = {
-  BattingStyle.rightHand: 'RIGHT_HAND',
-  BattingStyle.leftHand: 'LEFT_HAND',
-};
-
 const _$BowlingStyleEnumMap = {
   BowlingStyle.rightArm: 'RIGHT_ARM',
   BowlingStyle.leftArm: 'LEFT_ARM',
-};
-
-const _$BowlingTypeEnumMap = {
-  BowlingType.fast: 'FAST',
-  BowlingType.mediumFast: 'MEDIUM_FAST',
-  BowlingType.medium: 'MEDIUM',
-  BowlingType.offSpin: 'OFF_SPIN',
-  BowlingType.legSpin: 'LEG_SPIN',
-  BowlingType.slowLeftArm: 'SLOW_LEFT_ARM',
-  BowlingType.slowLeftArmOrthodox: 'SLOW_LEFT_ARM_ORTHODOX',
-};
-
-const _$ExperienceLevelEnumMap = {
-  ExperienceLevel.local: 'LOCAL',
-  ExperienceLevel.district: 'DISTRICT',
-  ExperienceLevel.state: 'STATE',
-  ExperienceLevel.national: 'NATIONAL',
 };

@@ -5,7 +5,23 @@ class ClaimProfileUseCase {
   final AuthRepository _repository;
   ClaimProfileUseCase(this._repository);
 
-  Future<void> call(String name, PlayingRole playingRole) {
-    return _repository.claimProfile(name, playingRole);
+  Future<void> call({
+    required String name,
+    required PlayingRole playingRole,
+    required ExperienceLevel experienceLevel,
+    required BattingStyle battingStyle,
+    required BowlingType bowlingType,
+    String? city,
+    String? jerseyNumber,
+  }) {
+    return _repository.claimProfile(
+      name: name,
+      playingRole: playingRole,
+      experienceLevel: experienceLevel,
+      battingStyle: battingStyle,
+      bowlingType: bowlingType,
+      city: city,
+      jerseyNumber: jerseyNumber,
+    );
   }
 }

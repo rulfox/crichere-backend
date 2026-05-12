@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crichere · S1 Auth — Mobile + Web</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A0F1E;--navym:#0F172A;--slate:#1A2236;--slate2:#1E293B;--slate3:#243047;--slate4:#2D3A52;
+  --green:#22C55E;--gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;--purp:#A855F7;--cyan:#06B6D4;
+  --tx:#F1F5F9;--txm:#CBD5E1;--txd:#94A3B8;--txf:#64748B;
+  --bdr:rgba(148,163,184,.1);--bdr2:rgba(148,163,184,.18);
+}
+body{font-family:'DM Sans',sans-serif;background:#060C1A;color:var(--tx);min-height:100vh}
+/* ── TOP NAV ── */
+.topnav{position:sticky;top:0;z-index:50;background:rgba(6,12,26,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bdr);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold);letter-spacing:1px}
+.sec-title{font-size:11px;font-weight:600;color:var(--txf);letter-spacing:.5px}
+.nav-pills{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.pill{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bdr2);background:transparent;color:var(--txd);transition:all .15s}
+.pill.act,.pill:hover{background:var(--gold);color:#1a0f00;border-color:var(--gold)}
+/* ── CANVAS ── */
+.canvas{padding:32px 24px 80px;display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start}
+.screen-wrap{display:none;animation:fadeIn .25s ease}
+.screen-wrap.show{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+/* ── LABELS ── */
+.frame-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--txf);text-align:center;margin-top:10px;font-family:'Rajdhani',sans-serif}
+/* ── PHONE FRAME ── */
+.phone{width:375px;min-height:812px;background:var(--navy);border-radius:44px;border:2px solid var(--slate4);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.04);position:relative;flex-shrink:0}
+.phone-notch{height:44px;background:var(--navym);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.notch-pill{width:90px;height:10px;background:#060c1a;border-radius:5px}
+.status-time{font-size:11px;font-weight:600;color:var(--txd)}
+.status-icons{font-size:10px;color:var(--txd)}
+.phone-body{padding:0;overflow:hidden}
+/* ── WEB FRAME ── */
+.web-frame{width:1100px;min-height:700px;background:var(--navym);border-radius:14px;border:1.5px solid var(--slate4);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6);flex-shrink:0}
+.web-chrome{height:36px;background:var(--slate2);display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid var(--bdr)}
+.wdot{width:10px;height:10px;border-radius:50%}
+.wurl{flex:1;height:18px;background:var(--navy);border-radius:4px;margin:0 8px;display:flex;align-items:center;padding:0 10px;font-size:10px;color:var(--txf);font-family:'JetBrains Mono',monospace}
+/* ── ANIMATIONS ── */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.8)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 12px rgba(245,158,11,.25)}50%{box-shadow:0 0 32px rgba(245,158,11,.55)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ring{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.12);opacity:.1}}
+/* ── COMMON UI ── */
+.btn-gold{display:flex;align-items:center;justify-content:center;background:var(--gold);color:#1a0f00;border:none;border-radius:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.3px}
+.btn-green{display:flex;align-items:center;justify-content:center;background:var(--green);color:#0a1f0e;border:none;border-radius:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-outline{display:flex;align-items:center;justify-content:center;background:transparent;color:var(--txd);border:1px solid var(--bdr2);border-radius:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.input-field{background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:12px;padding:12px 14px;color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;width:100%}
+.input-field:focus{border-color:rgba(245,158,11,.6);outline:none}
+.input-field::placeholder{color:var(--txf)}
+.card{background:var(--slate);border:1px solid var(--bdr);border-radius:16px;overflow:hidden}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px}
+.b-gold{background:rgba(245,158,11,.12);color:#FCD34D;border:1px solid rgba(245,158,11,.3)}
+.b-green{background:rgba(34,197,94,.12);color:#4ADE80;border:1px solid rgba(34,197,94,.28)}
+.b-blue{background:rgba(59,130,246,.12);color:#93C5FD;border:1px solid rgba(59,130,246,.28)}
+.b-red{background:rgba(239,68,68,.12);color:#FCA5A5;border:1px solid rgba(239,68,68,.28)}
+.b-gray{background:rgba(100,116,139,.12);color:var(--txd);border:1px solid rgba(100,116,139,.22)}
+.b-purp{background:rgba(168,85,247,.12);color:#D8B4FE;border:1px solid rgba(168,85,247,.28)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse 1.4s infinite;flex-shrink:0}
+.section-lbl{font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--txf);font-family:'Rajdhani',sans-serif;padding:0 0 5px}
+
+/* ─────────────────────────────────────────
+   SECTION COLORS: role chips
+───────────────────────────────────────── */
+.role-chip{padding:8px 12px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center;flex:1}
+.role-bat{background:rgba(59,130,246,.12);border:1.5px solid rgba(59,130,246,.3);color:#93C5FD}
+.role-bowl{background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.25);color:#FCA5A5}
+.role-ar{background:rgba(245,158,11,.18);border:1.5px solid rgba(245,158,11,.5);color:#FCD34D}
+.role-wk{background:rgba(34,197,94,.1);border:1.5px solid rgba(34,197,94,.25);color:#4ADE80}
+.exp-chip{flex:1;padding:7px 6px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;text-align:center;background:rgba(100,116,139,.1);border:1.5px solid var(--bdr);color:var(--txf);transition:all .15s}
+.exp-chip.sel{background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.5);color:var(--gold)}
+
+/* OTP Box */
+.otp-box{width:48px;height:60px;background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--tx);cursor:text;transition:border-color .2s}
+.otp-box.filled{border-color:rgba(245,158,11,.6);color:var(--gold)}
+.otp-box.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,158,11,.12)}
+.otp-box.error{border-color:rgba(239,68,68,.6);color:#FCA5A5}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <span class="logo">🏏 CRICHERE</span>
+  <span class="sec-title">Section 1 — Auth</span>
+  <div class="nav-pills">
+    <button class="pill act" onclick="showScreen('splash')">Splash</button>
+    <button class="pill" onclick="showScreen('phone')">Phone Entry</button>
+    <button class="pill" onclick="showScreen('otp')">OTP Verify</button>
+    <button class="pill" onclick="showScreen('claim')">Profile Claim</button>
+    <button class="pill" onclick="showScreen('new-profile')">New Profile Setup</button>
+    <button class="pill" onclick="showScreen('web-auth')">Web Auth</button>
+  </div>
+</div>
+
+<div class="canvas">
+
+<!-- ═══════════════════════════════════════════════
+     SPLASH — MOBILE
+═══════════════════════════════════════════════ -->
+<div class="screen-wrap show" id="sw-splash">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="background:radial-gradient(ellipse at 50% 30%,rgba(245,158,11,.1),transparent 60%),var(--navy);min-height:768px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;gap:0;position:relative;overflow:hidden">
+        <!-- Background rings -->
+        <div style="position:absolute;width:320px;height:320px;border-radius:50%;border:1px solid rgba(245,158,11,.06);top:50%;left:50%;transform:translate(-50%,-60%);animation:ring 4s infinite"></div>
+        <div style="position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid rgba(245,158,11,.1);top:50%;left:50%;transform:translate(-50%,-60%);animation:ring 4s 1s infinite"></div>
+        <!-- Logo icon -->
+        <div style="width:96px;height:96px;background:var(--gob,rgba(245,158,11,.1));border-radius:50%;border:2px solid rgba(245,158,11,.35);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:28px;animation:glow 3s infinite;position:relative">🏏
+          <div style="position:absolute;inset:-12px;border-radius:50%;border:1px dashed rgba(245,158,11,.2);animation:spin 12s linear infinite"></div>
+        </div>
+        <!-- Wordmark -->
+        <div style="font-family:'Rajdhani',sans-serif;font-size:52px;font-weight:700;letter-spacing:3px;line-height:1;margin-bottom:8px;background:linear-gradient(135deg,#FCD34D,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent">CRICHERE</div>
+        <div style="font-size:13px;color:var(--txd);letter-spacing:.8px;margin-bottom:36px;text-align:center">Your league. Your auction. Live.</div>
+        <!-- Badges -->
+        <div style="display:flex;gap:8px;margin-bottom:36px">
+          <span class="badge b-green">Android</span>
+          <span class="badge b-blue">iOS</span>
+          <span class="badge b-gray">Web</span>
+        </div>
+        <!-- CTA -->
+        <button class="btn-gold" style="width:100%;padding:16px;font-size:16px;border-radius:16px;font-family:'Rajdhani',sans-serif;letter-spacing:2px;animation:glow 3s 1s infinite">GET STARTED →</button>
+        <div style="margin-top:24px;font-size:10px;color:var(--txf);text-align:center;line-height:1.8">India's #1 cricket auction platform<br><span style="color:var(--txd)">500+ leagues · 50k+ players</span></div>
+        <!-- Version badge -->
+        <div style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--txf);font-family:'JetBrains Mono',monospace">v1.0.0 · ap-south-1</div>
+      </div>
+    </div>
+    <div class="frame-label">S1-A · SPLASH · MOBILE 375×812</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PHONE ENTRY — MOBILE
+═══════════════════════════════════════════════ -->
+<div class="screen-wrap" id="sw-phone">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="status-time">9:41</div><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="padding:32px 24px;min-height:768px;background:var(--navy)">
+        <!-- Back + header -->
+        <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;margin-bottom:4px">Sign In</div>
+        <div style="font-size:13px;color:var(--txd);margin-bottom:32px">Enter your Indian mobile number</div>
+        <!-- Phone input card -->
+        <div class="card" style="padding:16px;margin-bottom:12px;border-color:rgba(245,158,11,.22)">
+          <div class="section-lbl" style="margin-bottom:10px">MOBILE NUMBER</div>
+          <div style="display:flex;gap:10px">
+            <div style="background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:6px;font-size:14px;color:var(--txd);flex-shrink:0;cursor:pointer">🇮🇳 <span style="font-weight:600">+91</span></div>
+            <div style="flex:1;background:var(--slate3);border:1.5px solid rgba(245,158,11,.5);border-radius:12px;padding:12px 14px;font-size:16px;font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--tx);display:flex;align-items:center">98765 43210</div>
+          </div>
+        </div>
+        <!-- Validation rule note -->
+        <div style="font-size:10px;color:var(--txf);text-align:center;margin-bottom:20px;line-height:1.6">Format: ^[6-9]\d{9}$ · 6-digit OTP · Valid 5 min · Max 5 req/hr</div>
+        <!-- CTA -->
+        <button class="btn-gold" style="width:100%;padding:16px;font-size:15px;border-radius:16px;margin-bottom:24px">🔒 Send OTP</button>
+        <!-- Info box -->
+        <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:14px;padding:14px 16px">
+          <div style="font-size:11px;font-weight:700;color:#FCD34D;margin-bottom:5px">✓ OTP-only authentication</div>
+          <div style="font-size:11px;color:var(--txd);line-height:1.6">No passwords. JWT 1h access + 30d refresh tokens.<br>Stored securely in Keychain (iOS) / Keystore (Android).<br><span style="color:var(--txf)">POST /api/v1/auth/otp/send</span></div>
+        </div>
+        <!-- New user note -->
+        <div style="margin-top:20px;text-align:center;font-size:11px;color:var(--txf)">New to cricket leagues? <span style="color:var(--gold);cursor:pointer">Browse leagues first →</span></div>
+      </div>
+    </div>
+    <div class="frame-label">S1-B · PHONE ENTRY · MOBILE 375×812</div>
+  </div>
+
+  <!-- Phone entry — error state -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="status-time">9:41</div><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="padding:32px 24px;min-height:768px;background:var(--navy)">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;margin-bottom:4px">Sign In</div>
+        <div style="font-size:13px;color:var(--txd);margin-bottom:32px">Enter your Indian mobile number</div>
+        <div class="card" style="padding:16px;margin-bottom:8px;border-color:rgba(239,68,68,.35)">
+          <div class="section-lbl" style="margin-bottom:10px">MOBILE NUMBER</div>
+          <div style="display:flex;gap:10px">
+            <div style="background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:6px;font-size:14px;color:var(--txd);flex-shrink:0">🇮🇳 <span style="font-weight:600">+91</span></div>
+            <div style="flex:1;background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.45);border-radius:12px;padding:12px 14px;font-size:16px;font-family:'JetBrains Mono',monospace;font-weight:600;color:#FCA5A5;display:flex;align-items:center">55123</div>
+          </div>
+        </div>
+        <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:10px;padding:10px 14px;margin-bottom:20px">
+          <div style="font-size:11px;color:#FCA5A5">⚠ Invalid format. Enter a 10-digit Indian mobile number starting with 6–9.</div>
+        </div>
+        <button class="btn-gold" style="width:100%;padding:16px;font-size:15px;border-radius:16px;opacity:.5;cursor:not-allowed;margin-bottom:16px">🔒 Send OTP</button>
+        <div style="font-size:10px;color:var(--txf);text-align:center">Rate limited: 5 OTPs per hour per phone number</div>
+      </div>
+    </div>
+    <div class="frame-label">S1-B² · PHONE ENTRY (Error State)</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     OTP VERIFY — MOBILE
+═══════════════════════════════════════════════ -->
+<div class="screen-wrap" id="sw-otp">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="status-time">9:41</div><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="padding:32px 24px;min-height:768px;background:var(--navy)">
+        <span style="font-size:16px;color:var(--txd);cursor:pointer">← Back</span>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;margin:16px 0 4px">Enter OTP</div>
+        <div style="font-size:13px;color:var(--txd);margin-bottom:8px">Sent via SMS to <span style="color:var(--tx);font-weight:600">+91 98765 43210</span></div>
+        <div style="font-size:11px;color:var(--txf);margin-bottom:28px">via MSG91 · 6 digits · Valid 5 min</div>
+        <!-- OTP input boxes -->
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px">
+          <div class="otp-box filled">4</div>
+          <div class="otp-box filled">7</div>
+          <div class="otp-box filled">2</div>
+          <div class="otp-box active" style="position:relative">_</div>
+          <div class="otp-box"></div>
+          <div class="otp-box"></div>
+        </div>
+        <!-- Timer + attempts -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div id="otp-timer" style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--txd);font-weight:600">⏱ 04:23</div>
+          <div style="font-size:11px;color:var(--txf)">Attempt <span style="color:var(--tx);font-weight:600">1</span> of 3</div>
+        </div>
+        <div style="text-align:center;margin-bottom:28px"><span style="font-size:11px;color:var(--txf)">Didn't receive it? </span><span style="font-size:11px;color:var(--gold);cursor:pointer;font-weight:600">Resend OTP</span></div>
+        <button class="btn-gold" style="width:100%;padding:16px;font-size:15px;border-radius:16px;margin-bottom:14px">Verify &amp; Continue →</button>
+        <div style="font-size:10px;color:var(--txf);text-align:center;line-height:1.6">POST /api/v1/auth/otp/verify<br>On success: JWT stored in flutter_secure_storage</div>
+      </div>
+    </div>
+    <div class="frame-label">S1-C · OTP VERIFY · Mobile</div>
+  </div>
+
+  <!-- OTP error state -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="status-time">9:41</div><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="padding:32px 24px;min-height:768px;background:var(--navy)">
+        <span style="font-size:16px;color:var(--txd);cursor:pointer">← Back</span>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;margin:16px 0 4px">Enter OTP</div>
+        <div style="font-size:13px;color:var(--txd);margin-bottom:28px">Sent to <span style="font-weight:600;color:var(--tx)">+91 98765 43210</span></div>
+        <!-- Wrong OTP boxes -->
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
+          <div class="otp-box error">1</div><div class="otp-box error">2</div><div class="otp-box error">3</div>
+          <div class="otp-box error">4</div><div class="otp-box error">5</div><div class="otp-box error">6</div>
+        </div>
+        <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.28);border-radius:12px;padding:12px 14px;margin-bottom:20px">
+          <div style="font-size:12px;color:#FCA5A5;font-weight:600;margin-bottom:2px">⚠ Incorrect OTP</div>
+          <div style="font-size:11px;color:var(--txd)">2 attempts remaining before this OTP is invalidated.</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:24px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--red)">⏱ 03:47</div>
+          <div style="font-size:11px;color:var(--txf)">Attempt <span style="color:#FCA5A5;font-weight:600">2</span> of 3</div>
+        </div>
+        <button class="btn-gold" style="width:100%;padding:16px;font-size:15px;border-radius:16px;margin-bottom:12px">Try Again</button>
+        <button class="btn-outline" style="width:100%;padding:14px;font-size:13px;border-radius:14px">Resend OTP</button>
+      </div>
+    </div>
+    <div class="frame-label">S1-C² · OTP ERROR STATE</div>
+  </div>
+
+  <!-- OTP expired -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="status-time">9:41</div><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="padding:32px 24px;min-height:500px;background:var(--navy)">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;margin:16px 0 4px">OTP Expired</div>
+        <div style="font-size:13px;color:var(--txd);margin-bottom:28px">Your OTP has timed out after 5 minutes</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px;opacity:.35">
+          <div class="otp-box">•</div><div class="otp-box">•</div><div class="otp-box">•</div>
+          <div class="otp-box">•</div><div class="otp-box">•</div><div class="otp-box">•</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--red);text-align:center;margin-bottom:24px">⏱ 00:00 — Expired</div>
+        <button class="btn-gold" style="width:100%;padding:16px;font-size:15px;border-radius:16px;margin-bottom:12px">📲 Resend New OTP</button>
+        <div style="font-size:10px;color:var(--txf);text-align:center">Previous OTP invalidated. New OTP valid for 5 minutes.</div>
+      </div>
+    </div>
+    <div class="frame-label">S1-C³ · OTP EXPIRED</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     GHOST PROFILE CLAIM — MOBILE
+═══════════════════════════════════════════════ -->
+<div class="screen-wrap" id="sw-claim">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="status-time">9:41</div><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="padding:20px 22px 24px;min-height:768px;background:var(--navy);overflow-y:auto">
+        <!-- Ghost found banner -->
+        <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.25);border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+          <span style="font-size:22px">👻</span>
+          <div><div style="font-size:12px;font-weight:700;color:#4ADE80">Ghost profile found!</div><div style="font-size:11px;color:var(--txd);margin-top:2px">Pre-added to TechCup 2026 by Rahul Kumar</div></div>
+        </div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:2px">Claim Your Profile</div>
+        <div style="font-size:12px;color:var(--txd);margin-bottom:18px">Verify your identity and complete your cricket profile</div>
+        <!-- Avatar upload -->
+        <div style="text-align:center;margin-bottom:18px">
+          <div style="position:relative;width:76px;height:76px;margin:0 auto 6px;cursor:pointer">
+            <div style="width:76px;height:76px;border-radius:50%;background:var(--slate3);border:2px dashed rgba(245,158,11,.5);display:flex;align-items:center;justify-content:center;font-size:28px">📷</div>
+            <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid var(--navy);color:#1a0f00;font-weight:700">+</div>
+          </div>
+          <div style="font-size:9px;color:var(--txf)">Tap to upload · JPEG/PNG/WebP · Max 5MB · S3 presigned URL</div>
+        </div>
+        <!-- Fields -->
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div class="section-lbl" style="margin-bottom:5px">FULL NAME</div>
+            <input class="input-field" value="Anjali Sharma" style="background:var(--slate3)">
+          </div>
+          <!-- Playing role -->
+          <div>
+            <div class="section-lbl" style="margin-bottom:7px">PLAYING ROLE <span style="color:var(--red);margin-left:2px">*</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <div class="role-chip role-bat">🏏 Batter</div>
+              <div class="role-chip role-bowl">🎳 Bowler</div>
+              <div class="role-chip role-ar" style="border-width:2px">⭐ All-rounder ✓</div>
+              <div class="role-chip role-wk">🧤 Keeper</div>
+            </div>
+          </div>
+          <!-- Batting / Bowling -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <div class="section-lbl" style="margin-bottom:5px">BATTING</div>
+              <select class="input-field" style="background:var(--slate3);font-size:13px;padding:10px 12px">
+                <option>Right-hand bat</option><option>Left-hand bat</option>
+              </select>
+            </div>
+            <div>
+              <div class="section-lbl" style="margin-bottom:5px">BOWLING</div>
+              <select class="input-field" style="background:var(--slate3);font-size:13px;padding:10px 12px">
+                <option>Off spin</option><option>Fast</option><option>Leg spin</option><option>Medium pace</option><option>Left-arm spin</option>
+              </select>
+            </div>
+          </div>
+          <!-- Experience Level — confirmed valid: User entity field, PUT /users/{id}/cricket-profile -->
+          <div>
+            <div class="section-lbl" style="margin-bottom:7px">EXPERIENCE LEVEL <span style="color:var(--txf);font-size:8px;margin-left:4px">User entity · /cricket-profile</span></div>
+            <div style="display:flex;gap:6px">
+              <div class="exp-chip">Beginner</div>
+              <div class="exp-chip sel">Intermediate ✓</div>
+              <div class="exp-chip">Advanced</div>
+              <div class="exp-chip">Pro</div>
+            </div>
+          </div>
+          <!-- City -->
+          <div>
+            <div class="section-lbl" style="margin-bottom:5px">CITY</div>
+            <input class="input-field" value="Mumbai" style="background:var(--slate3)">
+          </div>
+          <!-- Jersey -->
+          <div>
+            <div class="section-lbl" style="margin-bottom:5px">JERSEY NUMBER (optional)</div>
+            <input class="input-field" type="number" value="7" style="background:var(--slate3);width:100px">
+          </div>
+        </div>
+        <!-- APIs note -->
+        <div style="margin-top:14px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.14);border-radius:10px;padding:10px 12px">
+          <div style="font-size:9px;color:var(--txf);line-height:1.7">POST /auth/claim-profile · PUT /users/{id}/basic<br>PUT /users/{id}/cricket-profile · PUT /users/{id}/photo</div>
+        </div>
+        <button class="btn-green" style="width:100%;padding:15px;font-size:15px;border-radius:16px;margin-top:14px">✓ Confirm &amp; Activate Profile</button>
+      </div>
+    </div>
+    <div class="frame-label">S1-D · GHOST PROFILE CLAIM · Mobile</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     NEW PROFILE SETUP — MOBILE (first time user, no ghost)
+═══════════════════════════════════════════════ -->
+<div class="screen-wrap" id="sw-new-profile">
+  <div>
+    <div class="phone">
+      <div class="phone-notch"><div class="status-time">9:41</div><div class="notch-pill"></div><span class="status-icons">▲●■</span></div>
+      <div class="phone-body" style="padding:20px 22px 24px;min-height:768px;background:var(--navy);overflow-y:auto">
+        <!-- Progress stepper -->
+        <div style="display:flex;align-items:center;gap:0;margin-bottom:20px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1a0f00;flex-shrink:0">1</div>
+          <div style="flex:1;height:2px;background:var(--gold)"></div>
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1a0f00;flex-shrink:0">2</div>
+          <div style="flex:1;height:2px;background:var(--bdr2)"></div>
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--slate3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--txf);flex-shrink:0;border:1.5px solid var(--bdr2)">3</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--txf);margin-bottom:20px">
+          <span style="color:var(--gold);font-weight:600">Phone ✓</span>
+          <span style="color:var(--gold);font-weight:600;margin-left:10px">Profile</span>
+          <span>Cricket</span>
+        </div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;margin-bottom:2px">Create Your Profile</div>
+        <div style="font-size:12px;color:var(--txd);margin-bottom:18px">No existing profile found. Set one up!</div>
+        <!-- Avatar -->
+        <div style="text-align:center;margin-bottom:18px">
+          <div style="position:relative;width:76px;height:76px;margin:0 auto 6px;cursor:pointer">
+            <div style="width:76px;height:76px;border-radius:50%;background:var(--slate3);border:2px dashed var(--bdr2);display:flex;align-items:center;justify-content:center;font-size:28px">📷</div>
+            <div style="position:absolute;bottom:0;right:0;width:24px;height:24px;background:var(--slate4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid var(--navy);color:var(--txd)">+</div>
+          </div>
+          <div style="font-size:9px;color:var(--txf)">Profile photo · 5MB max · JPEG/PNG/WebP</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <div class="section-lbl" style="margin-bottom:5px">FULL NAME <span style="color:var(--red)">*</span></div>
+            <input class="input-field" placeholder="Your full name" style="background:var(--slate3)">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <div class="section-lbl" style="margin-bottom:5px">DATE OF BIRTH</div>
+              <input class="input-field" type="date" style="background:var(--slate3);font-size:12px;padding:10px 12px">
+            </div>
+            <div>
+              <div class="section-lbl" style="margin-bottom:5px">CITY</div>
+              <input class="input-field" placeholder="City" style="background:var(--slate3)">
+            </div>
+          </div>
+          <div>
+            <div class="section-lbl" style="margin-bottom:5px">PLAYING ROLE <span style="color:var(--red)">*</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <div class="role-chip role-bat">🏏 Batter</div>
+              <div class="role-chip role-bowl">🎳 Bowler</div>
+              <div class="role-chip role-ar">⭐ All-rounder</div>
+              <div class="role-chip role-wk">🧤 Keeper</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-gold" style="width:100%;padding:15px;font-size:15px;border-radius:16px;margin-top:18px">Continue to Cricket Profile →</button>
+        <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--txf)">PUT /users/{id}/basic · Redirects based on profileStatus</div>
+      </div>
+    </div>
+    <div class="frame-label">S1-E · NEW PROFILE SETUP · Mobile</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     WEB AUTH — Side-by-side layout
+═══════════════════════════════════════════════ -->
+<div class="screen-wrap" id="sw-web-auth">
+  <div>
+    <div class="web-frame">
+      <div class="web-chrome">
+        <div class="wdot" style="background:#FC8181"></div>
+        <div class="wdot" style="background:#FCD34D"></div>
+        <div class="wdot" style="background:#4ADE80"></div>
+        <div class="wurl">crichere.app/auth</div>
+        <span class="badge b-gray" style="margin-left:auto">Web · 1440px</span>
+      </div>
+      <!-- Split layout -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;min-height:664px">
+        <!-- Left: branding panel -->
+        <div style="background:radial-gradient(ellipse at 30% 40%,rgba(245,158,11,.12),transparent 60%),var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;border-right:1px solid var(--bdr);position:relative;overflow:hidden">
+          <!-- Rings -->
+          <div style="position:absolute;width:480px;height:480px;border-radius:50%;border:1px solid rgba(245,158,11,.06);top:50%;left:50%;transform:translate(-50%,-50%);animation:ring 5s infinite"></div>
+          <div style="position:absolute;width:340px;height:340px;border-radius:50%;border:1px solid rgba(245,158,11,.09);top:50%;left:50%;transform:translate(-50%,-50%);animation:ring 5s 1.5s infinite"></div>
+          <!-- Icon -->
+          <div style="width:100px;height:100px;background:rgba(245,158,11,.1);border-radius:50%;border:2px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:48px;margin-bottom:24px;animation:glow 3s infinite;position:relative;z-index:1">🏏</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:56px;font-weight:700;letter-spacing:3px;background:linear-gradient(135deg,#FCD34D,#F59E0B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;position:relative;z-index:1">CRICHERE</div>
+          <div style="font-size:15px;color:var(--txd);text-align:center;margin-bottom:32px;position:relative;z-index:1;line-height:1.6">India's #1 cricket auction platform.<br>Real-time live auctions for every league.</div>
+          <!-- Stats row -->
+          <div style="display:flex;gap:28px;position:relative;z-index:1">
+            <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--gold)">500+</div><div style="font-size:11px;color:var(--txf)">Leagues</div></div>
+            <div style="width:1px;background:var(--bdr)"></div>
+            <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--green)">50k+</div><div style="font-size:11px;color:var(--txf)">Players</div></div>
+            <div style="width:1px;background:var(--bdr)"></div>
+            <div style="text-align:center"><div style="font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:var(--blue)">5k</div><div style="font-size:11px;color:var(--txf)">Concurrent viewers</div></div>
+          </div>
+        </div>
+        <!-- Right: auth form -->
+        <div style="background:var(--navym);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px">
+          <div style="width:100%;max-width:380px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;margin-bottom:4px">Sign In</div>
+            <div style="font-size:13px;color:var(--txd);margin-bottom:28px">No password needed — just your phone number</div>
+            <!-- Input -->
+            <div class="card" style="padding:18px;margin-bottom:12px;border-color:rgba(245,158,11,.22)">
+              <div class="section-lbl" style="margin-bottom:10px">MOBILE NUMBER</div>
+              <div style="display:flex;gap:10px">
+                <div style="background:var(--slate3);border:1.5px solid var(--bdr2);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:6px;font-size:14px;color:var(--txd);cursor:pointer;flex-shrink:0">🇮🇳 <strong>+91</strong></div>
+                <input class="input-field" placeholder="Enter 10-digit number" style="flex:1;font-size:15px;font-family:'JetBrains Mono',monospace">
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--txf);margin-bottom:18px;text-align:center">Format: starts with 6–9, 10 digits · POST /api/v1/auth/otp/send</div>
+            <button class="btn-gold" style="width:100%;padding:16px;font-size:15px;border-radius:14px;margin-bottom:20px">🔒 Send OTP</button>
+            <div style="text-align:center;margin-bottom:28px"><span style="font-size:12px;color:var(--txf)">New here? </span><span style="font-size:12px;color:var(--gold);cursor:pointer;font-weight:600">Browse leagues without signing in →</span></div>
+            <!-- OTP step preview -->
+            <div style="border-top:1px solid var(--bdr);padding-top:20px">
+              <div style="font-size:11px;font-weight:700;color:var(--txf);margin-bottom:12px;letter-spacing:.5px">AFTER OTP — YOU'LL ALSO GET</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:10px;align-items:center"><div style="width:30px;height:30px;border-radius:8px;background:var(--slate3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🏏</div><div style="font-size:12px;color:var(--txd)">Claim your pre-created ghost profile if added by admin</div></div>
+                <div style="display:flex;gap:10px;align-items:center"><div style="width:30px;height:30px;border-radius:8px;background:var(--slate3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📲</div><div style="font-size:12px;color:var(--txd)">Full access to live auctions, squad management, and stats</div></div>
+                <div style="display:flex;gap:10px;align-items:center"><div style="width:30px;height:30px;border-radius:8px;background:var(--slate3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🔒</div><div style="font-size:12px;color:var(--txd)">JWT secured · Keychain/Keystore · No passwords stored</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S1-F · WEB AUTH · 1440×700 · Split layout</div>
+  </div>
+
+  <!-- Web OTP step -->
+  <div>
+    <div class="web-frame" style="min-height:500px">
+      <div class="web-chrome">
+        <div class="wdot" style="background:#FC8181"></div>
+        <div class="wdot" style="background:#FCD34D"></div>
+        <div class="wdot" style="background:#4ADE80"></div>
+        <div class="wurl">crichere.app/auth/verify</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;min-height:464px">
+        <!-- Left branding -->
+        <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;border-right:1px solid var(--bdr)">
+          <div style="text-align:center;padding:40px">
+            <div style="font-size:56px;margin-bottom:16px">📱</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--gold);margin-bottom:8px">Check your SMS</div>
+            <div style="font-size:13px;color:var(--txd);line-height:1.7">We sent a 6-digit OTP to<br><strong style="color:var(--tx)">+91 98765 43210</strong></div>
+            <div style="margin-top:20px;font-size:11px;color:var(--txf)">Via MSG91 · Valid for 5 minutes</div>
+          </div>
+        </div>
+        <!-- Right OTP form -->
+        <div style="background:var(--navym);display:flex;align-items:center;justify-content:center;padding:40px">
+          <div style="width:100%;max-width:360px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;margin-bottom:4px">Enter OTP</div>
+            <div style="font-size:13px;color:var(--txd);margin-bottom:24px">6-digit code sent to your mobile</div>
+            <div style="display:flex;gap:10px;margin-bottom:18px;justify-content:center">
+              <div class="otp-box filled" style="width:56px;height:68px;font-size:28px">4</div>
+              <div class="otp-box filled" style="width:56px;height:68px;font-size:28px">7</div>
+              <div class="otp-box filled" style="width:56px;height:68px;font-size:28px">2</div>
+              <div class="otp-box active" style="width:56px;height:68px;font-size:28px">_</div>
+              <div class="otp-box" style="width:56px;height:68px;font-size:28px"></div>
+              <div class="otp-box" style="width:56px;height:68px;font-size:28px"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:20px;font-size:12px">
+              <div style="font-family:'JetBrains Mono',monospace;color:var(--txd)">⏱ 04:23 remaining</div>
+              <div style="color:var(--gold);cursor:pointer;font-weight:600">Resend OTP</div>
+            </div>
+            <button class="btn-gold" style="width:100%;padding:15px;font-size:15px;border-radius:14px;margin-bottom:12px">Verify &amp; Enter →</button>
+            <div style="text-align:center"><span style="font-size:11px;color:var(--txf);cursor:pointer">← Change number</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="frame-label">S1-G · WEB OTP VERIFY · Split layout</div>
+  </div>
+</div>
+
+</div><!-- /canvas -->
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll('.screen-wrap').forEach(s => s.classList.remove('show'));
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('act'));
+  document.getElementById('sw-'+id)?.classList.add('show');
+  event.target.classList.add('act');
+  window.scrollTo(0, 0);
+}
+// OTP countdown
+let t = 263;
+setInterval(() => {
+  t = t > 0 ? t - 1 : 0;
+  const el = document.getElementById('otp-timer');
+  if (el) {
+    const m = String(Math.floor(t/60)).padStart(2,'0');
+    const s = String(t%60).padStart(2,'0');
+    el.textContent = `⏱ ${m}:${s}`;
+    el.style.color = t < 60 ? 'var(--red)' : 'var(--txd)';
+  }
+}, 1000);
+</script>
+</body>
+</html>
