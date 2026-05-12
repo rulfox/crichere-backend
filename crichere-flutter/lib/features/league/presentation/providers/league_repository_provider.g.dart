@@ -368,3 +368,155 @@ final class LeaguesProvider
 }
 
 String _$leaguesHash() => r'9f30bdbde32f4b4f2ee13527cdb32d3966f137b3';
+
+@ProviderFor(leagueFranchises)
+final leagueFranchisesProvider = LeagueFranchisesFamily._();
+
+final class LeagueFranchisesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Franchise>>,
+          List<Franchise>,
+          FutureOr<List<Franchise>>
+        >
+    with $FutureModifier<List<Franchise>>, $FutureProvider<List<Franchise>> {
+  LeagueFranchisesProvider._({
+    required LeagueFranchisesFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'leagueFranchisesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$leagueFranchisesHash();
+
+  @override
+  String toString() {
+    return r'leagueFranchisesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Franchise>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Franchise>> create(Ref ref) {
+    final argument = this.argument as String;
+    return leagueFranchises(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LeagueFranchisesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$leagueFranchisesHash() => r'8c8adb5d495015ac929ad01e8b858cbd0bc1caba';
+
+final class LeagueFranchisesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<Franchise>>, String> {
+  LeagueFranchisesFamily._()
+    : super(
+        retry: null,
+        name: r'leagueFranchisesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  LeagueFranchisesProvider call(String leagueId) =>
+      LeagueFranchisesProvider._(argument: leagueId, from: this);
+
+  @override
+  String toString() => r'leagueFranchisesProvider';
+}
+
+@ProviderFor(leaguePlayers)
+final leaguePlayersProvider = LeaguePlayersFamily._();
+
+final class LeaguePlayersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<LeaguePlayer>>,
+          List<LeaguePlayer>,
+          FutureOr<List<LeaguePlayer>>
+        >
+    with
+        $FutureModifier<List<LeaguePlayer>>,
+        $FutureProvider<List<LeaguePlayer>> {
+  LeaguePlayersProvider._({
+    required LeaguePlayersFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'leaguePlayersProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$leaguePlayersHash();
+
+  @override
+  String toString() {
+    return r'leaguePlayersProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<LeaguePlayer>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<LeaguePlayer>> create(Ref ref) {
+    final argument = this.argument as String;
+    return leaguePlayers(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LeaguePlayersProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$leaguePlayersHash() => r'16f4f316a2afc0d9341a9579d84a70d156f98552';
+
+final class LeaguePlayersFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<LeaguePlayer>>, String> {
+  LeaguePlayersFamily._()
+    : super(
+        retry: null,
+        name: r'leaguePlayersProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  LeaguePlayersProvider call(String leagueId) =>
+      LeaguePlayersProvider._(argument: leagueId, from: this);
+
+  @override
+  String toString() => r'leaguePlayersProvider';
+}

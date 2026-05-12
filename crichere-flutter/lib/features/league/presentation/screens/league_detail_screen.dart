@@ -38,6 +38,22 @@ class LeagueDetailScreen extends ConsumerWidget {
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
                 child: const Text('AUCTIONEER PANEL (WEB)'),
               ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => context.router.push(FeeManagementRoute(leagueId: leagueId)),
+                    icon: const Icon(Icons.payments),
+                    label: const Text('FEES'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => context.router.push(ForfeitManagementRoute(leagueId: leagueId)),
+                    icon: const Icon(Icons.person_off),
+                    label: const Text('FORFEITS'),
+                  ),
+                ],
+              ),
             ],
           );
         },

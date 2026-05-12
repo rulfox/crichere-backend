@@ -91,6 +91,45 @@ final class AuthRepositoryProvider
 
 String _$authRepositoryHash() => r'93ebba2c09a00e1ad166869d298dd824d8943600';
 
+@ProviderFor(currentUser)
+final currentUserProvider = CurrentUserProvider._();
+
+final class CurrentUserProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<AuthResponse>,
+          AuthResponse,
+          FutureOr<AuthResponse>
+        >
+    with $FutureModifier<AuthResponse>, $FutureProvider<AuthResponse> {
+  CurrentUserProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentUserProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentUserHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<AuthResponse> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<AuthResponse> create(Ref ref) {
+    return currentUser(ref);
+  }
+}
+
+String _$currentUserHash() => r'4d9410bc980557f91bb2370eff4a97266fb4336c';
+
 @ProviderFor(sendOtpUseCase)
 final sendOtpUseCaseProvider = SendOtpUseCaseProvider._();
 

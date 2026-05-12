@@ -75,6 +75,23 @@ Map<String, dynamic> _$PlayerUnsoldToJson(PlayerUnsold instance) =>
       'runtimeType': instance.$type,
     };
 
+PlayerForceAssigned _$PlayerForceAssignedFromJson(Map<String, dynamic> json) =>
+    PlayerForceAssigned(
+      playerId: json['playerId'] as String,
+      franchiseId: json['franchiseId'] as String,
+      franchiseName: json['franchiseName'] as String,
+      $type: json['runtimeType'] as String?,
+    );
+
+Map<String, dynamic> _$PlayerForceAssignedToJson(
+  PlayerForceAssigned instance,
+) => <String, dynamic>{
+  'playerId': instance.playerId,
+  'franchiseId': instance.franchiseId,
+  'franchiseName': instance.franchiseName,
+  'runtimeType': instance.$type,
+};
+
 RoundStarted _$RoundStartedFromJson(Map<String, dynamic> json) => RoundStarted(
   roundNumber: (json['roundNumber'] as num).toInt(),
   $type: json['runtimeType'] as String?,

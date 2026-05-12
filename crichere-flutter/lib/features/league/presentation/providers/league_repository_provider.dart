@@ -1,10 +1,12 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:crichere_flutter/core/database/app_database.dart';
+import 'package:crichere_flutter/core/database/app_database.dart' hide Franchise, LeaguePlayer, League;
 import 'package:crichere_flutter/core/providers/auth_provider.dart';
 import 'package:crichere_flutter/features/league/data/league_api.dart';
 import 'package:crichere_flutter/features/league/data/league_repository_impl.dart';
 import 'package:crichere_flutter/features/league/domain/repositories/league_repository.dart';
 import 'package:crichere_flutter/features/league/domain/entities/league.dart' as domain;
+import 'package:crichere_flutter/features/league/domain/entities/league_player.dart';
+import 'package:crichere_flutter/features/franchise/domain/entities/franchise.dart';
 import 'package:crichere_flutter/features/league/domain/usecases/get_leagues_usecase.dart';
 import 'package:crichere_flutter/features/league/domain/usecases/get_league_detail_usecase.dart';
 import 'package:crichere_flutter/features/league/domain/usecases/create_league_usecase.dart';
@@ -45,4 +47,14 @@ ImportPlayersUseCase importPlayersUseCase(Ref ref) => ImportPlayersUseCase(ref.w
 @riverpod
 Future<List<domain.League>> leagues(Ref ref) async {
   return ref.watch(getLeaguesUseCaseProvider).call();
+}
+
+@riverpod
+Future<List<Franchise>> leagueFranchises(Ref ref, String leagueId) {
+  return ref.watch(leagueRepositoryProvider).getFranchises(leagueId);
+}
+
+@riverpod
+Future<List<LeaguePlayer>> leaguePlayers(Ref ref, String leagueId) {
+  return ref.watch(leagueRepositoryProvider).getLeaguePlayers(leagueId);
 }

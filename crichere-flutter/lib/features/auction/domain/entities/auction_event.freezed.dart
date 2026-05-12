@@ -39,6 +39,10 @@ AuctionEvent _$AuctionEventFromJson(
           return PlayerUnsold.fromJson(
             json
           );
+                case 'playerForceAssigned':
+          return PlayerForceAssigned.fromJson(
+            json
+          );
                 case 'roundStarted':
           return RoundStarted.fromJson(
             json
@@ -109,7 +113,7 @@ extension AuctionEventPatterns on AuctionEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PlayerUp value)?  playerUp,TResult Function( BidPlaced value)?  bidPlaced,TResult Function( PlayerSold value)?  playerSold,TResult Function( BidUndone value)?  bidUndone,TResult Function( SoldReverted value)?  soldReverted,TResult Function( PlayerUnsold value)?  playerUnsold,TResult Function( RoundStarted value)?  roundStarted,TResult Function( AuctionStarted value)?  auctionStarted,TResult Function( AuctionCompleted value)?  auctionCompleted,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PlayerUp value)?  playerUp,TResult Function( BidPlaced value)?  bidPlaced,TResult Function( PlayerSold value)?  playerSold,TResult Function( BidUndone value)?  bidUndone,TResult Function( SoldReverted value)?  soldReverted,TResult Function( PlayerUnsold value)?  playerUnsold,TResult Function( PlayerForceAssigned value)?  playerForceAssigned,TResult Function( RoundStarted value)?  roundStarted,TResult Function( AuctionStarted value)?  auctionStarted,TResult Function( AuctionCompleted value)?  auctionCompleted,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
@@ -118,7 +122,8 @@ return bidPlaced(_that);case PlayerSold() when playerSold != null:
 return playerSold(_that);case BidUndone() when bidUndone != null:
 return bidUndone(_that);case SoldReverted() when soldReverted != null:
 return soldReverted(_that);case PlayerUnsold() when playerUnsold != null:
-return playerUnsold(_that);case RoundStarted() when roundStarted != null:
+return playerUnsold(_that);case PlayerForceAssigned() when playerForceAssigned != null:
+return playerForceAssigned(_that);case RoundStarted() when roundStarted != null:
 return roundStarted(_that);case AuctionStarted() when auctionStarted != null:
 return auctionStarted(_that);case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted(_that);case _:
@@ -139,7 +144,7 @@ return auctionCompleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PlayerUp value)  playerUp,required TResult Function( BidPlaced value)  bidPlaced,required TResult Function( PlayerSold value)  playerSold,required TResult Function( BidUndone value)  bidUndone,required TResult Function( SoldReverted value)  soldReverted,required TResult Function( PlayerUnsold value)  playerUnsold,required TResult Function( RoundStarted value)  roundStarted,required TResult Function( AuctionStarted value)  auctionStarted,required TResult Function( AuctionCompleted value)  auctionCompleted,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PlayerUp value)  playerUp,required TResult Function( BidPlaced value)  bidPlaced,required TResult Function( PlayerSold value)  playerSold,required TResult Function( BidUndone value)  bidUndone,required TResult Function( SoldReverted value)  soldReverted,required TResult Function( PlayerUnsold value)  playerUnsold,required TResult Function( PlayerForceAssigned value)  playerForceAssigned,required TResult Function( RoundStarted value)  roundStarted,required TResult Function( AuctionStarted value)  auctionStarted,required TResult Function( AuctionCompleted value)  auctionCompleted,}){
 final _that = this;
 switch (_that) {
 case PlayerUp():
@@ -148,7 +153,8 @@ return bidPlaced(_that);case PlayerSold():
 return playerSold(_that);case BidUndone():
 return bidUndone(_that);case SoldReverted():
 return soldReverted(_that);case PlayerUnsold():
-return playerUnsold(_that);case RoundStarted():
+return playerUnsold(_that);case PlayerForceAssigned():
+return playerForceAssigned(_that);case RoundStarted():
 return roundStarted(_that);case AuctionStarted():
 return auctionStarted(_that);case AuctionCompleted():
 return auctionCompleted(_that);}
@@ -165,7 +171,7 @@ return auctionCompleted(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PlayerUp value)?  playerUp,TResult? Function( BidPlaced value)?  bidPlaced,TResult? Function( PlayerSold value)?  playerSold,TResult? Function( BidUndone value)?  bidUndone,TResult? Function( SoldReverted value)?  soldReverted,TResult? Function( PlayerUnsold value)?  playerUnsold,TResult? Function( RoundStarted value)?  roundStarted,TResult? Function( AuctionStarted value)?  auctionStarted,TResult? Function( AuctionCompleted value)?  auctionCompleted,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PlayerUp value)?  playerUp,TResult? Function( BidPlaced value)?  bidPlaced,TResult? Function( PlayerSold value)?  playerSold,TResult? Function( BidUndone value)?  bidUndone,TResult? Function( SoldReverted value)?  soldReverted,TResult? Function( PlayerUnsold value)?  playerUnsold,TResult? Function( PlayerForceAssigned value)?  playerForceAssigned,TResult? Function( RoundStarted value)?  roundStarted,TResult? Function( AuctionStarted value)?  auctionStarted,TResult? Function( AuctionCompleted value)?  auctionCompleted,}){
 final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
@@ -174,7 +180,8 @@ return bidPlaced(_that);case PlayerSold() when playerSold != null:
 return playerSold(_that);case BidUndone() when bidUndone != null:
 return bidUndone(_that);case SoldReverted() when soldReverted != null:
 return soldReverted(_that);case PlayerUnsold() when playerUnsold != null:
-return playerUnsold(_that);case RoundStarted() when roundStarted != null:
+return playerUnsold(_that);case PlayerForceAssigned() when playerForceAssigned != null:
+return playerForceAssigned(_that);case RoundStarted() when roundStarted != null:
 return roundStarted(_that);case AuctionStarted() when auctionStarted != null:
 return auctionStarted(_that);case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted(_that);case _:
@@ -194,7 +201,7 @@ return auctionCompleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)?  playerUp,TResult Function( String franchiseId,  String franchiseName,  int amount)?  bidPlaced,TResult Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult Function()?  bidUndone,TResult Function()?  soldReverted,TResult Function( String playerId)?  playerUnsold,TResult Function( int roundNumber)?  roundStarted,TResult Function()?  auctionStarted,TResult Function()?  auctionCompleted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)?  playerUp,TResult Function( String franchiseId,  String franchiseName,  int amount)?  bidPlaced,TResult Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult Function()?  bidUndone,TResult Function()?  soldReverted,TResult Function( String playerId)?  playerUnsold,TResult Function( String playerId,  String franchiseId,  String franchiseName)?  playerForceAssigned,TResult Function( int roundNumber)?  roundStarted,TResult Function()?  auctionStarted,TResult Function()?  auctionCompleted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
 return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice);case BidPlaced() when bidPlaced != null:
@@ -202,7 +209,8 @@ return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount);case Player
 return playerSold(_that.playerId,_that.franchiseId,_that.amount);case BidUndone() when bidUndone != null:
 return bidUndone();case SoldReverted() when soldReverted != null:
 return soldReverted();case PlayerUnsold() when playerUnsold != null:
-return playerUnsold(_that.playerId);case RoundStarted() when roundStarted != null:
+return playerUnsold(_that.playerId);case PlayerForceAssigned() when playerForceAssigned != null:
+return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case RoundStarted() when roundStarted != null:
 return roundStarted(_that.roundNumber);case AuctionStarted() when auctionStarted != null:
 return auctionStarted();case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted();case _:
@@ -223,7 +231,7 @@ return auctionCompleted();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)  playerUp,required TResult Function( String franchiseId,  String franchiseName,  int amount)  bidPlaced,required TResult Function( String playerId,  String franchiseId,  int amount)  playerSold,required TResult Function()  bidUndone,required TResult Function()  soldReverted,required TResult Function( String playerId)  playerUnsold,required TResult Function( int roundNumber)  roundStarted,required TResult Function()  auctionStarted,required TResult Function()  auctionCompleted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)  playerUp,required TResult Function( String franchiseId,  String franchiseName,  int amount)  bidPlaced,required TResult Function( String playerId,  String franchiseId,  int amount)  playerSold,required TResult Function()  bidUndone,required TResult Function()  soldReverted,required TResult Function( String playerId)  playerUnsold,required TResult Function( String playerId,  String franchiseId,  String franchiseName)  playerForceAssigned,required TResult Function( int roundNumber)  roundStarted,required TResult Function()  auctionStarted,required TResult Function()  auctionCompleted,}) {final _that = this;
 switch (_that) {
 case PlayerUp():
 return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice);case BidPlaced():
@@ -231,7 +239,8 @@ return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount);case Player
 return playerSold(_that.playerId,_that.franchiseId,_that.amount);case BidUndone():
 return bidUndone();case SoldReverted():
 return soldReverted();case PlayerUnsold():
-return playerUnsold(_that.playerId);case RoundStarted():
+return playerUnsold(_that.playerId);case PlayerForceAssigned():
+return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case RoundStarted():
 return roundStarted(_that.roundNumber);case AuctionStarted():
 return auctionStarted();case AuctionCompleted():
 return auctionCompleted();}
@@ -248,7 +257,7 @@ return auctionCompleted();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)?  playerUp,TResult? Function( String franchiseId,  String franchiseName,  int amount)?  bidPlaced,TResult? Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult? Function()?  bidUndone,TResult? Function()?  soldReverted,TResult? Function( String playerId)?  playerUnsold,TResult? Function( int roundNumber)?  roundStarted,TResult? Function()?  auctionStarted,TResult? Function()?  auctionCompleted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String playerId,  String playerName,  String? playerPhotoUrl,  int basePrice)?  playerUp,TResult? Function( String franchiseId,  String franchiseName,  int amount)?  bidPlaced,TResult? Function( String playerId,  String franchiseId,  int amount)?  playerSold,TResult? Function()?  bidUndone,TResult? Function()?  soldReverted,TResult? Function( String playerId)?  playerUnsold,TResult? Function( String playerId,  String franchiseId,  String franchiseName)?  playerForceAssigned,TResult? Function( int roundNumber)?  roundStarted,TResult? Function()?  auctionStarted,TResult? Function()?  auctionCompleted,}) {final _that = this;
 switch (_that) {
 case PlayerUp() when playerUp != null:
 return playerUp(_that.playerId,_that.playerName,_that.playerPhotoUrl,_that.basePrice);case BidPlaced() when bidPlaced != null:
@@ -256,7 +265,8 @@ return bidPlaced(_that.franchiseId,_that.franchiseName,_that.amount);case Player
 return playerSold(_that.playerId,_that.franchiseId,_that.amount);case BidUndone() when bidUndone != null:
 return bidUndone();case SoldReverted() when soldReverted != null:
 return soldReverted();case PlayerUnsold() when playerUnsold != null:
-return playerUnsold(_that.playerId);case RoundStarted() when roundStarted != null:
+return playerUnsold(_that.playerId);case PlayerForceAssigned() when playerForceAssigned != null:
+return playerForceAssigned(_that.playerId,_that.franchiseId,_that.franchiseName);case RoundStarted() when roundStarted != null:
 return roundStarted(_that.roundNumber);case AuctionStarted() when auctionStarted != null:
 return auctionStarted();case AuctionCompleted() when auctionCompleted != null:
 return auctionCompleted();case _:
@@ -644,6 +654,83 @@ class _$PlayerUnsoldCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? playerId = null,}) {
   return _then(PlayerUnsold(
 playerId: null == playerId ? _self.playerId : playerId // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class PlayerForceAssigned extends AuctionEvent {
+  const PlayerForceAssigned({required this.playerId, required this.franchiseId, required this.franchiseName, final  String? $type}): $type = $type ?? 'playerForceAssigned',super._();
+  factory PlayerForceAssigned.fromJson(Map<String, dynamic> json) => _$PlayerForceAssignedFromJson(json);
+
+ final  String playerId;
+ final  String franchiseId;
+ final  String franchiseName;
+
+@JsonKey(name: 'runtimeType')
+final String $type;
+
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PlayerForceAssignedCopyWith<PlayerForceAssigned> get copyWith => _$PlayerForceAssignedCopyWithImpl<PlayerForceAssigned>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$PlayerForceAssignedToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlayerForceAssigned&&(identical(other.playerId, playerId) || other.playerId == playerId)&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,playerId,franchiseId,franchiseName);
+
+@override
+String toString() {
+  return 'AuctionEvent.playerForceAssigned(playerId: $playerId, franchiseId: $franchiseId, franchiseName: $franchiseName)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PlayerForceAssignedCopyWith<$Res> implements $AuctionEventCopyWith<$Res> {
+  factory $PlayerForceAssignedCopyWith(PlayerForceAssigned value, $Res Function(PlayerForceAssigned) _then) = _$PlayerForceAssignedCopyWithImpl;
+@useResult
+$Res call({
+ String playerId, String franchiseId, String franchiseName
+});
+
+
+
+
+}
+/// @nodoc
+class _$PlayerForceAssignedCopyWithImpl<$Res>
+    implements $PlayerForceAssignedCopyWith<$Res> {
+  _$PlayerForceAssignedCopyWithImpl(this._self, this._then);
+
+  final PlayerForceAssigned _self;
+  final $Res Function(PlayerForceAssigned) _then;
+
+/// Create a copy of AuctionEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? playerId = null,Object? franchiseId = null,Object? franchiseName = null,}) {
+  return _then(PlayerForceAssigned(
+playerId: null == playerId ? _self.playerId : playerId // ignore: cast_nullable_to_non_nullable
+as String,franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
+as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

@@ -29,6 +29,13 @@ sealed class AuctionEvent with _$AuctionEvent {
   const factory AuctionEvent.bidUndone() = BidUndone;
   const factory AuctionEvent.soldReverted() = SoldReverted;
   const factory AuctionEvent.playerUnsold({required String playerId}) = PlayerUnsold;
+
+  const factory AuctionEvent.playerForceAssigned({
+    required String playerId,
+    required String franchiseId,
+    required String franchiseName,
+  }) = PlayerForceAssigned;
+
   const factory AuctionEvent.roundStarted({required int roundNumber}) = RoundStarted;
   const factory AuctionEvent.auctionStarted() = AuctionStarted;
   const factory AuctionEvent.auctionCompleted() = AuctionCompleted;

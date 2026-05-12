@@ -30,6 +30,10 @@ class AuctionStateNotifier extends _$AuctionStateNotifier {
         status: 'UNSOLD',
         bidHistory: [],
       ),
+      playerForceAssigned: (e) => state.copyWith(
+        status: 'FORCE_ASSIGNED',
+        bidHistory: [],
+      ),
       bidUndone: (_) => state, // Simplified
       soldReverted: (_) => state,
       roundStarted: (e) => state.copyWith(status: 'ROUND_${e.roundNumber}'),

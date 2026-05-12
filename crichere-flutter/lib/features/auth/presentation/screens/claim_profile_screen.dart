@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../providers/auth_repository_provider.dart';
 import '../../domain/entities/auth_enums.dart';
+import '../../../../core/router/app_router.gr.dart';
 
 @RoutePage()
 class ClaimProfileScreen extends HookConsumerWidget {
@@ -78,8 +79,9 @@ class ClaimProfileScreen extends HookConsumerWidget {
                           nameController.text,
                           selectedRole.value,
                         );
-                        // After claiming, maybe show setup or go home
-                        // context.router.replaceAll([const HomeRoute()]);
+                        if (context.mounted) {
+                          context.router.replaceAll([const HomeRoute()]);
+                        }
                       } catch (e) {
                         if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(

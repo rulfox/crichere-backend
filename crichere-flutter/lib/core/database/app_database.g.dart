@@ -1194,6 +1194,904 @@ class PlayersCompanion extends UpdateCompanion<Player> {
   }
 }
 
+class $FranchisesTable extends Franchises
+    with TableInfo<$FranchisesTable, Franchise> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FranchisesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _leagueIdMeta = const VerificationMeta(
+    'leagueId',
+  );
+  @override
+  late final GeneratedColumn<String> leagueId = GeneratedColumn<String>(
+    'league_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _logoUrlMeta = const VerificationMeta(
+    'logoUrl',
+  );
+  @override
+  late final GeneratedColumn<String> logoUrl = GeneratedColumn<String>(
+    'logo_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startingPurseMeta = const VerificationMeta(
+    'startingPurse',
+  );
+  @override
+  late final GeneratedColumn<int> startingPurse = GeneratedColumn<int>(
+    'starting_purse',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currentPurseMeta = const VerificationMeta(
+    'currentPurse',
+  );
+  @override
+  late final GeneratedColumn<int> currentPurse = GeneratedColumn<int>(
+    'current_purse',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    leagueId,
+    name,
+    logoUrl,
+    startingPurse,
+    currentPurse,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'franchises';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Franchise> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('league_id')) {
+      context.handle(
+        _leagueIdMeta,
+        leagueId.isAcceptableOrUnknown(data['league_id']!, _leagueIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_leagueIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('logo_url')) {
+      context.handle(
+        _logoUrlMeta,
+        logoUrl.isAcceptableOrUnknown(data['logo_url']!, _logoUrlMeta),
+      );
+    }
+    if (data.containsKey('starting_purse')) {
+      context.handle(
+        _startingPurseMeta,
+        startingPurse.isAcceptableOrUnknown(
+          data['starting_purse']!,
+          _startingPurseMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_startingPurseMeta);
+    }
+    if (data.containsKey('current_purse')) {
+      context.handle(
+        _currentPurseMeta,
+        currentPurse.isAcceptableOrUnknown(
+          data['current_purse']!,
+          _currentPurseMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_currentPurseMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Franchise map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Franchise(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      leagueId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}league_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      logoUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}logo_url'],
+      ),
+      startingPurse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}starting_purse'],
+      )!,
+      currentPurse: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_purse'],
+      )!,
+    );
+  }
+
+  @override
+  $FranchisesTable createAlias(String alias) {
+    return $FranchisesTable(attachedDatabase, alias);
+  }
+}
+
+class Franchise extends DataClass implements Insertable<Franchise> {
+  final String id;
+  final String leagueId;
+  final String name;
+  final String? logoUrl;
+  final int startingPurse;
+  final int currentPurse;
+  const Franchise({
+    required this.id,
+    required this.leagueId,
+    required this.name,
+    this.logoUrl,
+    required this.startingPurse,
+    required this.currentPurse,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['league_id'] = Variable<String>(leagueId);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || logoUrl != null) {
+      map['logo_url'] = Variable<String>(logoUrl);
+    }
+    map['starting_purse'] = Variable<int>(startingPurse);
+    map['current_purse'] = Variable<int>(currentPurse);
+    return map;
+  }
+
+  FranchisesCompanion toCompanion(bool nullToAbsent) {
+    return FranchisesCompanion(
+      id: Value(id),
+      leagueId: Value(leagueId),
+      name: Value(name),
+      logoUrl: logoUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(logoUrl),
+      startingPurse: Value(startingPurse),
+      currentPurse: Value(currentPurse),
+    );
+  }
+
+  factory Franchise.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Franchise(
+      id: serializer.fromJson<String>(json['id']),
+      leagueId: serializer.fromJson<String>(json['leagueId']),
+      name: serializer.fromJson<String>(json['name']),
+      logoUrl: serializer.fromJson<String?>(json['logoUrl']),
+      startingPurse: serializer.fromJson<int>(json['startingPurse']),
+      currentPurse: serializer.fromJson<int>(json['currentPurse']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'leagueId': serializer.toJson<String>(leagueId),
+      'name': serializer.toJson<String>(name),
+      'logoUrl': serializer.toJson<String?>(logoUrl),
+      'startingPurse': serializer.toJson<int>(startingPurse),
+      'currentPurse': serializer.toJson<int>(currentPurse),
+    };
+  }
+
+  Franchise copyWith({
+    String? id,
+    String? leagueId,
+    String? name,
+    Value<String?> logoUrl = const Value.absent(),
+    int? startingPurse,
+    int? currentPurse,
+  }) => Franchise(
+    id: id ?? this.id,
+    leagueId: leagueId ?? this.leagueId,
+    name: name ?? this.name,
+    logoUrl: logoUrl.present ? logoUrl.value : this.logoUrl,
+    startingPurse: startingPurse ?? this.startingPurse,
+    currentPurse: currentPurse ?? this.currentPurse,
+  );
+  Franchise copyWithCompanion(FranchisesCompanion data) {
+    return Franchise(
+      id: data.id.present ? data.id.value : this.id,
+      leagueId: data.leagueId.present ? data.leagueId.value : this.leagueId,
+      name: data.name.present ? data.name.value : this.name,
+      logoUrl: data.logoUrl.present ? data.logoUrl.value : this.logoUrl,
+      startingPurse: data.startingPurse.present
+          ? data.startingPurse.value
+          : this.startingPurse,
+      currentPurse: data.currentPurse.present
+          ? data.currentPurse.value
+          : this.currentPurse,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Franchise(')
+          ..write('id: $id, ')
+          ..write('leagueId: $leagueId, ')
+          ..write('name: $name, ')
+          ..write('logoUrl: $logoUrl, ')
+          ..write('startingPurse: $startingPurse, ')
+          ..write('currentPurse: $currentPurse')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, leagueId, name, logoUrl, startingPurse, currentPurse);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Franchise &&
+          other.id == this.id &&
+          other.leagueId == this.leagueId &&
+          other.name == this.name &&
+          other.logoUrl == this.logoUrl &&
+          other.startingPurse == this.startingPurse &&
+          other.currentPurse == this.currentPurse);
+}
+
+class FranchisesCompanion extends UpdateCompanion<Franchise> {
+  final Value<String> id;
+  final Value<String> leagueId;
+  final Value<String> name;
+  final Value<String?> logoUrl;
+  final Value<int> startingPurse;
+  final Value<int> currentPurse;
+  final Value<int> rowid;
+  const FranchisesCompanion({
+    this.id = const Value.absent(),
+    this.leagueId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.logoUrl = const Value.absent(),
+    this.startingPurse = const Value.absent(),
+    this.currentPurse = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  FranchisesCompanion.insert({
+    required String id,
+    required String leagueId,
+    required String name,
+    this.logoUrl = const Value.absent(),
+    required int startingPurse,
+    required int currentPurse,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       leagueId = Value(leagueId),
+       name = Value(name),
+       startingPurse = Value(startingPurse),
+       currentPurse = Value(currentPurse);
+  static Insertable<Franchise> custom({
+    Expression<String>? id,
+    Expression<String>? leagueId,
+    Expression<String>? name,
+    Expression<String>? logoUrl,
+    Expression<int>? startingPurse,
+    Expression<int>? currentPurse,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (leagueId != null) 'league_id': leagueId,
+      if (name != null) 'name': name,
+      if (logoUrl != null) 'logo_url': logoUrl,
+      if (startingPurse != null) 'starting_purse': startingPurse,
+      if (currentPurse != null) 'current_purse': currentPurse,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  FranchisesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? leagueId,
+    Value<String>? name,
+    Value<String?>? logoUrl,
+    Value<int>? startingPurse,
+    Value<int>? currentPurse,
+    Value<int>? rowid,
+  }) {
+    return FranchisesCompanion(
+      id: id ?? this.id,
+      leagueId: leagueId ?? this.leagueId,
+      name: name ?? this.name,
+      logoUrl: logoUrl ?? this.logoUrl,
+      startingPurse: startingPurse ?? this.startingPurse,
+      currentPurse: currentPurse ?? this.currentPurse,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (leagueId.present) {
+      map['league_id'] = Variable<String>(leagueId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (logoUrl.present) {
+      map['logo_url'] = Variable<String>(logoUrl.value);
+    }
+    if (startingPurse.present) {
+      map['starting_purse'] = Variable<int>(startingPurse.value);
+    }
+    if (currentPurse.present) {
+      map['current_purse'] = Variable<int>(currentPurse.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FranchisesCompanion(')
+          ..write('id: $id, ')
+          ..write('leagueId: $leagueId, ')
+          ..write('name: $name, ')
+          ..write('logoUrl: $logoUrl, ')
+          ..write('startingPurse: $startingPurse, ')
+          ..write('currentPurse: $currentPurse, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LeaguePlayersTable extends LeaguePlayers
+    with TableInfo<$LeaguePlayersTable, LeaguePlayer> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LeaguePlayersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _leagueIdMeta = const VerificationMeta(
+    'leagueId',
+  );
+  @override
+  late final GeneratedColumn<String> leagueId = GeneratedColumn<String>(
+    'league_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _playerIdMeta = const VerificationMeta(
+    'playerId',
+  );
+  @override
+  late final GeneratedColumn<String> playerId = GeneratedColumn<String>(
+    'player_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _basePriceOverrideMeta = const VerificationMeta(
+    'basePriceOverride',
+  );
+  @override
+  late final GeneratedColumn<int> basePriceOverride = GeneratedColumn<int>(
+    'base_price_override',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _finalPriceMeta = const VerificationMeta(
+    'finalPrice',
+  );
+  @override
+  late final GeneratedColumn<int> finalPrice = GeneratedColumn<int>(
+    'final_price',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _franchiseIdMeta = const VerificationMeta(
+    'franchiseId',
+  );
+  @override
+  late final GeneratedColumn<String> franchiseId = GeneratedColumn<String>(
+    'franchise_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    leagueId,
+    playerId,
+    status,
+    basePriceOverride,
+    finalPrice,
+    franchiseId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'league_players';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LeaguePlayer> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('league_id')) {
+      context.handle(
+        _leagueIdMeta,
+        leagueId.isAcceptableOrUnknown(data['league_id']!, _leagueIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_leagueIdMeta);
+    }
+    if (data.containsKey('player_id')) {
+      context.handle(
+        _playerIdMeta,
+        playerId.isAcceptableOrUnknown(data['player_id']!, _playerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_playerIdMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('base_price_override')) {
+      context.handle(
+        _basePriceOverrideMeta,
+        basePriceOverride.isAcceptableOrUnknown(
+          data['base_price_override']!,
+          _basePriceOverrideMeta,
+        ),
+      );
+    }
+    if (data.containsKey('final_price')) {
+      context.handle(
+        _finalPriceMeta,
+        finalPrice.isAcceptableOrUnknown(data['final_price']!, _finalPriceMeta),
+      );
+    }
+    if (data.containsKey('franchise_id')) {
+      context.handle(
+        _franchiseIdMeta,
+        franchiseId.isAcceptableOrUnknown(
+          data['franchise_id']!,
+          _franchiseIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LeaguePlayer map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LeaguePlayer(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      leagueId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}league_id'],
+      )!,
+      playerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}player_id'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      basePriceOverride: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}base_price_override'],
+      ),
+      finalPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}final_price'],
+      ),
+      franchiseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}franchise_id'],
+      ),
+    );
+  }
+
+  @override
+  $LeaguePlayersTable createAlias(String alias) {
+    return $LeaguePlayersTable(attachedDatabase, alias);
+  }
+}
+
+class LeaguePlayer extends DataClass implements Insertable<LeaguePlayer> {
+  final String id;
+  final String leagueId;
+  final String playerId;
+  final String status;
+  final int? basePriceOverride;
+  final int? finalPrice;
+  final String? franchiseId;
+  const LeaguePlayer({
+    required this.id,
+    required this.leagueId,
+    required this.playerId,
+    required this.status,
+    this.basePriceOverride,
+    this.finalPrice,
+    this.franchiseId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['league_id'] = Variable<String>(leagueId);
+    map['player_id'] = Variable<String>(playerId);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || basePriceOverride != null) {
+      map['base_price_override'] = Variable<int>(basePriceOverride);
+    }
+    if (!nullToAbsent || finalPrice != null) {
+      map['final_price'] = Variable<int>(finalPrice);
+    }
+    if (!nullToAbsent || franchiseId != null) {
+      map['franchise_id'] = Variable<String>(franchiseId);
+    }
+    return map;
+  }
+
+  LeaguePlayersCompanion toCompanion(bool nullToAbsent) {
+    return LeaguePlayersCompanion(
+      id: Value(id),
+      leagueId: Value(leagueId),
+      playerId: Value(playerId),
+      status: Value(status),
+      basePriceOverride: basePriceOverride == null && nullToAbsent
+          ? const Value.absent()
+          : Value(basePriceOverride),
+      finalPrice: finalPrice == null && nullToAbsent
+          ? const Value.absent()
+          : Value(finalPrice),
+      franchiseId: franchiseId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(franchiseId),
+    );
+  }
+
+  factory LeaguePlayer.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LeaguePlayer(
+      id: serializer.fromJson<String>(json['id']),
+      leagueId: serializer.fromJson<String>(json['leagueId']),
+      playerId: serializer.fromJson<String>(json['playerId']),
+      status: serializer.fromJson<String>(json['status']),
+      basePriceOverride: serializer.fromJson<int?>(json['basePriceOverride']),
+      finalPrice: serializer.fromJson<int?>(json['finalPrice']),
+      franchiseId: serializer.fromJson<String?>(json['franchiseId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'leagueId': serializer.toJson<String>(leagueId),
+      'playerId': serializer.toJson<String>(playerId),
+      'status': serializer.toJson<String>(status),
+      'basePriceOverride': serializer.toJson<int?>(basePriceOverride),
+      'finalPrice': serializer.toJson<int?>(finalPrice),
+      'franchiseId': serializer.toJson<String?>(franchiseId),
+    };
+  }
+
+  LeaguePlayer copyWith({
+    String? id,
+    String? leagueId,
+    String? playerId,
+    String? status,
+    Value<int?> basePriceOverride = const Value.absent(),
+    Value<int?> finalPrice = const Value.absent(),
+    Value<String?> franchiseId = const Value.absent(),
+  }) => LeaguePlayer(
+    id: id ?? this.id,
+    leagueId: leagueId ?? this.leagueId,
+    playerId: playerId ?? this.playerId,
+    status: status ?? this.status,
+    basePriceOverride: basePriceOverride.present
+        ? basePriceOverride.value
+        : this.basePriceOverride,
+    finalPrice: finalPrice.present ? finalPrice.value : this.finalPrice,
+    franchiseId: franchiseId.present ? franchiseId.value : this.franchiseId,
+  );
+  LeaguePlayer copyWithCompanion(LeaguePlayersCompanion data) {
+    return LeaguePlayer(
+      id: data.id.present ? data.id.value : this.id,
+      leagueId: data.leagueId.present ? data.leagueId.value : this.leagueId,
+      playerId: data.playerId.present ? data.playerId.value : this.playerId,
+      status: data.status.present ? data.status.value : this.status,
+      basePriceOverride: data.basePriceOverride.present
+          ? data.basePriceOverride.value
+          : this.basePriceOverride,
+      finalPrice: data.finalPrice.present
+          ? data.finalPrice.value
+          : this.finalPrice,
+      franchiseId: data.franchiseId.present
+          ? data.franchiseId.value
+          : this.franchiseId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LeaguePlayer(')
+          ..write('id: $id, ')
+          ..write('leagueId: $leagueId, ')
+          ..write('playerId: $playerId, ')
+          ..write('status: $status, ')
+          ..write('basePriceOverride: $basePriceOverride, ')
+          ..write('finalPrice: $finalPrice, ')
+          ..write('franchiseId: $franchiseId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    leagueId,
+    playerId,
+    status,
+    basePriceOverride,
+    finalPrice,
+    franchiseId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LeaguePlayer &&
+          other.id == this.id &&
+          other.leagueId == this.leagueId &&
+          other.playerId == this.playerId &&
+          other.status == this.status &&
+          other.basePriceOverride == this.basePriceOverride &&
+          other.finalPrice == this.finalPrice &&
+          other.franchiseId == this.franchiseId);
+}
+
+class LeaguePlayersCompanion extends UpdateCompanion<LeaguePlayer> {
+  final Value<String> id;
+  final Value<String> leagueId;
+  final Value<String> playerId;
+  final Value<String> status;
+  final Value<int?> basePriceOverride;
+  final Value<int?> finalPrice;
+  final Value<String?> franchiseId;
+  final Value<int> rowid;
+  const LeaguePlayersCompanion({
+    this.id = const Value.absent(),
+    this.leagueId = const Value.absent(),
+    this.playerId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.basePriceOverride = const Value.absent(),
+    this.finalPrice = const Value.absent(),
+    this.franchiseId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LeaguePlayersCompanion.insert({
+    required String id,
+    required String leagueId,
+    required String playerId,
+    required String status,
+    this.basePriceOverride = const Value.absent(),
+    this.finalPrice = const Value.absent(),
+    this.franchiseId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       leagueId = Value(leagueId),
+       playerId = Value(playerId),
+       status = Value(status);
+  static Insertable<LeaguePlayer> custom({
+    Expression<String>? id,
+    Expression<String>? leagueId,
+    Expression<String>? playerId,
+    Expression<String>? status,
+    Expression<int>? basePriceOverride,
+    Expression<int>? finalPrice,
+    Expression<String>? franchiseId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (leagueId != null) 'league_id': leagueId,
+      if (playerId != null) 'player_id': playerId,
+      if (status != null) 'status': status,
+      if (basePriceOverride != null) 'base_price_override': basePriceOverride,
+      if (finalPrice != null) 'final_price': finalPrice,
+      if (franchiseId != null) 'franchise_id': franchiseId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LeaguePlayersCompanion copyWith({
+    Value<String>? id,
+    Value<String>? leagueId,
+    Value<String>? playerId,
+    Value<String>? status,
+    Value<int?>? basePriceOverride,
+    Value<int?>? finalPrice,
+    Value<String?>? franchiseId,
+    Value<int>? rowid,
+  }) {
+    return LeaguePlayersCompanion(
+      id: id ?? this.id,
+      leagueId: leagueId ?? this.leagueId,
+      playerId: playerId ?? this.playerId,
+      status: status ?? this.status,
+      basePriceOverride: basePriceOverride ?? this.basePriceOverride,
+      finalPrice: finalPrice ?? this.finalPrice,
+      franchiseId: franchiseId ?? this.franchiseId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (leagueId.present) {
+      map['league_id'] = Variable<String>(leagueId.value);
+    }
+    if (playerId.present) {
+      map['player_id'] = Variable<String>(playerId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (basePriceOverride.present) {
+      map['base_price_override'] = Variable<int>(basePriceOverride.value);
+    }
+    if (finalPrice.present) {
+      map['final_price'] = Variable<int>(finalPrice.value);
+    }
+    if (franchiseId.present) {
+      map['franchise_id'] = Variable<String>(franchiseId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LeaguePlayersCompanion(')
+          ..write('id: $id, ')
+          ..write('leagueId: $leagueId, ')
+          ..write('playerId: $playerId, ')
+          ..write('status: $status, ')
+          ..write('basePriceOverride: $basePriceOverride, ')
+          ..write('finalPrice: $finalPrice, ')
+          ..write('franchiseId: $franchiseId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $NotificationsTable extends Notifications
     with TableInfo<$NotificationsTable, Notification> {
   @override
@@ -1550,6 +2448,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $LeaguesTable leagues = $LeaguesTable(this);
   late final $PlayersTable players = $PlayersTable(this);
+  late final $FranchisesTable franchises = $FranchisesTable(this);
+  late final $LeaguePlayersTable leaguePlayers = $LeaguePlayersTable(this);
   late final $NotificationsTable notifications = $NotificationsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -1558,6 +2458,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     leagues,
     players,
+    franchises,
+    leaguePlayers,
     notifications,
   ];
 }
@@ -2133,6 +3035,470 @@ typedef $$PlayersTableProcessedTableManager =
       Player,
       PrefetchHooks Function()
     >;
+typedef $$FranchisesTableCreateCompanionBuilder =
+    FranchisesCompanion Function({
+      required String id,
+      required String leagueId,
+      required String name,
+      Value<String?> logoUrl,
+      required int startingPurse,
+      required int currentPurse,
+      Value<int> rowid,
+    });
+typedef $$FranchisesTableUpdateCompanionBuilder =
+    FranchisesCompanion Function({
+      Value<String> id,
+      Value<String> leagueId,
+      Value<String> name,
+      Value<String?> logoUrl,
+      Value<int> startingPurse,
+      Value<int> currentPurse,
+      Value<int> rowid,
+    });
+
+class $$FranchisesTableFilterComposer
+    extends Composer<_$AppDatabase, $FranchisesTable> {
+  $$FranchisesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get leagueId => $composableBuilder(
+    column: $table.leagueId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get logoUrl => $composableBuilder(
+    column: $table.logoUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get startingPurse => $composableBuilder(
+    column: $table.startingPurse,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentPurse => $composableBuilder(
+    column: $table.currentPurse,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FranchisesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FranchisesTable> {
+  $$FranchisesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get leagueId => $composableBuilder(
+    column: $table.leagueId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get logoUrl => $composableBuilder(
+    column: $table.logoUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get startingPurse => $composableBuilder(
+    column: $table.startingPurse,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentPurse => $composableBuilder(
+    column: $table.currentPurse,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FranchisesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FranchisesTable> {
+  $$FranchisesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get leagueId =>
+      $composableBuilder(column: $table.leagueId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get logoUrl =>
+      $composableBuilder(column: $table.logoUrl, builder: (column) => column);
+
+  GeneratedColumn<int> get startingPurse => $composableBuilder(
+    column: $table.startingPurse,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get currentPurse => $composableBuilder(
+    column: $table.currentPurse,
+    builder: (column) => column,
+  );
+}
+
+class $$FranchisesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FranchisesTable,
+          Franchise,
+          $$FranchisesTableFilterComposer,
+          $$FranchisesTableOrderingComposer,
+          $$FranchisesTableAnnotationComposer,
+          $$FranchisesTableCreateCompanionBuilder,
+          $$FranchisesTableUpdateCompanionBuilder,
+          (
+            Franchise,
+            BaseReferences<_$AppDatabase, $FranchisesTable, Franchise>,
+          ),
+          Franchise,
+          PrefetchHooks Function()
+        > {
+  $$FranchisesTableTableManager(_$AppDatabase db, $FranchisesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FranchisesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FranchisesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FranchisesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> leagueId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> logoUrl = const Value.absent(),
+                Value<int> startingPurse = const Value.absent(),
+                Value<int> currentPurse = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => FranchisesCompanion(
+                id: id,
+                leagueId: leagueId,
+                name: name,
+                logoUrl: logoUrl,
+                startingPurse: startingPurse,
+                currentPurse: currentPurse,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String leagueId,
+                required String name,
+                Value<String?> logoUrl = const Value.absent(),
+                required int startingPurse,
+                required int currentPurse,
+                Value<int> rowid = const Value.absent(),
+              }) => FranchisesCompanion.insert(
+                id: id,
+                leagueId: leagueId,
+                name: name,
+                logoUrl: logoUrl,
+                startingPurse: startingPurse,
+                currentPurse: currentPurse,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FranchisesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FranchisesTable,
+      Franchise,
+      $$FranchisesTableFilterComposer,
+      $$FranchisesTableOrderingComposer,
+      $$FranchisesTableAnnotationComposer,
+      $$FranchisesTableCreateCompanionBuilder,
+      $$FranchisesTableUpdateCompanionBuilder,
+      (Franchise, BaseReferences<_$AppDatabase, $FranchisesTable, Franchise>),
+      Franchise,
+      PrefetchHooks Function()
+    >;
+typedef $$LeaguePlayersTableCreateCompanionBuilder =
+    LeaguePlayersCompanion Function({
+      required String id,
+      required String leagueId,
+      required String playerId,
+      required String status,
+      Value<int?> basePriceOverride,
+      Value<int?> finalPrice,
+      Value<String?> franchiseId,
+      Value<int> rowid,
+    });
+typedef $$LeaguePlayersTableUpdateCompanionBuilder =
+    LeaguePlayersCompanion Function({
+      Value<String> id,
+      Value<String> leagueId,
+      Value<String> playerId,
+      Value<String> status,
+      Value<int?> basePriceOverride,
+      Value<int?> finalPrice,
+      Value<String?> franchiseId,
+      Value<int> rowid,
+    });
+
+class $$LeaguePlayersTableFilterComposer
+    extends Composer<_$AppDatabase, $LeaguePlayersTable> {
+  $$LeaguePlayersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get leagueId => $composableBuilder(
+    column: $table.leagueId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get playerId => $composableBuilder(
+    column: $table.playerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get basePriceOverride => $composableBuilder(
+    column: $table.basePriceOverride,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get finalPrice => $composableBuilder(
+    column: $table.finalPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get franchiseId => $composableBuilder(
+    column: $table.franchiseId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LeaguePlayersTableOrderingComposer
+    extends Composer<_$AppDatabase, $LeaguePlayersTable> {
+  $$LeaguePlayersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get leagueId => $composableBuilder(
+    column: $table.leagueId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get playerId => $composableBuilder(
+    column: $table.playerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get basePriceOverride => $composableBuilder(
+    column: $table.basePriceOverride,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get finalPrice => $composableBuilder(
+    column: $table.finalPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get franchiseId => $composableBuilder(
+    column: $table.franchiseId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LeaguePlayersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LeaguePlayersTable> {
+  $$LeaguePlayersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get leagueId =>
+      $composableBuilder(column: $table.leagueId, builder: (column) => column);
+
+  GeneratedColumn<String> get playerId =>
+      $composableBuilder(column: $table.playerId, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get basePriceOverride => $composableBuilder(
+    column: $table.basePriceOverride,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get finalPrice => $composableBuilder(
+    column: $table.finalPrice,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get franchiseId => $composableBuilder(
+    column: $table.franchiseId,
+    builder: (column) => column,
+  );
+}
+
+class $$LeaguePlayersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LeaguePlayersTable,
+          LeaguePlayer,
+          $$LeaguePlayersTableFilterComposer,
+          $$LeaguePlayersTableOrderingComposer,
+          $$LeaguePlayersTableAnnotationComposer,
+          $$LeaguePlayersTableCreateCompanionBuilder,
+          $$LeaguePlayersTableUpdateCompanionBuilder,
+          (
+            LeaguePlayer,
+            BaseReferences<_$AppDatabase, $LeaguePlayersTable, LeaguePlayer>,
+          ),
+          LeaguePlayer,
+          PrefetchHooks Function()
+        > {
+  $$LeaguePlayersTableTableManager(_$AppDatabase db, $LeaguePlayersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LeaguePlayersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LeaguePlayersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LeaguePlayersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> leagueId = const Value.absent(),
+                Value<String> playerId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int?> basePriceOverride = const Value.absent(),
+                Value<int?> finalPrice = const Value.absent(),
+                Value<String?> franchiseId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LeaguePlayersCompanion(
+                id: id,
+                leagueId: leagueId,
+                playerId: playerId,
+                status: status,
+                basePriceOverride: basePriceOverride,
+                finalPrice: finalPrice,
+                franchiseId: franchiseId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String leagueId,
+                required String playerId,
+                required String status,
+                Value<int?> basePriceOverride = const Value.absent(),
+                Value<int?> finalPrice = const Value.absent(),
+                Value<String?> franchiseId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LeaguePlayersCompanion.insert(
+                id: id,
+                leagueId: leagueId,
+                playerId: playerId,
+                status: status,
+                basePriceOverride: basePriceOverride,
+                finalPrice: finalPrice,
+                franchiseId: franchiseId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LeaguePlayersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LeaguePlayersTable,
+      LeaguePlayer,
+      $$LeaguePlayersTableFilterComposer,
+      $$LeaguePlayersTableOrderingComposer,
+      $$LeaguePlayersTableAnnotationComposer,
+      $$LeaguePlayersTableCreateCompanionBuilder,
+      $$LeaguePlayersTableUpdateCompanionBuilder,
+      (
+        LeaguePlayer,
+        BaseReferences<_$AppDatabase, $LeaguePlayersTable, LeaguePlayer>,
+      ),
+      LeaguePlayer,
+      PrefetchHooks Function()
+    >;
 typedef $$NotificationsTableCreateCompanionBuilder =
     NotificationsCompanion Function({
       Value<int> id,
@@ -2337,6 +3703,10 @@ class $AppDatabaseManager {
       $$LeaguesTableTableManager(_db, _db.leagues);
   $$PlayersTableTableManager get players =>
       $$PlayersTableTableManager(_db, _db.players);
+  $$FranchisesTableTableManager get franchises =>
+      $$FranchisesTableTableManager(_db, _db.franchises);
+  $$LeaguePlayersTableTableManager get leaguePlayers =>
+      $$LeaguePlayersTableTableManager(_db, _db.leaguePlayers);
   $$NotificationsTableTableManager get notifications =>
       $$NotificationsTableTableManager(_db, _db.notifications);
 }

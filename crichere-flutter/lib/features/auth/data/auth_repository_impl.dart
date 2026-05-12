@@ -54,4 +54,25 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     return response;
   }
+
+  @override
+  Future<void> updateCricketProfile(String userId, PlayingRole role, String battingStyle, String bowlingStyle) async {
+    // Basic mapping from text to enum if possible, else null
+    BattingStyle? batStyle;
+    if (battingStyle.toUpperCase() == 'RHB') batStyle = BattingStyle.rightHand;
+    if (battingStyle.toUpperCase() == 'LHB') batStyle = BattingStyle.leftHand;
+    
+    BowlingStyle? bowlStyle;
+    if (bowlingStyle.toUpperCase() == 'RAB') bowlStyle = BowlingStyle.rightArm;
+    if (bowlingStyle.toUpperCase() == 'LAB') bowlStyle = BowlingStyle.leftArm;
+
+    await _api.updateCricketProfile(
+      userId,
+      CricketProfileRequest(
+        playingRole: role,
+        battingStyle: batStyle,
+        bowlingStyle: bowlStyle,
+      ),
+    );
+  }
 }

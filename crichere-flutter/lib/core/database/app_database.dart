@@ -36,6 +36,31 @@ class Players extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+class Franchises extends Table {
+  TextColumn get id => text()();
+  TextColumn get leagueId => text()();
+  TextColumn get name => text()();
+  TextColumn get logoUrl => text().nullable()();
+  IntColumn get startingPurse => integer()();
+  IntColumn get currentPurse => integer()();
+  
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+class LeaguePlayers extends Table {
+  TextColumn get id => text()();
+  TextColumn get leagueId => text()();
+  TextColumn get playerId => text()();
+  TextColumn get status => text()();
+  IntColumn get basePriceOverride => integer().nullable()();
+  IntColumn get finalPrice => integer().nullable()();
+  TextColumn get franchiseId => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 class Notifications extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text()();
@@ -44,7 +69,7 @@ class Notifications extends Table {
   BoolColumn get isRead => boolean().withDefault(const Constant(false))();
 }
 
-@DriftDatabase(tables: [Leagues, Players, Notifications])
+@DriftDatabase(tables: [Leagues, Players, Franchises, LeaguePlayers, Notifications])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());
 

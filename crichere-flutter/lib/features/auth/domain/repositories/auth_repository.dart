@@ -8,4 +8,5 @@ abstract class AuthRepository {
   Future<void> logout();
   Future<AuthResponse> getCurrentUser();
   Future<AuthResponse> refreshToken(String token);
+  Future<void> updateCricketProfile(String userId, PlayingRole role, String battingStyle, String bowlingStyle);
 }

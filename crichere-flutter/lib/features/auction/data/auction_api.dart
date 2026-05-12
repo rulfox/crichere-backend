@@ -30,4 +30,10 @@ abstract class AuctionApi {
 
   @POST('/auctions/{id}/undo-sold')
   Future<void> undoSold(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
+
+  @POST('/auctions/{id}/force-assign')
+  Future<void> forceAssign(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
+
+  @POST('/auctions/{id}/pre-assign')
+  Future<void> preAssign(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
 }

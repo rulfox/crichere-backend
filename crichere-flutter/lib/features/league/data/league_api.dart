@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import '../domain/entities/league.dart';
+import '../domain/entities/league_player.dart';
+import '../../franchise/domain/entities/franchise.dart';
 import 'models/league_request.dart';
-import 'dart:io';
 
 part 'league_api.g.dart';
 
@@ -25,4 +27,10 @@ abstract class LeagueApi {
     @Path('id') String leagueId,
     @Part() File file,
   );
+
+  @GET('/leagues/{id}/franchises')
+  Future<List<Franchise>> getLeagueFranchises(@Path('id') String leagueId);
+
+  @GET('/leagues/{id}/players')
+  Future<List<LeaguePlayer>> getLeaguePlayers(@Path('id') String leagueId);
 }

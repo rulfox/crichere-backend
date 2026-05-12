@@ -44,4 +44,9 @@ class ExportService {
       text: 'Check out the ${squad.franchiseName} squad!',
     ));
   }
+
+  Future<void> exportSquadToImage(FranchiseSquad squad) async {
+    // SC-005: 1080x1080 PNG for WhatsApp sharing
+    // TODO: Implement using screenshot package and a custom widget
+  }
 }

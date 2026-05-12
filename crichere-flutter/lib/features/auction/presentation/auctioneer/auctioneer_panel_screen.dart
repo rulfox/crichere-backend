@@ -1,9 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../providers/auction_provider.dart';
 import '../providers/auction_state_provider.dart';
+import '../../../league/presentation/providers/league_repository_provider.dart';
 
 @RoutePage()
 class AuctioneerPanelScreen extends HookConsumerWidget {
@@ -15,6 +17,85 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auctionState = ref.watch(auctionStateProvider);
     final auctionRepo = ref.watch(auctionRepositoryProvider);
+    final playersAsync = ref.watch(leaguePlayersProvider(auctionId));
+    final franchisesAsync = ref.watch(leagueFranchisesProvider(auctionId));
+    
+    final selectedFranchiseId = useState<String?>(null);
+
+    void showForceAssignDialog(String playerId, String playerName) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Force Assign $playerName'),
+          content: franchisesAsync.when(
+            data: (franchises) => DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Select Franchise'),
+              items: franchises.map((f) => DropdownMenuItem(value: f.id, child: Text(f.name))).toList(),
+              onChanged: (val) => selectedFranchiseId.value = val,
+            ),
+            loading: () => const CircularProgressIndicator(),
+            error: (e, _) => Text('Error loading franchises: $e'),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+            ElevatedButton(
+              onPressed: () async {
+                if (selectedFranchiseId.value != null) {
+                  await auctionRepo.forceAssign(auctionId, playerId, selectedFranchiseId.value!);
+                  if (context.mounted) Navigator.pop(context);
+                }
+              },
+              child: const Text('FORCE ASSIGN'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    void showPreAssignDialog(String playerId, String playerName) {
+      final type = useState('CAPTAIN');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Pre-Assign $playerName'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                initialValue: type.value,
+                items: const [
+                  DropdownMenuItem(value: 'CAPTAIN', child: Text('CAPTAIN (Deduct Purse)')),
+                  DropdownMenuItem(value: 'ICON', child: Text('ICON (Free)')),
+                ],
+                onChanged: (val) => type.value = val!,
+              ),
+              const SizedBox(height: 16),
+              franchisesAsync.when(
+                data: (franchises) => DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(labelText: 'Select Franchise'),
+                  items: franchises.map((f) => DropdownMenuItem(value: f.id, child: Text(f.name))).toList(),
+                  onChanged: (val) => selectedFranchiseId.value = val,
+                ),
+                loading: () => const CircularProgressIndicator(),
+                error: (e, _) => Text('Error: $e'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+            ElevatedButton(
+              onPressed: () async {
+                if (selectedFranchiseId.value != null) {
+                  await auctionRepo.preAssign(auctionId, playerId, selectedFranchiseId.value!, type.value);
+                  if (context.mounted) Navigator.pop(context);
+                }
+              },
+              child: const Text('PRE-ASSIGN'),
+            ),
+          ],
+        ),
+      );
+    }
 
     void showUndoSoldDialog() {
       final reasonController = TextEditingController();
@@ -77,12 +158,35 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                         child: Text('AVAILABLE PLAYERS', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                       Expanded(
-                        child: ListView.builder(
-                          itemCount: 10,
-                          itemBuilder: (context, index) => ListTile(
-                            title: Text('Player $index'),
-                            onTap: () => auctionRepo.putSpecificPlayer(auctionId, 'p$index'),
+                        child: playersAsync.when(
+                          data: (players) => ListView.builder(
+                            itemCount: players.length,
+                            itemBuilder: (context, index) {
+                              final p = players[index];
+                              return ListTile(
+                                title: Text(p.playerName),
+                                subtitle: Text('Base: ₹${p.basePriceOverride ?? "Default"}'),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.assignment_ind, size: 20),
+                                      onPressed: () => showPreAssignDialog(p.playerId, p.playerName),
+                                      tooltip: 'Pre-assign',
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.flash_on, size: 20),
+                                      onPressed: () => showForceAssignDialog(p.playerId, p.playerName),
+                                      tooltip: 'Force Assign',
+                                    ),
+                                  ],
+                                ),
+                                onTap: () => auctionRepo.putSpecificPlayer(auctionId, p.playerId),
+                              );
+                            },
                           ),
+                          loading: () => const Center(child: CircularProgressIndicator()),
+                          error: (e, _) => Center(child: Text('Error: $e')),
                         ),
                       ),
                     ],
@@ -122,7 +226,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _ActionButton(label: 'UNDO BID (Ctrl+Z)', icon: Icons.undo, color: Colors.red, onPressed: () => auctionRepo.undoBid(auctionId), isOutlined: true),
+                            _ActionButton(label: 'UNDO BID (Ctrl+Z)', icon: Icons.undo, color: Colors.red, onPressed: () => auctionState.status == 'BIDDING' ? auctionRepo.undoBid(auctionId) : null, isOutlined: true),
                             _ActionButton(label: 'UNSOLD', icon: Icons.close, color: Colors.orange, onPressed: () => auctionRepo.markUnsold(auctionId)),
                             _ActionButton(label: 'SOLD (Enter)', icon: Icons.check, color: Colors.green, onPressed: () => auctionRepo.markSold(auctionId)),
                           ],
@@ -152,7 +256,7 @@ class _ActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isOutlined;
 
   const _ActionButton({required this.label, required this.icon, required this.color, required this.onPressed, this.isOutlined = false});

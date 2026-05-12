@@ -1,5 +1,7 @@
-import '../../../core/database/app_database.dart';
+import '../../../core/database/app_database.dart' hide Franchise, LeaguePlayer, League;
 import '../domain/entities/league.dart' as domain;
+import '../domain/entities/league_player.dart';
+import '../../franchise/domain/entities/franchise.dart';
 import '../domain/repositories/league_repository.dart';
 import 'league_api.dart';
 import 'models/league_request.dart';
@@ -68,7 +70,17 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
-  Future<void> importPlayers(String leagueId, File csvFile) async {
-    await _api.importPlayers(leagueId, csvFile);
+  Future<void> importPlayers(String leagueId, File file) async {
+    await _api.importPlayers(leagueId, file);
+  }
+
+  @override
+  Future<List<Franchise>> getFranchises(String leagueId) async {
+    return await _api.getLeagueFranchises(leagueId);
+  }
+
+  @override
+  Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId) async {
+    return await _api.getLeaguePlayers(leagueId);
   }
 }

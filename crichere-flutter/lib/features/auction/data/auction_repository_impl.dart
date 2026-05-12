@@ -43,4 +43,21 @@ class AuctionRepositoryImpl implements AuctionRepository {
   Future<void> undoSold(String auctionId, String reason) async {
     await _api.undoSold(auctionId, {'reason': reason});
   }
+
+  @override
+  Future<void> forceAssign(String auctionId, String playerId, String franchiseId) async {
+    await _api.forceAssign(auctionId, {
+      'playerId': playerId,
+      'franchiseId': franchiseId,
+    });
+  }
+
+  @override
+  Future<void> preAssign(String auctionId, String playerId, String franchiseId, String type) async {
+    await _api.preAssign(auctionId, {
+      'playerId': playerId,
+      'franchiseId': franchiseId,
+      'type': type,
+    });
+  }
 }
