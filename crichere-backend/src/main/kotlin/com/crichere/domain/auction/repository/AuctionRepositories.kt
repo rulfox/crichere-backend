@@ -25,7 +25,7 @@ interface AuctionRoundCategoryIncrementRepository : JpaRepository<AuctionRoundCa
 @Repository
 interface BidRepository : JpaRepository<Bid, UUID> {
     fun findByLeaguePlayerIdAndAuctionIdOrderByBidAtDesc(leaguePlayerId: UUID, auctionId: UUID): List<Bid>
-    fun findFirstByLeaguePlayerIdAndStatusOrderByBidAtDesc(leaguePlayerId: UUID, status: BidStatus): Optional<Bid>
+    fun findFirstByLeaguePlayerIdAndAuctionIdAndStatusOrderByBidAtDesc(leaguePlayerId: UUID, auctionId: UUID, status: BidStatus): Optional<Bid>
 }
 
 @Repository

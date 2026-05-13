@@ -79,7 +79,8 @@ class DisplayController(
             }
         } else {
             val snapshot = auctionService.getStateSnapshot(id)
-            emitter.send(SseEmitter.event().name("SNAPSHOT").data(objectMapper.writeValueAsString(snapshot)))
+            val event = mapOf("event" to "SNAPSHOT", "data" to snapshot)
+            emitter.send(SseEmitter.event().data(objectMapper.writeValueAsString(event)))
         }
 
         return emitter

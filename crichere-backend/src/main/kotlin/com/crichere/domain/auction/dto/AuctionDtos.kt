@@ -28,6 +28,8 @@ data class RoundConfigDto(
     val playerPoolSource: PlayerPoolSource,
     val franchiseEligibilityRule: FranchiseEligibilityRule,
     val completionTrigger: CompletionTrigger,
+    val countdownSeconds: Int? = null,
+    val antiSnipeSeconds: Int? = null,
 
     @field:NotEmpty
     @field:Valid

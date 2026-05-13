@@ -16,25 +16,16 @@ class RedisConfig {
     @Bean
     fun container(
         connectionFactory: RedisConnectionFactory,
-        listenerAdapter: MessageListenerAdapter
+        sseBroadcaster: SseBroadcaster
     ): RedisMessageListenerContainer {
         val container = RedisMessageListenerContainer()
         container.setConnectionFactory(connectionFactory)
-        container.addMessageListener(listenerAdapter, PatternTopic("auction:*"))
+        container.addMessageListener({ message, _ ->
+            val channel = String(message.channel)
+            val body = String(message.body)
+            val auctionId = UUID.fromString(channel.substringAfter("auction:"))
+            sseBroadcaster.broadcastRaw(auctionId, body)
+        }, PatternTopic("auction:*"))
         return container
-    }
-
-    @Bean
-    fun listenerAdapter(sseBroadcaster: SseBroadcaster, objectMapper: ObjectMapper): MessageListenerAdapter {
-        return MessageListenerAdapter(object : Any() {
-            fun handleMessage(message: String, channel: String) {
-                val auctionId = UUID.fromString(channel.substringAfter("auction:"))
-                // We assume the message is already a JSON string of the event
-                // But SseBroadcaster.broadcast also serializes. 
-                // Let's refine SseBroadcaster to take raw JSON if needed, 
-                // or just pass the message string.
-                sseBroadcaster.broadcastRaw(auctionId, message)
-            }
-        }, "handleMessage")
     }
 }
