@@ -184,3 +184,7 @@ WHERE user_id IN (SELECT id FROM users WHERE phone LIKE '9000000___');
 
 DELETE FROM users
 WHERE phone LIKE '9000000___';
+
+-- ── Remove V017 and V018 from Flyway history so their files can be deleted ─
+
+DELETE FROM flyway_schema_history WHERE version IN ('017', '018');
