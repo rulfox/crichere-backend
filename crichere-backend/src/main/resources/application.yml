@@ -46,7 +46,7 @@ crichere:
     expiration-ms: ${JWT_EXPIRATION_MS:3600000} # 1 hour
     refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:30}
   s3:
-    region: ap-south-1
+    region: ${AWS_REGION:ap-south-1}
     bucket: ${S3_BUCKET:crichere-assets}
   sms:
     msg91-auth-key: ${MSG91_AUTH_KEY:dummy}
