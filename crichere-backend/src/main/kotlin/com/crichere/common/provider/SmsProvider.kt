@@ -15,10 +15,10 @@ class ProdSmsProvider : SmsProvider {
     private val logger = LoggerFactory.getLogger(ProdSmsProvider::class.java)
 
     override fun sendSms(phone: String, message: String) {
-        logger.info("SMS SENT [prod] to $phone")
+        logger.info("SMS SENT [prod] $message to $phone")
     }
 
     override fun sendOtp(phone: String, otp: String) {
-        logger.info("OTP SENT [prod] to $phone")
+        logger.info("OTP SENT [prod] $otp to $phone")
     }
 }
