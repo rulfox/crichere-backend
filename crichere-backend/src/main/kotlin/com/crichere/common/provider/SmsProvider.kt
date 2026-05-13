@@ -10,20 +10,6 @@ interface SmsProvider {
 }
 
 @Component
-@Profile("dev")
-class DevSmsProvider : SmsProvider {
-    private val logger = LoggerFactory.getLogger(DevSmsProvider::class.java)
-
-    override fun sendSms(phone: String, message: String) {
-        logger.info("SMS SENT [dev] to $phone: $message")
-    }
-
-    override fun sendOtp(phone: String, otp: String) {
-        logger.info("OTP SENT [dev] to $phone: $otp")
-    }
-}
-
-@Component
 @Profile("prod")
 class ProdSmsProvider : SmsProvider {
     private val logger = LoggerFactory.getLogger(ProdSmsProvider::class.java)
