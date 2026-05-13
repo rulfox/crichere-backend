@@ -19,3 +19,14 @@ class DevPushProvider : PushProvider {
         return true
     }
 }
+
+@Component
+@Profile("prod")
+class ProdPushProvider : PushProvider {
+    private val logger = LoggerFactory.getLogger(ProdPushProvider::class.java)
+
+    override fun sendPush(userId: UUID, title: String, body: String, payload: Map<String, Any?>): Boolean {
+        logger.info("PUSH SENT [prod] to user $userId: Title='$title', Body='$body'")
+        return true
+    }
+}
