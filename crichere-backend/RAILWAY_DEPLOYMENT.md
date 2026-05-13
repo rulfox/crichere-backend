@@ -12,22 +12,31 @@ Railway will automatically inject several variables. You just need to map them o
 ## 2. Environment Variables Configuration
 Go to your **Backend Service** -> **Variables** tab and add/update the following:
 
-| Variable | Value / Source | Description |
+### Core Configuration
+| Variable | Value | Description |
 | :--- | :--- | :--- |
 | `SPRING_PROFILES_ACTIVE` | `prod` | Switches to production settings. |
-| `PORT` | `8080` | (Injected by Railway, but good to have as default). |
-| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}` | Railway Postgres connection string. |
-| `SPRING_DATASOURCE_USERNAME` | `${{Postgres.PGUSER}}` | Database user. |
-| `SPRING_DATASOURCE_PASSWORD` | `${{Postgres.PGPASSWORD}}` | Database password. |
-| `SPRING_DATA_REDIS_HOST` | `${{Redis.REDISHOST}}` | Redis host. |
-| `SPRING_DATA_REDIS_PORT` | `${{Redis.REDISPORT}}` | Redis port. |
 | `JWT_SECRET` | `(Generate a 64-character hex string)` | Used for signing tokens. |
-| `CORS_ALLOWED_ORIGINS` | `(Your Firebase Frontend URL)` | e.g., `https://crichere.web.app` |
-| `MSG91_AUTH_KEY` | `(Your Key)` | SMS provider key. |
-| `MSG91_TEMPLATE_ID` | `(Your ID)` | SMS template ID. |
+| `CORS_ALLOWED_ORIGINS` | `*` or `(Your Railway Frontend URL)` | e.g., `https://crichere-web.up.railway.app` |
 
-## 3. Important Note
-Railway's PostgreSQL uses a internal private network. If you use the `${{Postgres.DATABASE_URL}}` directly, ensure the driver is correct (it usually provides `postgres://` while Spring needs `jdbc:postgresql://`). The mapping above handles this correctly.
+### Database & Redis (Automatic Mapping)
+I have updated the code to automatically use Railway's default variable names. If you have added the Postgres and Redis plugins, ensure these variables exist in your backend service (Railway should link them automatically):
+
+- `PGHOST` (from Postgres plugin)
+- `PGPORT` (from Postgres plugin)
+- `PGDATABASE` (from Postgres plugin)
+- `PGUSER` (from Postgres plugin)
+- `PGPASSWORD` (from Postgres plugin)
+- `REDISHOST` (from Redis plugin)
+- `REDISPORT` (from Redis plugin)
+
+**Note:** You do NOT need to manually set `SPRING_DATASOURCE_URL` anymore unless you want to override the automatic mapping.
+
+## 3. Troubleshooting the "JDBC URL invalid" error
+If you still see `jdbc:postgresql://:/` in the logs, it means Railway has not yet linked the Postgres plugin to your Backend service. 
+1. Go to the **Variables** tab of your Backend service.
+2. Check if variables like `PGHOST` are present. 
+3. If not, click **New Variable** -> **Reference Variable** and select the Postgres service variables.
 
 ## 4. Deployment Trigger
 Once you connect your GitHub repo to Railway, every time you push to `main`, Railway will:
