@@ -2,6 +2,7 @@ package com.crichere.config
 
 import com.crichere.domain.auction.sse.SseBroadcaster
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.connection.RedisConnectionFactory
@@ -13,12 +14,22 @@ import java.util.*
 @Configuration
 class RedisConfig {
 
+    private val logger = LoggerFactory.getLogger(RedisConfig::class.java)
+
     @Bean
     fun container(
         connectionFactory: RedisConnectionFactory,
         sseBroadcaster: SseBroadcaster
     ): RedisMessageListenerContainer {
-        val container = RedisMessageListenerContainer()
+        val container = object : RedisMessageListenerContainer() {
+            override fun start() {
+                try {
+                    super.start()
+                } catch (e: Exception) {
+                    logger.warn("Redis pub/sub unavailable at startup — auction SSE broadcasting disabled: ${e.message}")
+                }
+            }
+        }
         container.setConnectionFactory(connectionFactory)
         container.addMessageListener({ message, _ ->
             val channel = String(message.channel)
