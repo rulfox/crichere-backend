@@ -1,4 +1,6 @@
 spring:
+  flyway:
+    ignore-missing-migrations: true
   jpa:
     show-sql: false
     hibernate:
