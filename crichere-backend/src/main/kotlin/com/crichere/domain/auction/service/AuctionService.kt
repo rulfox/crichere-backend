@@ -62,7 +62,9 @@ class AuctionService(
                 bidMode = roundDto.bidMode,
                 playerPoolSource = roundDto.playerPoolSource,
                 franchiseEligibilityRule = roundDto.franchiseEligibilityRule,
-                completionTrigger = roundDto.completionTrigger
+                completionTrigger = roundDto.completionTrigger,
+                countdownSeconds = roundDto.countdownSeconds ?: 60,
+                antiSnipeSeconds = roundDto.antiSnipeSeconds ?: 10
             ))
             
             roundDto.bidIncrementSlabs.forEach { slabDto ->
@@ -80,15 +82,16 @@ class AuctionService(
 
     @Transactional
     fun startAuction(auctionId: UUID, actorId: UUID): Auction {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         if (auction.status != AuctionStatus.DRAFT) throw BusinessLogicException("Auction must be in DRAFT status to start", "error.invalid_auction_status")
         
         auction.status = AuctionStatus.LIVE
         auction.startedAt = Instant.now()
         
-        // Initialize PlayerAuctionStates
+        // Initialize PlayerAuctionStates if not already done
+        val existingPlayers = playerStateRepository.findByAuctionId(auction.id).map { it.leaguePlayerId }.toSet()
         val players = leaguePlayerRepository.findByLeagueId(auction.leagueId)
-        players.forEach { player ->
+        players.filter { it.id !in existingPlayers }.forEach { player ->
             playerStateRepository.save(PlayerAuctionState(
                 auctionId = auction.id,
                 leaguePlayerId = player.id,
@@ -110,7 +113,7 @@ class AuctionService(
 
     @Transactional
     fun pauseAuction(auctionId: UUID, reason: String?, actorId: UUID): Auction {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         if (auction.status != AuctionStatus.LIVE) throw BusinessLogicException("Auction must be LIVE to pause", "error.invalid_auction_status")
         auction.status = AuctionStatus.PAUSED
         val savedAuction = auctionRepository.save(auction)
@@ -120,7 +123,7 @@ class AuctionService(
 
     @Transactional
     fun resumeAuction(auctionId: UUID, actorId: UUID): Auction {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         if (auction.status != AuctionStatus.PAUSED) throw BusinessLogicException("Auction must be PAUSED to resume", "error.invalid_auction_status")
         auction.status = AuctionStatus.LIVE
         val savedAuction = auctionRepository.save(auction)
@@ -130,7 +133,7 @@ class AuctionService(
 
     @Transactional
     fun completeAuction(auctionId: UUID, actorId: UUID): Auction {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val playerStates = playerStateRepository.findByAuctionId(auction.id)
 
         val league = leagueRepository.findById(auction.leagueId).get()
@@ -159,7 +162,7 @@ class AuctionService(
     @Transactional
     fun startRound(auctionId: UUID, roundId: UUID, actorId: UUID): AuctionRoundConfig {
         val round = roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         
         round.status = RoundStatus.LIVE
         round.startedAt = Instant.now()
@@ -201,15 +204,22 @@ class AuctionService(
 
     @Transactional
     fun putPlayer(auctionId: UUID, leaguePlayerId: UUID?, actorId: UUID): PlayerAuctionState {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val league = leagueRepository.findById(auction.leagueId).get()
         val roundId = auction.currentRoundId ?: throw BusinessLogicException("No active round", "error.no_active_round")
+        val round = roundConfigRepository.findById(roundId).get()
+
+        val availablePlayers = when (round.playerPoolSource) {
+            PlayerPoolSource.ALL_REGISTERED -> playerStateRepository.findByAuctionId(auctionId).filter { it.state == PlayerAuctionStateValue.AVAILABLE }
+            PlayerPoolSource.UNSOLD_PREVIOUS_ROUND, PlayerPoolSource.UNSOLD_ANY_PREVIOUS_ROUND -> 
+                playerStateRepository.findByAuctionId(auctionId).filter { it.state == PlayerAuctionStateValue.UNSOLD }
+            PlayerPoolSource.AUCTIONEER_CURATED -> playerStateRepository.findByAuctionId(auctionId).filter { it.state == PlayerAuctionStateValue.AVAILABLE }
+        }
         
         val playerId = when (league.playerOrderMode) {
             com.crichere.domain.league.enums.PlayerOrderMode.RANDOM -> {
                 if (leaguePlayerId != null) throw BusinessLogicException("Manual selection not allowed in RANDOM mode", "error.manual_selection_disabled")
-                val availablePlayers = playerStateRepository.findByAuctionId(auctionId).filter { it.state == PlayerAuctionStateValue.AVAILABLE }
-                if (availablePlayers.isEmpty()) throw BusinessLogicException("No available players in pool", "error.empty_pool")
+                if (availablePlayers.isEmpty()) throw BusinessLogicException("No available players in current pool", "error.empty_pool")
                 availablePlayers.random().leaguePlayerId
             }
             com.crichere.domain.league.enums.PlayerOrderMode.FREE_PICK -> {
@@ -217,8 +227,7 @@ class AuctionService(
             }
             com.crichere.domain.league.enums.PlayerOrderMode.HYBRID -> {
                 leaguePlayerId ?: run {
-                    val availablePlayers = playerStateRepository.findByAuctionId(auctionId).filter { it.state == PlayerAuctionStateValue.AVAILABLE }
-                    if (availablePlayers.isEmpty()) throw BusinessLogicException("No available players in pool", "error.empty_pool")
+                    if (availablePlayers.isEmpty()) throw BusinessLogicException("No available players in current pool", "error.empty_pool")
                     availablePlayers.random().leaguePlayerId
                 }
             }
@@ -230,7 +239,9 @@ class AuctionService(
         val playerState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId)
             .orElseThrow { ResourceNotFoundException("Player not found in auction pool", "error.player_not_found") }
 
-        if (playerState.state != PlayerAuctionStateValue.AVAILABLE) throw BusinessLogicException("Player is not AVAILABLE", "error.invalid_player_state")
+        if (playerState.state != PlayerAuctionStateValue.AVAILABLE && playerState.state != PlayerAuctionStateValue.UNSOLD) {
+            throw BusinessLogicException("Player is not in a valid state to be put up (must be AVAILABLE or UNSOLD)", "error.invalid_player_state")
+        }
 
         playerState.state = PlayerAuctionStateValue.UP_FOR_BIDDING
         playerState.currentHighestBid = null
@@ -254,7 +265,7 @@ class AuctionService(
 
     @Transactional
     fun placeBid(auctionId: UUID, franchiseId: UUID, bidAmount: Int, actorId: UUID): Bid {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val playerId = auction.currentLeaguePlayerId ?: throw BusinessLogicException("No player currently up for bidding", "error.no_player_up")
         val playerState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId).get()
         
@@ -315,6 +326,7 @@ class AuctionService(
                 auctionRepository.save(auction)
                 logAndBroadcast(auctionId, AuctionAction.TIMER_RESET, mapOf(
                     "newDurationSeconds" to round.antiSnipeSeconds,
+                    "startedAt" to now,
                     "reason" to "ANTI_SNIPE",
                     "leaguePlayerId" to playerId
                 ), actorId)
@@ -330,7 +342,7 @@ class AuctionService(
      */
     @Transactional
     fun startTimer(auctionId: UUID, durationOverride: Int?, actorId: UUID): TimerStateResponse {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         if (auction.status != AuctionStatus.LIVE) throw BusinessLogicException("Auction must be LIVE to start timer", "error.invalid_auction_status")
         val playerId = auction.currentLeaguePlayerId ?: throw BusinessLogicException("No player currently up for bidding", "error.no_player_up")
         val roundId = auction.currentRoundId ?: throw BusinessLogicException("No active round", "error.no_active_round")
@@ -356,7 +368,7 @@ class AuctionService(
      */
     @Transactional
     fun stopTimer(auctionId: UUID, actorId: UUID) {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         auction.timerStartedAt = null
         auction.timerDurationSeconds = null
         auctionRepository.save(auction)
@@ -449,19 +461,19 @@ class AuctionService(
 
     @Transactional
     fun undoBid(auctionId: UUID, reason: String, actorId: UUID): PlayerAuctionState {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val playerId = auction.currentLeaguePlayerId ?: throw BusinessLogicException("No player currently up for bidding", "error.no_player_up")
         val playerState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId).get()
 
         if (playerState.state != PlayerAuctionStateValue.UP_FOR_BIDDING) throw BusinessLogicException("Undo bid is only valid when player is UP_FOR_BIDDING", "error.invalid_player_state")
 
-        val lastBid = bidRepository.findFirstByLeaguePlayerIdAndStatusOrderByBidAtDesc(playerId, BidStatus.ACTIVE)
+        val lastBid = bidRepository.findFirstByLeaguePlayerIdAndAuctionIdAndStatusOrderByBidAtDesc(playerId, auctionId, BidStatus.ACTIVE)
             .orElseThrow { BusinessLogicException("No active bids to undo", "error.no_active_bids") }
         
         lastBid.status = BidStatus.UNDONE
         bidRepository.save(lastBid)
         
-        val nextBid = bidRepository.findFirstByLeaguePlayerIdAndStatusOrderByBidAtDesc(playerId, BidStatus.ACTIVE)
+        val nextBid = bidRepository.findFirstByLeaguePlayerIdAndAuctionIdAndStatusOrderByBidAtDesc(playerId, auctionId, BidStatus.ACTIVE)
         val undoneAmount = lastBid.bidAmount
         val undoneFranchiseId = lastBid.franchiseId
         
@@ -484,7 +496,7 @@ class AuctionService(
 
     @Transactional
     fun sellPlayer(auctionId: UUID, leaguePlayerId: UUID, franchiseId: UUID, finalPrice: Int, actorId: UUID): PlayerAuctionState {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val playerState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, leaguePlayerId).get()
         
         if (playerState.state != PlayerAuctionStateValue.UP_FOR_BIDDING) throw BusinessLogicException("Player is not in bidding state", "error.invalid_player_state")
@@ -503,6 +515,10 @@ class AuctionService(
         purse.currentAmount -= finalPrice
         purseRepository.save(purse)
         
+        val franchise = franchiseRepository.findById(franchiseId).get()
+        franchise.remainingPurse -= finalPrice
+        franchiseRepository.save(franchise)
+        
         franchisePlayerRepository.save(FranchisePlayer(
             franchiseId = franchiseId,
             leaguePlayerId = leaguePlayerId,
@@ -511,8 +527,11 @@ class AuctionService(
         ))
         
         auction.currentLeaguePlayerId = null
+        auction.timerStartedAt = null
+        auction.timerDurationSeconds = null
         auctionRepository.save(auction)
         
+        logAndBroadcast(auctionId, AuctionAction.TIMER_STOPPED, emptyMap(), actorId)
         logAndBroadcast(auctionId, AuctionAction.PLAYER_SOLD, mapOf(
             "leaguePlayerId" to leaguePlayerId,
             "franchiseId" to franchiseId,
@@ -522,7 +541,6 @@ class AuctionService(
 
         // Notify sold player and franchise owner
         val lp = leaguePlayerRepository.findById(leaguePlayerId).get()
-        val franchise = franchiseRepository.findById(franchiseId).get()
         notificationService.notifyPlayerSold(lp.userId, franchise.name, finalPrice)
         notificationService.notifyPlayerSold(franchise.ownerId, franchise.name, finalPrice)
         
@@ -531,7 +549,7 @@ class AuctionService(
 
     @Transactional
     fun undoSold(auctionId: UUID, leaguePlayerId: UUID, reason: String, actorId: UUID): PlayerAuctionState {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         
         // Find last audit log entry
         val logs = auctionAuditLogRepository.findByAuctionIdOrderBySequenceNumberAsc(auctionId)
@@ -555,6 +573,10 @@ class AuctionService(
         purse.currentAmount += restoredAmount
         purseRepository.save(purse)
         
+        val franchise = franchiseRepository.findById(revertedFromFranchiseId).get()
+        franchise.remainingPurse += restoredAmount
+        franchiseRepository.save(franchise)
+        
         franchisePlayerRepository.deleteByLeaguePlayerId(leaguePlayerId)
         
         auction.currentLeaguePlayerId = leaguePlayerId
@@ -572,15 +594,18 @@ class AuctionService(
 
     @Transactional
     fun unsoldPlayer(auctionId: UUID, leaguePlayerId: UUID, actorId: UUID): PlayerAuctionState {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val playerState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, leaguePlayerId).get()
         
         playerState.state = PlayerAuctionStateValue.UNSOLD
         playerStateRepository.save(playerState)
         
         auction.currentLeaguePlayerId = null
+        auction.timerStartedAt = null
+        auction.timerDurationSeconds = null
         auctionRepository.save(auction)
         
+        logAndBroadcast(auctionId, AuctionAction.TIMER_STOPPED, emptyMap(), actorId)
         logAndBroadcast(auctionId, AuctionAction.PLAYER_UNSOLD, mapOf(
             "leaguePlayerId" to leaguePlayerId,
             "roundId" to auction.currentRoundId
@@ -591,7 +616,7 @@ class AuctionService(
 
     @Transactional
     fun preAssign(auctionId: UUID, leaguePlayerId: UUID, franchiseId: UUID, assignmentType: String, price: Int, actorId: UUID): PlayerAuctionState {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val playerState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, leaguePlayerId)
             .orElseThrow { ResourceNotFoundException("Player not found in auction pool", "error.player_not_found") }
         
@@ -636,7 +661,7 @@ class AuctionService(
 
     @Transactional
     fun forceAssign(auctionId: UUID, leaguePlayerId: UUID, franchiseId: UUID, price: Int, actorId: UUID): PlayerAuctionState {
-        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
+        val auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow { ResourceNotFoundException("Auction not found", "error.auction_not_found") }
         val playerState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, leaguePlayerId).get()
         
         if (playerState.state != PlayerAuctionStateValue.UNSOLD && playerState.state != PlayerAuctionStateValue.AVAILABLE) {
@@ -655,6 +680,10 @@ class AuctionService(
                 purse.currentAmount -= price
                 purseRepository.save(purse)
             }
+
+            val franchise = franchiseRepository.findById(franchiseId).get()
+            franchise.remainingPurse -= price
+            franchiseRepository.save(franchise)
         }
         
         franchisePlayerRepository.save(FranchisePlayer(
@@ -798,8 +827,12 @@ class AuctionService(
         val round = roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
         val playerStates = playerStateRepository.findByAuctionId(auctionId)
         
-        return playerStates.filter { it.state == PlayerAuctionStateValue.AVAILABLE }
-        // TODO: Apply round.playerPoolSource filters if necessary
+        return when (round.playerPoolSource) {
+            PlayerPoolSource.ALL_REGISTERED -> playerStates.filter { it.state == PlayerAuctionStateValue.AVAILABLE }
+            PlayerPoolSource.UNSOLD_PREVIOUS_ROUND, PlayerPoolSource.UNSOLD_ANY_PREVIOUS_ROUND -> 
+                playerStates.filter { it.state == PlayerAuctionStateValue.UNSOLD }
+            PlayerPoolSource.AUCTIONEER_CURATED -> playerStates.filter { it.state == PlayerAuctionStateValue.AVAILABLE } // Default to AVAILABLE for now
+        }
     }
 
     @Transactional
@@ -817,7 +850,10 @@ class AuctionService(
         val auction = getAuction(auctionId)
         if (auction.currentLeaguePlayerId == leaguePlayerId) {
             auction.currentLeaguePlayerId = null
+            auction.timerStartedAt = null
+            auction.timerDurationSeconds = null
             auctionRepository.save(auction)
+            logAndBroadcast(auctionId, AuctionAction.TIMER_STOPPED, emptyMap(), actorId)
         }
         
         logAndBroadcast(auctionId, AuctionAction.PLAYER_WITHDRAWN, mapOf(
@@ -979,7 +1015,18 @@ class AuctionService(
             "data" to payload
         )
         val json = objectMapper.writeValueAsString(event)
-        redisTemplate.convertAndSend("auction:$auctionId", json)
+        
+        if (org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive()) {
+            org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
+                object : org.springframework.transaction.support.TransactionSynchronization {
+                    override fun afterCommit() {
+                        redisTemplate.convertAndSend("auction:$auctionId", json)
+                    }
+                }
+            )
+        } else {
+            redisTemplate.convertAndSend("auction:$auctionId", json)
+        }
     }
 
     fun getAuditLogs(auctionId: UUID, fromSequence: Long?) = if (fromSequence != null) {

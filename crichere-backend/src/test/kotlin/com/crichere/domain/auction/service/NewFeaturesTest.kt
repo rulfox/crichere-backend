@@ -55,6 +55,7 @@ class NewFeaturesTest {
     fun setUp() {
         val counter = mockk<io.micrometer.core.instrument.Counter>(relaxed = true)
         every { meterRegistry.counter(any()) } returns counter
+        every { franchiseRepository.save(any()) } answers { firstArg() }
 
         auctionService = AuctionService(
             auctionRepository, roundConfigRepository, slabRepository, categoryIncrementRepository,
@@ -72,7 +73,7 @@ class NewFeaturesTest {
         val round = AuctionRoundConfig(id = roundId, auctionId = auctionId, roundNumber = 1, currencyType = CurrencyType.CASH, purseSource = PurseSource.FRESH, bidMode = BidMode.EACH_BID_RECORDED, playerPoolSource = PlayerPoolSource.ALL_REGISTERED, franchiseEligibilityRule = FranchiseEligibilityRule.ALL, completionTrigger = CompletionTrigger.AUCTIONEER_MANUAL)
         round.countdownSeconds = 45
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { auctionRepository.save(any()) } answers { firstArg() }
         every { roundConfigRepository.findById(roundId) } returns Optional.of(round)
         every { auctionAuditLogRepository.findMaxSequenceNumberByAuctionId(any()) } returns 0L
@@ -124,7 +125,7 @@ class NewFeaturesTest {
         val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
         val leaguePlayer = LeaguePlayer(id = auction.currentLeaguePlayerId!!, leagueId = auction.leagueId, userId = UUID.randomUUID())
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { auctionRepository.save(any()) } answers { firstArg() }
         every { roundConfigRepository.findById(roundId) } returns Optional.of(round)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(any(), any()) } returns Optional.of(playerState)
@@ -158,7 +159,7 @@ class NewFeaturesTest {
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = player.id, state = PlayerAuctionStateValue.UP_FOR_BIDDING, currentHighestBid = 5000)
         val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(any(), any()) } returns Optional.of(playerState)
         every { categoryIncrementRepository.findByRoundId(roundId) } returns increments
         every { leaguePlayerRepository.findById(player.id) } returns Optional.of(player)
@@ -189,7 +190,7 @@ class NewFeaturesTest {
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = player.id, state = PlayerAuctionStateValue.UP_FOR_BIDDING, currentHighestBid = 2000)
         val purse = FranchisePurseState(franchiseId = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 10000, currentAmount = 10000)
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(any(), any()) } returns Optional.of(playerState)
         every { categoryIncrementRepository.findByRoundId(roundId) } returns emptyList()
         every { slabRepository.findByRoundIdOrderByFromAmountAsc(roundId) } returns slabs

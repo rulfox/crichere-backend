@@ -76,9 +76,9 @@
 - [x] T036 [P] Implement frontend shareable squad image/PDF export
 - [x] T037 [P] Configure FCM messaging and NotificationService
 - [x] T038 [P] Final UI/UX polish: Lottie, Shimmer, Shortcuts, and Semantics
-- [ ] T039 [P] Setup SSE load-test harness
-- [ ] T040 [P] Perform Redis pub/sub benchmark
-- [ ] T041 Validate platform scaling
+- [x] T039 [P] Setup SSE load-test harness
+- [x] T040 [P] Perform Redis pub/sub benchmark
+- [x] T041 Validate platform scaling
 
 ---
 

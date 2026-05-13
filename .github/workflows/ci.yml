@@ -1,21 +1,15 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'crichere-backend/**'
-      - 'build.gradle.kts'
-      - 'settings.gradle.kts'
-      - '.github/workflows/ci.yml'
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   test:
-    name: Test
+    name: Backend Tests
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -29,21 +23,26 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run tests
-        run: ./gradlew :crichere-backend:test --no-daemon
+      - name: Run Unit & Integration Tests
+        run: ./gradlew :crichere-backend:test --info --no-daemon
 
-      - name: Upload test report
-        if: failure()
+      - name: Upload Test Results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
+          name: test-results
           path: crichere-backend/build/reports/tests/
 
   build:
-    name: Build & Docker
+    name: Build & Push to ECR
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    # These permissions are required for OIDC authentication with AWS
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -55,11 +54,31 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: chmod +x gradlew && ./gradlew :crichere-backend:bootJar --no-daemon -x test
 
-      - name: Build JAR
-        run: ./gradlew :crichere-backend:bootJar --no-daemon -x test
+      # --- AWS ECR SECTION ---
+      # To enable this, you need to:
+      # 1. Create an IAM OIDC Provider for GitHub in AWS
+      # 2. Create an IAM Role for GitHub Actions with ECR permissions
+      # 3. Add the Role ARN to GitHub Secrets as AWS_ROLE_ARN
 
-      - name: Build Docker image
-        run: docker build -t crichere-backend:${{ github.sha }} -t crichere-backend:latest .
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+      #     aws-region: ap-south-1
+
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
+
+      # - name: Build, tag, and push image to Amazon ECR
+      #   env:
+      #     ECR_REGISTRY: ${{ steps.login-ecr.registry }}
+      #     ECR_REPOSITORY: crichere-backend
+      #     IMAGE_TAG: ${{ github.sha }}
+      #   run: |
+      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest

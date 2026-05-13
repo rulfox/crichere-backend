@@ -79,6 +79,7 @@ class AuctionServiceTest {
         every { objectMapper.writeValueAsString(any()) } returns "{}"
         every { categoryIncrementRepository.findByRoundId(any()) } returns emptyList()
         every { slabRepository.findByRoundIdOrderByFromAmountAsc(any()) } returns emptyList()
+        every { franchiseRepository.save(any()) } answers { firstArg() }
 
         auctionService = AuctionService(
             auctionRepository, roundConfigRepository, slabRepository, categoryIncrementRepository,
@@ -98,7 +99,7 @@ class AuctionServiceTest {
         val leaguePlayer = LeaguePlayer(id = playerId, leagueId = auction.leagueId, userId = UUID.randomUUID())
         val bidAmount = 5000
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId) } returns Optional.of(playerState)
         every { purseRepository.findByFranchiseIdAndRoundId(franchiseId, roundId) } returns purse
         every { leaguePlayerRepository.findById(playerId) } returns Optional.of(leaguePlayer)
@@ -126,7 +127,7 @@ class AuctionServiceTest {
         val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, roundId = UUID.randomUUID(), currencyType = CurrencyType.CASH, startingAmount = 4000, currentAmount = 4000)
         val bidAmount = 5000
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId) } returns Optional.of(playerState)
         every { purseRepository.findByFranchiseIdAndRoundId(franchiseId, roundId) } returns purse
 
@@ -141,7 +142,7 @@ class AuctionServiceTest {
     fun placeBidNoPlayerUp() {
         val auction = Auction(id = auctionId, leagueId = UUID.randomUUID(), currentLeaguePlayerId = null)
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
 
         val exception = assertThrows(BusinessLogicException::class.java) {
             auctionService.placeBid(auctionId, franchiseId, 5000, actorId)
@@ -157,9 +158,9 @@ class AuctionServiceTest {
         val lastBid = Bid(id = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, leaguePlayerId = playerId, franchiseId = franchiseId, bidAmount = 5000, status = BidStatus.ACTIVE, recordedBy = actorId)
         val prevBid = Bid(id = UUID.randomUUID(), auctionId = auctionId, roundId = roundId, leaguePlayerId = playerId, franchiseId = UUID.randomUUID(), bidAmount = 4000, status = BidStatus.ACTIVE, recordedBy = actorId)
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId) } returns Optional.of(playerState)
-        every { bidRepository.findFirstByLeaguePlayerIdAndStatusOrderByBidAtDesc(playerId, BidStatus.ACTIVE) } returnsMany listOf(Optional.of(lastBid), Optional.of(prevBid))
+        every { bidRepository.findFirstByLeaguePlayerIdAndAuctionIdAndStatusOrderByBidAtDesc(playerId, auctionId, BidStatus.ACTIVE) } returnsMany listOf(Optional.of(lastBid), Optional.of(prevBid))
         every { bidRepository.save(any()) } answers { firstArg() }
         every { playerStateRepository.save(any()) } answers { firstArg() }
 
@@ -178,9 +179,9 @@ class AuctionServiceTest {
         val auction = Auction(id = auctionId, leagueId = UUID.randomUUID(), currentLeaguePlayerId = playerId)
         val playerState = PlayerAuctionState(auctionId = auctionId, leaguePlayerId = playerId, state = PlayerAuctionStateValue.UP_FOR_BIDDING)
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId) } returns Optional.of(playerState)
-        every { bidRepository.findFirstByLeaguePlayerIdAndStatusOrderByBidAtDesc(playerId, BidStatus.ACTIVE) } returns Optional.empty()
+        every { bidRepository.findFirstByLeaguePlayerIdAndAuctionIdAndStatusOrderByBidAtDesc(playerId, auctionId, BidStatus.ACTIVE) } returns Optional.empty()
 
         val exception = assertThrows(BusinessLogicException::class.java) {
             auctionService.undoBid(auctionId, "Mistake", actorId)
@@ -198,7 +199,7 @@ class AuctionServiceTest {
         val leaguePlayer = LeaguePlayer(id = playerId, leagueId = UUID.randomUUID(), userId = UUID.randomUUID())
         val franchise = Franchise(id = franchiseId, name = "Team A", ownerId = UUID.randomUUID(), leagueId = UUID.randomUUID())
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId) } returns Optional.of(playerState)
         every { purseRepository.findByFranchiseIdAndRoundId(franchiseId, roundId) } returns purse
         every { playerStateRepository.save(any()) } answers { firstArg() }
@@ -233,6 +234,7 @@ class AuctionServiceTest {
             finalPrice = 5000
         )
         val purse = FranchisePurseState(franchiseId = franchiseId, auctionId = auctionId, roundId = roundId, currencyType = CurrencyType.CASH, startingAmount = 5000, currentAmount = 5000)
+        val franchise = Franchise(id = franchiseId, name = "Team A", ownerId = UUID.randomUUID(), leagueId = UUID.randomUUID())
         val lastLog = AuctionAuditLog(
             auctionId = auctionId,
             action = AuctionAction.PLAYER_SOLD,
@@ -240,11 +242,12 @@ class AuctionServiceTest {
             sequenceNumber = 1
         )
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { auctionRepository.save(any()) } answers { firstArg() }
         every { auctionAuditLogRepository.findByAuctionIdOrderBySequenceNumberAsc(auctionId) } returns listOf(lastLog)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId) } returns Optional.of(playerState)
         every { purseRepository.findByFranchiseIdAndRoundId(franchiseId, roundId) } returns purse
+        every { franchiseRepository.findById(franchiseId) } returns Optional.of(franchise)
         every { playerStateRepository.save(any()) } answers { firstArg() }
         every { purseRepository.save(any()) } answers { firstArg() }
         every { franchisePlayerRepository.deleteByLeaguePlayerId(playerId) } just runs
@@ -270,7 +273,7 @@ class AuctionServiceTest {
             sequenceNumber = 1
         )
 
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
+        every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { auctionAuditLogRepository.findByAuctionIdOrderBySequenceNumberAsc(auctionId) } returns listOf(lastLog)
 
         val exception = assertThrows(BusinessLogicException::class.java) {
