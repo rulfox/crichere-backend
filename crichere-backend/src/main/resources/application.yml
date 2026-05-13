@@ -23,7 +23,7 @@ spring:
       port: ${SPRING_DATA_REDIS_PORT:6379}
 
 server:
-  port: 8080
+  port: ${PORT:8080}
   servlet:
     context-path: /api/v1
 
