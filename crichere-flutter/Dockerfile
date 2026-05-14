@@ -9,14 +9,22 @@ FROM ghcr.io/cirruslabs/flutter:3.24.5 AS builder
 # This warms the SDK cache so the non-root build step needs no SDK writes.
 RUN flutter config --no-analytics && flutter precache --web
 
+# Mark the SDK directory as safe for git and ensure permissions for the builder user
+RUN git config --global --add safe.directory /sdks/flutter \
+    && chown -R root:root /sdks/flutter \
+    && chmod -R g+rwX /sdks/flutter
+
 # Create a non-root user.
 # Running Flutter as root in Docker causes an "Unexpected wasm dry run failure"
 # due to seccomp restrictions on certain CPU instructions. Non-root avoids this.
-RUN useradd --create-home --shell /bin/bash builder \
+RUN useradd --create-home --shell /bin/bash builder --groups root \
     && mkdir /app && chown builder:builder /app
 
 WORKDIR /app
 USER builder
+
+# Mark the SDK directory as safe for git for the builder user as well
+RUN git config --global --add safe.directory /sdks/flutter
 
 # Copy dependency manifest (pubspec.lock may be gitignored, only copy pubspec.yaml)
 COPY --chown=builder:builder pubspec.yaml ./
