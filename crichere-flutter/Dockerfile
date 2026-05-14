@@ -12,7 +12,7 @@ RUN flutter config --no-analytics && flutter precache --web
 # Create a non-root user.
 # Running Flutter as root in Docker causes an "Unexpected wasm dry run failure"
 # due to seccomp restrictions on certain CPU instructions. Non-root avoids this.
-RUN useradd --uid 1000 --create-home --shell /bin/bash builder \
+RUN useradd --create-home --shell /bin/bash builder \
     && mkdir /app && chown builder:builder /app
 
 WORKDIR /app
