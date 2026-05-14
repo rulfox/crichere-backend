@@ -5,8 +5,8 @@ FROM ghcr.io/cirruslabs/flutter:stable AS builder
 
 WORKDIR /app
 
-# Copy dependency manifest first for better layer caching
-COPY pubspec.yaml pubspec.lock ./
+# Copy dependency manifest (pubspec.lock may be gitignored, so only copy pubspec.yaml)
+COPY pubspec.yaml ./
 RUN flutter pub get
 
 # Copy the rest of the source code
