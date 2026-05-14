@@ -17,8 +17,8 @@ ARG API_BASE_URL=https://api.crichere.com/api/v1
 ARG ENV=prod
 
 # Build Flutter for web in release mode
-# --no-web-wasm: avoids WASM dry-run failures when building in Docker as root
-RUN flutter build web --release --no-web-wasm \
+# --web-renderer=html: pure HTML renderer, avoids Skwasm/WASM dry-run issues in Docker
+RUN flutter build web --release --web-renderer=html \
     --dart-define=API_BASE_URL=${API_BASE_URL} \
     --dart-define=ENV=${ENV}
 
