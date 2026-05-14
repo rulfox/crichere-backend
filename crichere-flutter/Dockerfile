@@ -1,7 +1,9 @@
 # ──────────────────────────────────────────────
 # Stage 1: Build Flutter web app
 # ──────────────────────────────────────────────
-FROM ghcr.io/cirruslabs/flutter:stable AS builder
+# Pin to 3.24.5: last stable before --web-renderer was removed
+# This version supports --web-renderer=html to bypass WASM dry-run issues
+FROM ghcr.io/cirruslabs/flutter:3.24.5 AS builder
 
 WORKDIR /app
 
@@ -16,8 +18,7 @@ COPY . .
 ARG API_BASE_URL=https://api.crichere.com/api/v1
 ARG ENV=prod
 
-# Build Flutter for web in release mode
-# --web-renderer=html: pure HTML renderer, avoids Skwasm/WASM dry-run issues in Docker
+# Build Flutter for web using HTML renderer (pure JS, no WASM dependency)
 RUN flutter build web --release --web-renderer=html \
     --dart-define=API_BASE_URL=${API_BASE_URL} \
     --dart-define=ENV=${ENV}
