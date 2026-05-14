@@ -1,25 +1,31 @@
 # ──────────────────────────────────────────────
 # Stage 1: Build Flutter web app
 # ──────────────────────────────────────────────
-# Pin to 3.24.5: last stable before --web-renderer was removed
-# This version supports --web-renderer=html to bypass WASM dry-run issues
-FROM ghcr.io/cirruslabs/flutter:3.24.5 AS builder
+FROM ghcr.io/cirruslabs/flutter:stable AS builder
+
+# Disable telemetry and pre-download web tooling as root.
+# This warms the SDK cache so the non-root build step needs no SDK writes.
+RUN flutter config --no-analytics && flutter precache --web
+
+# Create a non-root user.
+# Running Flutter as root in Docker causes an "Unexpected wasm dry run failure"
+# due to seccomp restrictions on certain CPU instructions. Non-root avoids this.
+RUN useradd --uid 1000 --create-home --shell /bin/bash builder \
+    && mkdir /app && chown builder:builder /app
 
 WORKDIR /app
+USER builder
 
-# Copy dependency manifest (pubspec.lock may be gitignored, only copy pubspec.yaml)
-COPY pubspec.yaml ./
+COPY --chown=builder:builder pubspec.yaml ./
 RUN flutter pub get
 
-# Copy the rest of the source code
-COPY . .
+COPY --chown=builder:builder . .
 
 # Build args for compile-time dart-defines (defaults = production values)
 ARG API_BASE_URL=https://api.crichere.com/api/v1
 ARG ENV=prod
 
-# Build Flutter for web using HTML renderer (pure JS, no WASM dependency)
-RUN flutter build web --release --web-renderer=html \
+RUN flutter build web --release \
     --dart-define=API_BASE_URL=${API_BASE_URL} \
     --dart-define=ENV=${ENV}
 
@@ -28,7 +34,6 @@ RUN flutter build web --release --web-renderer=html \
 # ──────────────────────────────────────────────
 FROM nginx:alpine
 
-# Copy the compiled web assets from the builder stage
 COPY --from=builder /app/build/web /usr/share/nginx/html
 
 # Copy the nginx config template (Railway injects $PORT at runtime)
