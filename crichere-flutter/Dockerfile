@@ -5,7 +5,7 @@ FROM ghcr.io/cirruslabs/flutter:stable AS builder
 
 WORKDIR /app
 
-# Copy dependency manifest (pubspec.lock may be gitignored, so only copy pubspec.yaml)
+# Copy dependency manifest (pubspec.lock may be gitignored, only copy pubspec.yaml)
 COPY pubspec.yaml ./
 RUN flutter pub get
 
@@ -17,7 +17,8 @@ ARG API_BASE_URL=https://api.crichere.com/api/v1
 ARG ENV=prod
 
 # Build Flutter for web in release mode
-RUN flutter build web --release \
+# --no-web-wasm: avoids WASM dry-run failures when building in Docker as root
+RUN flutter build web --release --no-web-wasm \
     --dart-define=API_BASE_URL=${API_BASE_URL} \
     --dart-define=ENV=${ENV}
 
