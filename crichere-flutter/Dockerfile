@@ -37,8 +37,9 @@ COPY --chown=builder:builder . .
 ARG API_BASE_URL=https://api.crichere.com/api/v1
 ARG ENV=prod
 
-# Build Flutter for web (CanvasKit default; non-root user avoids WASM seccomp issue)
-RUN flutter build web --release \
+# Build Flutter for web. --no-wasm-dry-run skips the dart2wasm feasibility check
+# that fails under Docker's seccomp profile (exit 252), and builds with dart2js.
+RUN flutter build web --release --no-wasm-dry-run \
     --dart-define=API_BASE_URL=${API_BASE_URL} \
     --dart-define=ENV=${ENV}
 
