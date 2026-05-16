@@ -58,7 +58,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
               style: CricButtonStyle.primary,
               onPressed: () async {
                 if (selectedFranchiseId.value != null) {
-                  await auctionRepo.forceAssign(auctionId, playerId, selectedFranchiseId.value!);
+                  await auctionRepo.forceAssign(auctionId, playerId, selectedFranchiseId.value!, 0);
                   if (context.mounted) Navigator.pop(context);
                 }
               },
@@ -108,7 +108,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
               style: CricButtonStyle.primary,
               onPressed: () async {
                 if (selectedFranchiseId.value != null) {
-                  await auctionRepo.preAssign(auctionId, playerId, selectedFranchiseId.value!, type.value);
+                  await auctionRepo.preAssign(auctionId, playerId, selectedFranchiseId.value!, type.value, 0);
                   if (context.mounted) Navigator.pop(context);
                 }
               },

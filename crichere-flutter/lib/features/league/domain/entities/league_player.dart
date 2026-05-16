@@ -4,7 +4,7 @@ part 'league_player.freezed.dart';
 part 'league_player.g.dart';
 
 @freezed
-class LeaguePlayer with _$LeaguePlayer {
+abstract class LeaguePlayer with _$LeaguePlayer {
   const LeaguePlayer._();
 
   const factory LeaguePlayer({

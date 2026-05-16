@@ -20,12 +20,13 @@ class _LeagueApi implements LeagueApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<List<League>> getLeagues() async {
+  Future<PageResponse<League>> getLeagues({int? page, int? size}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page, r'size': size};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<League>>(
+    final _options = _setStreamType<PageResponse<League>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -35,12 +36,13 @@ class _LeagueApi implements LeagueApi {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<League> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PageResponse<League> _value;
     try {
-      _value = _result.data!
-          .map((dynamic i) => League.fromJson(i as Map<String, dynamic>))
-          .toList();
+      _value = PageResponse<League>.fromJson(
+        _result.data!,
+        (json) => League.fromJson(json as Map<String, dynamic>),
+      );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
@@ -153,32 +155,118 @@ class _LeagueApi implements LeagueApi {
   }
 
   @override
-  Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId) async {
+  Future<List<Franchise>> getFranchises(String leagueId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<LeaguePlayer>>(
+    final _options = _setStreamType<List<Franchise>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/players/league/${leagueId}',
+            '/leagues/${leagueId}/franchises',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<LeaguePlayer> _value;
+    late List<Franchise> _value;
     try {
       _value = _result.data!
-          .map((dynamic i) => LeaguePlayer.fromJson(i as Map<String, dynamic>))
+          .map((dynamic i) => Franchise.fromJson(i as Map<String, dynamic>))
           .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
     }
     return _value;
+  }
+
+  @override
+  Future<PageResponse<LeaguePlayer>> getLeaguePlayers(
+    String leagueId, {
+    int? page,
+    int? size,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'page': page, r'size': size};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<PageResponse<LeaguePlayer>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/leagues/${leagueId}/players',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PageResponse<LeaguePlayer> _value;
+    try {
+      _value = PageResponse<LeaguePlayer>.fromJson(
+        _result.data!,
+        (json) => LeaguePlayer.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<LeaguePlayer> updatePlayerEligibility(
+    String leagueId,
+    String playerId,
+    Map<String, bool> body,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
+    final _options = _setStreamType<LeaguePlayer>(
+      Options(method: 'PATCH', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/leagues/${leagueId}/players/${playerId}/eligible',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late LeaguePlayer _value;
+    try {
+      _value = LeaguePlayer.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<void> removePlayer(String leagueId, String playerId) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/leagues/${leagueId}/players/${playerId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
   }
 
   @override

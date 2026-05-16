@@ -291,6 +291,287 @@ as DateTime,
 
 
 /// @nodoc
+mixin _$FranchiseInvite {
+
+ String get id; String get franchiseId; String get email; String get token; String get status; DateTime get expiresAt; String? get inviteUrl;
+/// Create a copy of FranchiseInvite
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FranchiseInviteCopyWith<FranchiseInvite> get copyWith => _$FranchiseInviteCopyWithImpl<FranchiseInvite>(this as FranchiseInvite, _$identity);
+
+  /// Serializes this FranchiseInvite to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FranchiseInvite&&(identical(other.id, id) || other.id == id)&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.email, email) || other.email == email)&&(identical(other.token, token) || other.token == token)&&(identical(other.status, status) || other.status == status)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.inviteUrl, inviteUrl) || other.inviteUrl == inviteUrl));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,franchiseId,email,token,status,expiresAt,inviteUrl);
+
+@override
+String toString() {
+  return 'FranchiseInvite(id: $id, franchiseId: $franchiseId, email: $email, token: $token, status: $status, expiresAt: $expiresAt, inviteUrl: $inviteUrl)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FranchiseInviteCopyWith<$Res>  {
+  factory $FranchiseInviteCopyWith(FranchiseInvite value, $Res Function(FranchiseInvite) _then) = _$FranchiseInviteCopyWithImpl;
+@useResult
+$Res call({
+ String id, String franchiseId, String email, String token, String status, DateTime expiresAt, String? inviteUrl
+});
+
+
+
+
+}
+/// @nodoc
+class _$FranchiseInviteCopyWithImpl<$Res>
+    implements $FranchiseInviteCopyWith<$Res> {
+  _$FranchiseInviteCopyWithImpl(this._self, this._then);
+
+  final FranchiseInvite _self;
+  final $Res Function(FranchiseInvite) _then;
+
+/// Create a copy of FranchiseInvite
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? franchiseId = null,Object? email = null,Object? token = null,Object? status = null,Object? expiresAt = null,Object? inviteUrl = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as DateTime,inviteUrl: freezed == inviteUrl ? _self.inviteUrl : inviteUrl // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FranchiseInvite].
+extension FranchiseInvitePatterns on FranchiseInvite {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FranchiseInvite value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FranchiseInvite() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FranchiseInvite value)  $default,){
+final _that = this;
+switch (_that) {
+case _FranchiseInvite():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FranchiseInvite value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FranchiseInvite() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String franchiseId,  String email,  String token,  String status,  DateTime expiresAt,  String? inviteUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FranchiseInvite() when $default != null:
+return $default(_that.id,_that.franchiseId,_that.email,_that.token,_that.status,_that.expiresAt,_that.inviteUrl);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String franchiseId,  String email,  String token,  String status,  DateTime expiresAt,  String? inviteUrl)  $default,) {final _that = this;
+switch (_that) {
+case _FranchiseInvite():
+return $default(_that.id,_that.franchiseId,_that.email,_that.token,_that.status,_that.expiresAt,_that.inviteUrl);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String franchiseId,  String email,  String token,  String status,  DateTime expiresAt,  String? inviteUrl)?  $default,) {final _that = this;
+switch (_that) {
+case _FranchiseInvite() when $default != null:
+return $default(_that.id,_that.franchiseId,_that.email,_that.token,_that.status,_that.expiresAt,_that.inviteUrl);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FranchiseInvite implements FranchiseInvite {
+  const _FranchiseInvite({required this.id, required this.franchiseId, required this.email, required this.token, required this.status, required this.expiresAt, this.inviteUrl});
+  factory _FranchiseInvite.fromJson(Map<String, dynamic> json) => _$FranchiseInviteFromJson(json);
+
+@override final  String id;
+@override final  String franchiseId;
+@override final  String email;
+@override final  String token;
+@override final  String status;
+@override final  DateTime expiresAt;
+@override final  String? inviteUrl;
+
+/// Create a copy of FranchiseInvite
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FranchiseInviteCopyWith<_FranchiseInvite> get copyWith => __$FranchiseInviteCopyWithImpl<_FranchiseInvite>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FranchiseInviteToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FranchiseInvite&&(identical(other.id, id) || other.id == id)&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.email, email) || other.email == email)&&(identical(other.token, token) || other.token == token)&&(identical(other.status, status) || other.status == status)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.inviteUrl, inviteUrl) || other.inviteUrl == inviteUrl));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,franchiseId,email,token,status,expiresAt,inviteUrl);
+
+@override
+String toString() {
+  return 'FranchiseInvite(id: $id, franchiseId: $franchiseId, email: $email, token: $token, status: $status, expiresAt: $expiresAt, inviteUrl: $inviteUrl)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FranchiseInviteCopyWith<$Res> implements $FranchiseInviteCopyWith<$Res> {
+  factory _$FranchiseInviteCopyWith(_FranchiseInvite value, $Res Function(_FranchiseInvite) _then) = __$FranchiseInviteCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String franchiseId, String email, String token, String status, DateTime expiresAt, String? inviteUrl
+});
+
+
+
+
+}
+/// @nodoc
+class __$FranchiseInviteCopyWithImpl<$Res>
+    implements _$FranchiseInviteCopyWith<$Res> {
+  __$FranchiseInviteCopyWithImpl(this._self, this._then);
+
+  final _FranchiseInvite _self;
+  final $Res Function(_FranchiseInvite) _then;
+
+/// Create a copy of FranchiseInvite
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? franchiseId = null,Object? email = null,Object? token = null,Object? status = null,Object? expiresAt = null,Object? inviteUrl = freezed,}) {
+  return _then(_FranchiseInvite(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
+as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,token: null == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,expiresAt: null == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as DateTime,inviteUrl: freezed == inviteUrl ? _self.inviteUrl : inviteUrl // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$InviteAcceptRequest {
 
  String get token;

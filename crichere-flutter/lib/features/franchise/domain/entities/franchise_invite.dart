@@ -17,6 +17,22 @@ abstract class InviteValidationResponse with _$InviteValidationResponse {
   factory InviteValidationResponse.fromJson(Map<String, dynamic> json) => _$InviteValidationResponseFromJson(json);
 }
 
+// Matches backend FranchiseInviteResponse
+@freezed
+abstract class FranchiseInvite with _$FranchiseInvite {
+  const factory FranchiseInvite({
+    required String id,
+    required String franchiseId,
+    required String email,
+    required String token,
+    required String status,
+    required DateTime expiresAt,
+    String? inviteUrl,
+  }) = _FranchiseInvite;
+
+  factory FranchiseInvite.fromJson(Map<String, dynamic> json) => _$FranchiseInviteFromJson(json);
+}
+
 @freezed
 abstract class InviteAcceptRequest with _$InviteAcceptRequest {
   const factory InviteAcceptRequest({

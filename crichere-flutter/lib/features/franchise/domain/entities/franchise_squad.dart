@@ -4,7 +4,7 @@ part 'franchise_squad.freezed.dart';
 part 'franchise_squad.g.dart';
 
 @freezed
-class AuctionPlayerSummary with _$AuctionPlayerSummary {
+abstract class AuctionPlayerSummary with _$AuctionPlayerSummary {
   const factory AuctionPlayerSummary({
     required String playerName,
     String? playerCategory,
@@ -17,7 +17,7 @@ class AuctionPlayerSummary with _$AuctionPlayerSummary {
 }
 
 @freezed
-class FranchiseSquadResponse with _$FranchiseSquadResponse {
+abstract class FranchiseSquadResponse with _$FranchiseSquadResponse {
   const factory FranchiseSquadResponse({
     required String franchiseId,
     required String franchiseName,

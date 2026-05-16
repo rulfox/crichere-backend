@@ -4,7 +4,7 @@ part 'page_response.freezed.dart';
 part 'page_response.g.dart';
 
 @Freezed(genericArgumentFactories: true)
-class PageResponse<T> with _$PageResponse<T> {
+abstract class PageResponse<T> with _$PageResponse<T> {
   const factory PageResponse({
     required List<T> content,
     required int totalElements,

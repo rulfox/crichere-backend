@@ -13,42 +13,42 @@ part of 'franchise_squad.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$FranchiseSquad {
+mixin _$AuctionPlayerSummary {
 
- String get franchiseId; String get franchiseName; int get purseRemaining; List<FranchisePlayer> get players;
-/// Create a copy of FranchiseSquad
+ String get playerName; String? get playerCategory; int? get finalPrice; String? get assignmentType; int? get roundNumber;
+/// Create a copy of AuctionPlayerSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$FranchiseSquadCopyWith<FranchiseSquad> get copyWith => _$FranchiseSquadCopyWithImpl<FranchiseSquad>(this as FranchiseSquad, _$identity);
+$AuctionPlayerSummaryCopyWith<AuctionPlayerSummary> get copyWith => _$AuctionPlayerSummaryCopyWithImpl<AuctionPlayerSummary>(this as AuctionPlayerSummary, _$identity);
 
-  /// Serializes this FranchiseSquad to a JSON map.
+  /// Serializes this AuctionPlayerSummary to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FranchiseSquad&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.purseRemaining, purseRemaining) || other.purseRemaining == purseRemaining)&&const DeepCollectionEquality().equals(other.players, players));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuctionPlayerSummary&&(identical(other.playerName, playerName) || other.playerName == playerName)&&(identical(other.playerCategory, playerCategory) || other.playerCategory == playerCategory)&&(identical(other.finalPrice, finalPrice) || other.finalPrice == finalPrice)&&(identical(other.assignmentType, assignmentType) || other.assignmentType == assignmentType)&&(identical(other.roundNumber, roundNumber) || other.roundNumber == roundNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,purseRemaining,const DeepCollectionEquality().hash(players));
+int get hashCode => Object.hash(runtimeType,playerName,playerCategory,finalPrice,assignmentType,roundNumber);
 
 @override
 String toString() {
-  return 'FranchiseSquad(franchiseId: $franchiseId, franchiseName: $franchiseName, purseRemaining: $purseRemaining, players: $players)';
+  return 'AuctionPlayerSummary(playerName: $playerName, playerCategory: $playerCategory, finalPrice: $finalPrice, assignmentType: $assignmentType, roundNumber: $roundNumber)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $FranchiseSquadCopyWith<$Res>  {
-  factory $FranchiseSquadCopyWith(FranchiseSquad value, $Res Function(FranchiseSquad) _then) = _$FranchiseSquadCopyWithImpl;
+abstract mixin class $AuctionPlayerSummaryCopyWith<$Res>  {
+  factory $AuctionPlayerSummaryCopyWith(AuctionPlayerSummary value, $Res Function(AuctionPlayerSummary) _then) = _$AuctionPlayerSummaryCopyWithImpl;
 @useResult
 $Res call({
- String franchiseId, String franchiseName, int purseRemaining, List<FranchisePlayer> players
+ String playerName, String? playerCategory, int? finalPrice, String? assignmentType, int? roundNumber
 });
 
 
@@ -56,30 +56,31 @@ $Res call({
 
 }
 /// @nodoc
-class _$FranchiseSquadCopyWithImpl<$Res>
-    implements $FranchiseSquadCopyWith<$Res> {
-  _$FranchiseSquadCopyWithImpl(this._self, this._then);
+class _$AuctionPlayerSummaryCopyWithImpl<$Res>
+    implements $AuctionPlayerSummaryCopyWith<$Res> {
+  _$AuctionPlayerSummaryCopyWithImpl(this._self, this._then);
 
-  final FranchiseSquad _self;
-  final $Res Function(FranchiseSquad) _then;
+  final AuctionPlayerSummary _self;
+  final $Res Function(AuctionPlayerSummary) _then;
 
-/// Create a copy of FranchiseSquad
+/// Create a copy of AuctionPlayerSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? purseRemaining = null,Object? players = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? playerName = null,Object? playerCategory = freezed,Object? finalPrice = freezed,Object? assignmentType = freezed,Object? roundNumber = freezed,}) {
   return _then(_self.copyWith(
-franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
-as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
-as String,purseRemaining: null == purseRemaining ? _self.purseRemaining : purseRemaining // ignore: cast_nullable_to_non_nullable
-as int,players: null == players ? _self.players : players // ignore: cast_nullable_to_non_nullable
-as List<FranchisePlayer>,
+playerName: null == playerName ? _self.playerName : playerName // ignore: cast_nullable_to_non_nullable
+as String,playerCategory: freezed == playerCategory ? _self.playerCategory : playerCategory // ignore: cast_nullable_to_non_nullable
+as String?,finalPrice: freezed == finalPrice ? _self.finalPrice : finalPrice // ignore: cast_nullable_to_non_nullable
+as int?,assignmentType: freezed == assignmentType ? _self.assignmentType : assignmentType // ignore: cast_nullable_to_non_nullable
+as String?,roundNumber: freezed == roundNumber ? _self.roundNumber : roundNumber // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [FranchiseSquad].
-extension FranchiseSquadPatterns on FranchiseSquad {
+/// Adds pattern-matching-related methods to [AuctionPlayerSummary].
+extension AuctionPlayerSummaryPatterns on AuctionPlayerSummary {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -92,10 +93,10 @@ extension FranchiseSquadPatterns on FranchiseSquad {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FranchiseSquad value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AuctionPlayerSummary value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _FranchiseSquad() when $default != null:
+case _AuctionPlayerSummary() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -114,10 +115,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FranchiseSquad value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AuctionPlayerSummary value)  $default,){
 final _that = this;
 switch (_that) {
-case _FranchiseSquad():
+case _AuctionPlayerSummary():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -135,10 +136,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FranchiseSquad value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AuctionPlayerSummary value)?  $default,){
 final _that = this;
 switch (_that) {
-case _FranchiseSquad() when $default != null:
+case _AuctionPlayerSummary() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName,  int purseRemaining,  List<FranchisePlayer> players)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String playerName,  String? playerCategory,  int? finalPrice,  String? assignmentType,  int? roundNumber)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _FranchiseSquad() when $default != null:
-return $default(_that.franchiseId,_that.franchiseName,_that.purseRemaining,_that.players);case _:
+case _AuctionPlayerSummary() when $default != null:
+return $default(_that.playerName,_that.playerCategory,_that.finalPrice,_that.assignmentType,_that.roundNumber);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.franchiseId,_that.franchiseName,_that.purseRemaining,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName,  int purseRemaining,  List<FranchisePlayer> players)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String playerName,  String? playerCategory,  int? finalPrice,  String? assignmentType,  int? roundNumber)  $default,) {final _that = this;
 switch (_that) {
-case _FranchiseSquad():
-return $default(_that.franchiseId,_that.franchiseName,_that.purseRemaining,_that.players);case _:
+case _AuctionPlayerSummary():
+return $default(_that.playerName,_that.playerCategory,_that.finalPrice,_that.assignmentType,_that.roundNumber);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.franchiseId,_that.franchiseName,_that.purseRemaining,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String franchiseId,  String franchiseName,  int purseRemaining,  List<FranchisePlayer> players)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String playerName,  String? playerCategory,  int? finalPrice,  String? assignmentType,  int? roundNumber)?  $default,) {final _that = this;
 switch (_that) {
-case _FranchiseSquad() when $default != null:
-return $default(_that.franchiseId,_that.franchiseName,_that.purseRemaining,_that.players);case _:
+case _AuctionPlayerSummary() when $default != null:
+return $default(_that.playerName,_that.playerCategory,_that.finalPrice,_that.assignmentType,_that.roundNumber);case _:
   return null;
 
 }
@@ -211,55 +212,50 @@ return $default(_that.franchiseId,_that.franchiseName,_that.purseRemaining,_that
 /// @nodoc
 @JsonSerializable()
 
-class _FranchiseSquad implements FranchiseSquad {
-  const _FranchiseSquad({required this.franchiseId, required this.franchiseName, required this.purseRemaining, required final  List<FranchisePlayer> players}): _players = players;
-  factory _FranchiseSquad.fromJson(Map<String, dynamic> json) => _$FranchiseSquadFromJson(json);
+class _AuctionPlayerSummary implements AuctionPlayerSummary {
+  const _AuctionPlayerSummary({required this.playerName, this.playerCategory, this.finalPrice, this.assignmentType, this.roundNumber});
+  factory _AuctionPlayerSummary.fromJson(Map<String, dynamic> json) => _$AuctionPlayerSummaryFromJson(json);
 
-@override final  String franchiseId;
-@override final  String franchiseName;
-@override final  int purseRemaining;
- final  List<FranchisePlayer> _players;
-@override List<FranchisePlayer> get players {
-  if (_players is EqualUnmodifiableListView) return _players;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_players);
-}
+@override final  String playerName;
+@override final  String? playerCategory;
+@override final  int? finalPrice;
+@override final  String? assignmentType;
+@override final  int? roundNumber;
 
-
-/// Create a copy of FranchiseSquad
+/// Create a copy of AuctionPlayerSummary
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$FranchiseSquadCopyWith<_FranchiseSquad> get copyWith => __$FranchiseSquadCopyWithImpl<_FranchiseSquad>(this, _$identity);
+_$AuctionPlayerSummaryCopyWith<_AuctionPlayerSummary> get copyWith => __$AuctionPlayerSummaryCopyWithImpl<_AuctionPlayerSummary>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$FranchiseSquadToJson(this, );
+  return _$AuctionPlayerSummaryToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FranchiseSquad&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.purseRemaining, purseRemaining) || other.purseRemaining == purseRemaining)&&const DeepCollectionEquality().equals(other._players, _players));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuctionPlayerSummary&&(identical(other.playerName, playerName) || other.playerName == playerName)&&(identical(other.playerCategory, playerCategory) || other.playerCategory == playerCategory)&&(identical(other.finalPrice, finalPrice) || other.finalPrice == finalPrice)&&(identical(other.assignmentType, assignmentType) || other.assignmentType == assignmentType)&&(identical(other.roundNumber, roundNumber) || other.roundNumber == roundNumber));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,purseRemaining,const DeepCollectionEquality().hash(_players));
+int get hashCode => Object.hash(runtimeType,playerName,playerCategory,finalPrice,assignmentType,roundNumber);
 
 @override
 String toString() {
-  return 'FranchiseSquad(franchiseId: $franchiseId, franchiseName: $franchiseName, purseRemaining: $purseRemaining, players: $players)';
+  return 'AuctionPlayerSummary(playerName: $playerName, playerCategory: $playerCategory, finalPrice: $finalPrice, assignmentType: $assignmentType, roundNumber: $roundNumber)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$FranchiseSquadCopyWith<$Res> implements $FranchiseSquadCopyWith<$Res> {
-  factory _$FranchiseSquadCopyWith(_FranchiseSquad value, $Res Function(_FranchiseSquad) _then) = __$FranchiseSquadCopyWithImpl;
+abstract mixin class _$AuctionPlayerSummaryCopyWith<$Res> implements $AuctionPlayerSummaryCopyWith<$Res> {
+  factory _$AuctionPlayerSummaryCopyWith(_AuctionPlayerSummary value, $Res Function(_AuctionPlayerSummary) _then) = __$AuctionPlayerSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- String franchiseId, String franchiseName, int purseRemaining, List<FranchisePlayer> players
+ String playerName, String? playerCategory, int? finalPrice, String? assignmentType, int? roundNumber
 });
 
 
@@ -267,22 +263,298 @@ $Res call({
 
 }
 /// @nodoc
-class __$FranchiseSquadCopyWithImpl<$Res>
-    implements _$FranchiseSquadCopyWith<$Res> {
-  __$FranchiseSquadCopyWithImpl(this._self, this._then);
+class __$AuctionPlayerSummaryCopyWithImpl<$Res>
+    implements _$AuctionPlayerSummaryCopyWith<$Res> {
+  __$AuctionPlayerSummaryCopyWithImpl(this._self, this._then);
 
-  final _FranchiseSquad _self;
-  final $Res Function(_FranchiseSquad) _then;
+  final _AuctionPlayerSummary _self;
+  final $Res Function(_AuctionPlayerSummary) _then;
 
-/// Create a copy of FranchiseSquad
+/// Create a copy of AuctionPlayerSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? purseRemaining = null,Object? players = null,}) {
-  return _then(_FranchiseSquad(
+@override @pragma('vm:prefer-inline') $Res call({Object? playerName = null,Object? playerCategory = freezed,Object? finalPrice = freezed,Object? assignmentType = freezed,Object? roundNumber = freezed,}) {
+  return _then(_AuctionPlayerSummary(
+playerName: null == playerName ? _self.playerName : playerName // ignore: cast_nullable_to_non_nullable
+as String,playerCategory: freezed == playerCategory ? _self.playerCategory : playerCategory // ignore: cast_nullable_to_non_nullable
+as String?,finalPrice: freezed == finalPrice ? _self.finalPrice : finalPrice // ignore: cast_nullable_to_non_nullable
+as int?,assignmentType: freezed == assignmentType ? _self.assignmentType : assignmentType // ignore: cast_nullable_to_non_nullable
+as String?,roundNumber: freezed == roundNumber ? _self.roundNumber : roundNumber // ignore: cast_nullable_to_non_nullable
+as int?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$FranchiseSquadResponse {
+
+ String get franchiseId; String get franchiseName; List<AuctionPlayerSummary> get players;
+/// Create a copy of FranchiseSquadResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FranchiseSquadResponseCopyWith<FranchiseSquadResponse> get copyWith => _$FranchiseSquadResponseCopyWithImpl<FranchiseSquadResponse>(this as FranchiseSquadResponse, _$identity);
+
+  /// Serializes this FranchiseSquadResponse to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FranchiseSquadResponse&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&const DeepCollectionEquality().equals(other.players, players));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,const DeepCollectionEquality().hash(players));
+
+@override
+String toString() {
+  return 'FranchiseSquadResponse(franchiseId: $franchiseId, franchiseName: $franchiseName, players: $players)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FranchiseSquadResponseCopyWith<$Res>  {
+  factory $FranchiseSquadResponseCopyWith(FranchiseSquadResponse value, $Res Function(FranchiseSquadResponse) _then) = _$FranchiseSquadResponseCopyWithImpl;
+@useResult
+$Res call({
+ String franchiseId, String franchiseName, List<AuctionPlayerSummary> players
+});
+
+
+
+
+}
+/// @nodoc
+class _$FranchiseSquadResponseCopyWithImpl<$Res>
+    implements $FranchiseSquadResponseCopyWith<$Res> {
+  _$FranchiseSquadResponseCopyWithImpl(this._self, this._then);
+
+  final FranchiseSquadResponse _self;
+  final $Res Function(FranchiseSquadResponse) _then;
+
+/// Create a copy of FranchiseSquadResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? players = null,}) {
+  return _then(_self.copyWith(
 franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
 as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
-as String,purseRemaining: null == purseRemaining ? _self.purseRemaining : purseRemaining // ignore: cast_nullable_to_non_nullable
-as int,players: null == players ? _self._players : players // ignore: cast_nullable_to_non_nullable
-as List<FranchisePlayer>,
+as String,players: null == players ? _self.players : players // ignore: cast_nullable_to_non_nullable
+as List<AuctionPlayerSummary>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FranchiseSquadResponse].
+extension FranchiseSquadResponsePatterns on FranchiseSquadResponse {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FranchiseSquadResponse value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FranchiseSquadResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FranchiseSquadResponse value)  $default,){
+final _that = this;
+switch (_that) {
+case _FranchiseSquadResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FranchiseSquadResponse value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FranchiseSquadResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName,  List<AuctionPlayerSummary> players)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FranchiseSquadResponse() when $default != null:
+return $default(_that.franchiseId,_that.franchiseName,_that.players);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName,  List<AuctionPlayerSummary> players)  $default,) {final _that = this;
+switch (_that) {
+case _FranchiseSquadResponse():
+return $default(_that.franchiseId,_that.franchiseName,_that.players);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String franchiseId,  String franchiseName,  List<AuctionPlayerSummary> players)?  $default,) {final _that = this;
+switch (_that) {
+case _FranchiseSquadResponse() when $default != null:
+return $default(_that.franchiseId,_that.franchiseName,_that.players);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FranchiseSquadResponse implements FranchiseSquadResponse {
+  const _FranchiseSquadResponse({required this.franchiseId, required this.franchiseName, required final  List<AuctionPlayerSummary> players}): _players = players;
+  factory _FranchiseSquadResponse.fromJson(Map<String, dynamic> json) => _$FranchiseSquadResponseFromJson(json);
+
+@override final  String franchiseId;
+@override final  String franchiseName;
+ final  List<AuctionPlayerSummary> _players;
+@override List<AuctionPlayerSummary> get players {
+  if (_players is EqualUnmodifiableListView) return _players;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_players);
+}
+
+
+/// Create a copy of FranchiseSquadResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FranchiseSquadResponseCopyWith<_FranchiseSquadResponse> get copyWith => __$FranchiseSquadResponseCopyWithImpl<_FranchiseSquadResponse>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FranchiseSquadResponseToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FranchiseSquadResponse&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&const DeepCollectionEquality().equals(other._players, _players));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,const DeepCollectionEquality().hash(_players));
+
+@override
+String toString() {
+  return 'FranchiseSquadResponse(franchiseId: $franchiseId, franchiseName: $franchiseName, players: $players)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FranchiseSquadResponseCopyWith<$Res> implements $FranchiseSquadResponseCopyWith<$Res> {
+  factory _$FranchiseSquadResponseCopyWith(_FranchiseSquadResponse value, $Res Function(_FranchiseSquadResponse) _then) = __$FranchiseSquadResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ String franchiseId, String franchiseName, List<AuctionPlayerSummary> players
+});
+
+
+
+
+}
+/// @nodoc
+class __$FranchiseSquadResponseCopyWithImpl<$Res>
+    implements _$FranchiseSquadResponseCopyWith<$Res> {
+  __$FranchiseSquadResponseCopyWithImpl(this._self, this._then);
+
+  final _FranchiseSquadResponse _self;
+  final $Res Function(_FranchiseSquadResponse) _then;
+
+/// Create a copy of FranchiseSquadResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? players = null,}) {
+  return _then(_FranchiseSquadResponse(
+franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
+as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
+as String,players: null == players ? _self._players : players // ignore: cast_nullable_to_non_nullable
+as List<AuctionPlayerSummary>,
   ));
 }
 

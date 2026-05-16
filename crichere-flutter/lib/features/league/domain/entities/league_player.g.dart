@@ -21,6 +21,7 @@ _LeaguePlayer _$LeaguePlayerFromJson(Map<String, dynamic> json) =>
       franchiseName: json['franchiseName'] as String?,
       category: json['category'] as String?,
       tag: json['tag'] as String?,
+      auctionEligible: json['auctionEligible'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$LeaguePlayerToJson(_LeaguePlayer instance) =>
@@ -38,4 +39,5 @@ Map<String, dynamic> _$LeaguePlayerToJson(_LeaguePlayer instance) =>
       'franchiseName': instance.franchiseName,
       'category': instance.category,
       'tag': instance.tag,
+      'auctionEligible': instance.auctionEligible,
     };

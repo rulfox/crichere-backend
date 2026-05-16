@@ -10,7 +10,7 @@ import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 class ExportService {
   final ScreenshotController _screenshotController = ScreenshotController();
 
-  Future<void> exportSquadToPdf(FranchiseSquad squad) async {
+  Future<void> exportSquadToPdf(FranchiseSquadResponse squad) async {
     final pdf = pw.Document();
 
     pdf.addPage(
@@ -20,17 +20,16 @@ class ExportService {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Header(level: 0, child: pw.Text('Squad: ${squad.franchiseName}')),
-              pw.Text('Purse Remaining: INR ${squad.purseRemaining}'),
               pw.SizedBox(height: 20),
               pw.TableHelper.fromTextArray(
                 context: context,
                 data: <List<String>>[
-                  <String>['Player Name', 'Role', 'Assignment', 'Price'],
+                  <String>['Player Name', 'Category', 'Assignment', 'Price'],
                   ...squad.players.map((p) => [
-                        p.name,
-                        p.role,
-                        p.assignmentType,
-                        'INR ${p.price}',
+                        p.playerName,
+                        p.playerCategory ?? '-',
+                        p.assignmentType ?? 'AUCTIONED',
+                        p.finalPrice != null ? '₹${p.finalPrice}' : '-',
                       ])
                 ],
               ),
@@ -50,10 +49,9 @@ class ExportService {
     ));
   }
 
-  Future<void> exportSquadToImage(FranchiseSquad squad) async {
-    // SC-005: 1080x1080 PNG for WhatsApp sharing
+  Future<void> exportSquadToImage(FranchiseSquadResponse squad) async {
     final widget = SquadShareCard(squad: squad);
-    
+
     final imageBytes = await _screenshotController.captureFromWidget(
       widget,
       delay: const Duration(milliseconds: 100),
@@ -73,7 +71,7 @@ class ExportService {
 }
 
 class SquadShareCard extends StatelessWidget {
-  final FranchiseSquad squad;
+  final FranchiseSquadResponse squad;
   const SquadShareCard({super.key, required this.squad});
 
   @override
@@ -139,16 +137,17 @@ class SquadShareCard extends StatelessWidget {
                       const SizedBox(width: 15),
                       Expanded(
                         child: Text(
-                          p.name,
+                          p.playerName,
                           style: CricTextStyle.headingMd.copyWith(fontSize: 22),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Text(
-                        '₹${p.price}',
-                        style: CricTextStyle.badge.copyWith(color: CricColor.gold, fontSize: 16),
-                      ),
+                      if (p.finalPrice != null)
+                        Text(
+                          '₹${p.finalPrice}',
+                          style: CricTextStyle.badge.copyWith(color: CricColor.gold, fontSize: 16),
+                        ),
                     ],
                   ),
                 );

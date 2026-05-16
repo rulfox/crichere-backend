@@ -185,6 +185,35 @@ class _AuthApi implements AuthApi {
   }
 
   @override
+  Future<List<League>> getUserLeagues(String id) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<League>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/users/${id}/leagues',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<League> _value;
+    try {
+      _value = _result.data!
+          .map((dynamic i) => League.fromJson(i as Map<String, dynamic>))
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<void> updateBasicInfo(String id, UserBasicInfoRequest request) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -246,12 +275,21 @@ class _AuthApi implements AuthApi {
   }
 
   @override
-  Future<List<AuthResponse>> searchUsers(String query) async {
+  Future<PageResponse<AuthResponse>> searchUsers(
+    String query, {
+    int? page,
+    int? size,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'query': query};
+    final queryParameters = <String, dynamic>{
+      r'query': query,
+      r'page': page,
+      r'size': size,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<AuthResponse>>(
+    final _options = _setStreamType<PageResponse<AuthResponse>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -261,12 +299,13 @@ class _AuthApi implements AuthApi {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<AuthResponse> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PageResponse<AuthResponse> _value;
     try {
-      _value = _result.data!
-          .map((dynamic i) => AuthResponse.fromJson(i as Map<String, dynamic>))
-          .toList();
+      _value = PageResponse<AuthResponse>.fromJson(
+        _result.data!,
+        (json) => AuthResponse.fromJson(json as Map<String, dynamic>),
+      );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

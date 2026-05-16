@@ -138,6 +138,7 @@ class PreAssignmentScreen extends HookConsumerWidget {
                         p.playerId,
                         franchiseId,
                         type,
+                        0,
                       );
                       // Update local state to reflect the selection
                       final updated = Map<String, Map<String, LeaguePlayer?>>.from(selections.value);

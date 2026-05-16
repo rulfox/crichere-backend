@@ -1,7 +1,7 @@
 import '../../data/models/auth_response.dart';
 import '../entities/auth_enums.dart';
-import '../../../core/network/page_response.dart';
-import '../../league/domain/entities/league.dart';
+import '../../../../core/network/page_response.dart';
+import '../../../league/domain/entities/league.dart';
 
 abstract class AuthRepository {
   Future<void> sendOtp(String phone);

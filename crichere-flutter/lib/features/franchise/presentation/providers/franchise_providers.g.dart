@@ -98,17 +98,93 @@ final class FranchiseRepositoryProvider
 String _$franchiseRepositoryHash() =>
     r'b02d29f3e2d0f4012c94196b57dfa61ef030a8ff';
 
+@ProviderFor(franchise)
+final franchiseProvider = FranchiseFamily._();
+
+final class FranchiseProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Franchise>,
+          Franchise,
+          FutureOr<Franchise>
+        >
+    with $FutureModifier<Franchise>, $FutureProvider<Franchise> {
+  FranchiseProvider._({
+    required FranchiseFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'franchiseProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$franchiseHash();
+
+  @override
+  String toString() {
+    return r'franchiseProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Franchise> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Franchise> create(Ref ref) {
+    final argument = this.argument as String;
+    return franchise(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FranchiseProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$franchiseHash() => r'7ad3caffb8ab365ed849b1e8cc9c2bfbc92dc0d3';
+
+final class FranchiseFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Franchise>, String> {
+  FranchiseFamily._()
+    : super(
+        retry: null,
+        name: r'franchiseProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  FranchiseProvider call(String id) =>
+      FranchiseProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'franchiseProvider';
+}
+
 @ProviderFor(squad)
 final squadProvider = SquadFamily._();
 
 final class SquadProvider
     extends
         $FunctionalProvider<
-          AsyncValue<FranchiseSquad>,
-          FranchiseSquad,
-          FutureOr<FranchiseSquad>
+          AsyncValue<FranchiseSquadResponse>,
+          FranchiseSquadResponse,
+          FutureOr<FranchiseSquadResponse>
         >
-    with $FutureModifier<FranchiseSquad>, $FutureProvider<FranchiseSquad> {
+    with
+        $FutureModifier<FranchiseSquadResponse>,
+        $FutureProvider<FranchiseSquadResponse> {
   SquadProvider._({
     required SquadFamily super.from,
     required String super.argument,
@@ -132,12 +208,12 @@ final class SquadProvider
 
   @$internal
   @override
-  $FutureProviderElement<FranchiseSquad> $createElement(
+  $FutureProviderElement<FranchiseSquadResponse> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<FranchiseSquad> create(Ref ref) {
+  FutureOr<FranchiseSquadResponse> create(Ref ref) {
     final argument = this.argument as String;
     return squad(ref, argument);
   }
@@ -153,10 +229,10 @@ final class SquadProvider
   }
 }
 
-String _$squadHash() => r'0195654ff99023c1e83db9d3cc14490a5ece7fe2';
+String _$squadHash() => r'1218d89fea8ffb8aa6775c1499b396191c5c3c51';
 
 final class SquadFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<FranchiseSquad>, String> {
+    with $FunctionalFamilyOverride<FutureOr<FranchiseSquadResponse>, String> {
   SquadFamily._()
     : super(
         retry: null,

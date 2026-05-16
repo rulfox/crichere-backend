@@ -87,7 +87,7 @@ class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text('PURSE LEFT', style: CricTextStyle.overline),
-                          Text('₹${franchise.remainingPurse}', style: CricTextStyle.displayLg.copyWith(fontSize: 20, color: CricColor.gold)),
+                          Text('₹${franchise.currentPurse}', style: CricTextStyle.displayLg.copyWith(fontSize: 20, color: CricColor.gold)),
                         ],
                       ),
                     ],
@@ -107,16 +107,15 @@ class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
                         child: Row(
                           children: [
                             AvatarCircle(
-                              url: null, // Photo URL not in summary yet
+                              name: player.playerName,
                               radius: 20,
-                              label: player.playerName[0],
                             ),
                             const SizedBox(width: CricSpacing.md),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(player.playerName, style: CricTextStyle.bodyBold),
+                                  Text(player.playerName, style: CricTextStyle.body),
                                   Text(player.playerCategory ?? 'N/A', style: CricTextStyle.caption),
                                 ],
                               ),
@@ -124,7 +123,7 @@ class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text('₹${player.finalPrice}', style: CricTextStyle.bodyBold.copyWith(color: CricColor.gold)),
+                                Text('₹${player.finalPrice}', style: CricTextStyle.body.copyWith(color: CricColor.gold)),
                                 Text(player.assignmentType ?? 'SOLD', style: CricTextStyle.overline.copyWith(color: CricColor.textFaint)),
                               ],
                             ),

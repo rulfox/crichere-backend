@@ -16,7 +16,7 @@ abstract class AuctionApi {
   Future<AuctionSummary> getAuctionSummary(@Path("id") String auctionId);
 
   @GET('/auctions/{id}/rounds')
-  Future<List<dynamic>> getRounds(@Path('id') String auctionId);
+  Future<dynamic> getRounds(@Path('id') String auctionId);
 
   @POST('/auctions/{id}/rounds')
   Future<void> addRound(@Path('id') String auctionId, @Body() Map<String, dynamic> body);
@@ -26,9 +26,9 @@ abstract class AuctionApi {
 
   @PATCH('/auctions/{id}/rounds/{roundId}/pool')
   Future<void> updateRoundPool(
-    @Path('id') String auctionId, 
-    @Path('roundId') String roundId, 
-    @Body() Map<String, List<String>> body
+    @Path('id') String auctionId,
+    @Path('roundId') String roundId,
+    @Body() Map<String, dynamic> body,
   );
 
   @POST('/auctions/{id}/player/put')
