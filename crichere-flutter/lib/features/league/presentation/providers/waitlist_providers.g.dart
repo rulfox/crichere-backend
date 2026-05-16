@@ -10,7 +10,7 @@ part of 'waitlist_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(waitlist)
-const waitlistProvider = WaitlistFamily._();
+final waitlistProvider = WaitlistFamily._();
 
 final class WaitlistProvider
     extends
@@ -22,7 +22,7 @@ final class WaitlistProvider
     with
         $FutureModifier<List<WaitlistEntry>>,
         $FutureProvider<List<WaitlistEntry>> {
-  const WaitlistProvider._({
+  WaitlistProvider._({
     required WaitlistFamily super.from,
     required String super.argument,
   }) : super(
@@ -70,7 +70,7 @@ String _$waitlistHash() => r'8e91e54be54790a6c0160146168bdd0906952cd8';
 
 final class WaitlistFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<WaitlistEntry>>, String> {
-  const WaitlistFamily._()
+  WaitlistFamily._()
     : super(
         retry: null,
         name: r'waitlistProvider',

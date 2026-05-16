@@ -10,7 +10,7 @@ part of 'auth_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(storage)
-const storageProvider = StorageProvider._();
+final storageProvider = StorageProvider._();
 
 final class StorageProvider
     extends
@@ -20,7 +20,7 @@ final class StorageProvider
           FlutterSecureStorage
         >
     with $Provider<FlutterSecureStorage> {
-  const StorageProvider._()
+  StorageProvider._()
     : super(
         from: null,
         argument: null,
@@ -57,12 +57,12 @@ final class StorageProvider
 String _$storageHash() => r'db8a2ca64a99913dd5fc19fa5cb71bf32e8f7104';
 
 @ProviderFor(dioClient)
-const dioClientProvider = DioClientProvider._();
+final dioClientProvider = DioClientProvider._();
 
 final class DioClientProvider
     extends $FunctionalProvider<DioClient, DioClient, DioClient>
     with $Provider<DioClient> {
-  const DioClientProvider._()
+  DioClientProvider._()
     : super(
         from: null,
         argument: null,
@@ -98,11 +98,11 @@ final class DioClientProvider
 String _$dioClientHash() => r'830c83bd0b6dcb6c640c018b893be3b9749aebd9';
 
 @ProviderFor(AuthStateNotifier)
-const authStateProvider = AuthStateNotifierProvider._();
+final authStateProvider = AuthStateNotifierProvider._();
 
 final class AuthStateNotifierProvider
     extends $NotifierProvider<AuthStateNotifier, AuthState> {
-  const AuthStateNotifierProvider._()
+  AuthStateNotifierProvider._()
     : super(
         from: null,
         argument: null,
@@ -136,7 +136,6 @@ abstract class _$AuthStateNotifier extends $Notifier<AuthState> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AuthState, AuthState>;
     final element =
         ref.element
@@ -146,17 +145,17 @@ abstract class _$AuthStateNotifier extends $Notifier<AuthState> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }
 
 @ProviderFor(authCheck)
-const authCheckProvider = AuthCheckProvider._();
+final authCheckProvider = AuthCheckProvider._();
 
 final class AuthCheckProvider
     extends $FunctionalProvider<AsyncValue<void>, void, FutureOr<void>>
     with $FutureModifier<void>, $FutureProvider<void> {
-  const AuthCheckProvider._()
+  AuthCheckProvider._()
     : super(
         from: null,
         argument: null,
@@ -184,7 +183,7 @@ final class AuthCheckProvider
 String _$authCheckHash() => r'c442051a968f1e1960ec979749b705442f1af549';
 
 @ProviderFor(notificationService)
-const notificationServiceProvider = NotificationServiceProvider._();
+final notificationServiceProvider = NotificationServiceProvider._();
 
 final class NotificationServiceProvider
     extends
@@ -194,7 +193,7 @@ final class NotificationServiceProvider
           NotificationService
         >
     with $Provider<NotificationService> {
-  const NotificationServiceProvider._()
+  NotificationServiceProvider._()
     : super(
         from: null,
         argument: null,

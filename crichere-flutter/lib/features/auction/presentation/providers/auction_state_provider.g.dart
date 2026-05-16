@@ -10,11 +10,11 @@ part of 'auction_state_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(AuctionStateNotifier)
-const auctionStateProvider = AuctionStateNotifierProvider._();
+final auctionStateProvider = AuctionStateNotifierProvider._();
 
 final class AuctionStateNotifierProvider
     extends $NotifierProvider<AuctionStateNotifier, AuctionState> {
-  const AuctionStateNotifierProvider._()
+  AuctionStateNotifierProvider._()
     : super(
         from: null,
         argument: null,
@@ -49,7 +49,6 @@ abstract class _$AuctionStateNotifier extends $Notifier<AuctionState> {
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
     final ref = this.ref as $Ref<AuctionState, AuctionState>;
     final element =
         ref.element
@@ -59,6 +58,6 @@ abstract class _$AuctionStateNotifier extends $Notifier<AuctionState> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    element.handleCreate(ref, build);
   }
 }

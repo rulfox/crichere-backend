@@ -10,7 +10,7 @@ part of 'auction_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(auctionEvents)
-const auctionEventsProvider = AuctionEventsFamily._();
+final auctionEventsProvider = AuctionEventsFamily._();
 
 final class AuctionEventsProvider
     extends
@@ -20,7 +20,7 @@ final class AuctionEventsProvider
           Stream<AuctionEvent>
         >
     with $FutureModifier<AuctionEvent>, $StreamProvider<AuctionEvent> {
-  const AuctionEventsProvider._({
+  AuctionEventsProvider._({
     required AuctionEventsFamily super.from,
     required String super.argument,
   }) : super(
@@ -68,7 +68,7 @@ String _$auctionEventsHash() => r'839d76971907b08e731d1d46ec541a62e4005bd1';
 
 final class AuctionEventsFamily extends $Family
     with $FunctionalFamilyOverride<Stream<AuctionEvent>, String> {
-  const AuctionEventsFamily._()
+  AuctionEventsFamily._()
     : super(
         retry: null,
         name: r'auctionEventsProvider',
@@ -85,12 +85,12 @@ final class AuctionEventsFamily extends $Family
 }
 
 @ProviderFor(auctionApi)
-const auctionApiProvider = AuctionApiProvider._();
+final auctionApiProvider = AuctionApiProvider._();
 
 final class AuctionApiProvider
     extends $FunctionalProvider<AuctionApi, AuctionApi, AuctionApi>
     with $Provider<AuctionApi> {
-  const AuctionApiProvider._()
+  AuctionApiProvider._()
     : super(
         from: null,
         argument: null,
@@ -126,7 +126,7 @@ final class AuctionApiProvider
 String _$auctionApiHash() => r'80d6f6eafabc8c1e9bd67bb70ec97ed38bbed621';
 
 @ProviderFor(auctionRepository)
-const auctionRepositoryProvider = AuctionRepositoryProvider._();
+final auctionRepositoryProvider = AuctionRepositoryProvider._();
 
 final class AuctionRepositoryProvider
     extends
@@ -136,7 +136,7 @@ final class AuctionRepositoryProvider
           AuctionRepository
         >
     with $Provider<AuctionRepository> {
-  const AuctionRepositoryProvider._()
+  AuctionRepositoryProvider._()
     : super(
         from: null,
         argument: null,
@@ -173,7 +173,7 @@ final class AuctionRepositoryProvider
 String _$auctionRepositoryHash() => r'63ac664b433292612efb48a5417270c7a734d57a';
 
 @ProviderFor(getAuctionSummary)
-const getAuctionSummaryProvider = GetAuctionSummaryFamily._();
+final getAuctionSummaryProvider = GetAuctionSummaryFamily._();
 
 final class GetAuctionSummaryProvider
     extends
@@ -183,7 +183,7 @@ final class GetAuctionSummaryProvider
           FutureOr<AuctionSummary>
         >
     with $FutureModifier<AuctionSummary>, $FutureProvider<AuctionSummary> {
-  const GetAuctionSummaryProvider._({
+  GetAuctionSummaryProvider._({
     required GetAuctionSummaryFamily super.from,
     required String super.argument,
   }) : super(
@@ -231,7 +231,7 @@ String _$getAuctionSummaryHash() => r'088c3132af1766938e0215c7bd99567581cb4b42';
 
 final class GetAuctionSummaryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<AuctionSummary>, String> {
-  const GetAuctionSummaryFamily._()
+  GetAuctionSummaryFamily._()
     : super(
         retry: null,
         name: r'getAuctionSummaryProvider',

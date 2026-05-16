@@ -10,12 +10,12 @@ part of 'auth_repository_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(authApi)
-const authApiProvider = AuthApiProvider._();
+final authApiProvider = AuthApiProvider._();
 
 final class AuthApiProvider
     extends $FunctionalProvider<AuthApi, AuthApi, AuthApi>
     with $Provider<AuthApi> {
-  const AuthApiProvider._()
+  AuthApiProvider._()
     : super(
         from: null,
         argument: null,
@@ -51,12 +51,12 @@ final class AuthApiProvider
 String _$authApiHash() => r'2412ac8a32ac4d38c38cb1730070e1a7d914bc09';
 
 @ProviderFor(authRepository)
-const authRepositoryProvider = AuthRepositoryProvider._();
+final authRepositoryProvider = AuthRepositoryProvider._();
 
 final class AuthRepositoryProvider
     extends $FunctionalProvider<AuthRepository, AuthRepository, AuthRepository>
     with $Provider<AuthRepository> {
-  const AuthRepositoryProvider._()
+  AuthRepositoryProvider._()
     : super(
         from: null,
         argument: null,
@@ -92,7 +92,7 @@ final class AuthRepositoryProvider
 String _$authRepositoryHash() => r'93ebba2c09a00e1ad166869d298dd824d8943600';
 
 @ProviderFor(currentUser)
-const currentUserProvider = CurrentUserProvider._();
+final currentUserProvider = CurrentUserProvider._();
 
 final class CurrentUserProvider
     extends
@@ -102,7 +102,7 @@ final class CurrentUserProvider
           FutureOr<AuthResponse>
         >
     with $FutureModifier<AuthResponse>, $FutureProvider<AuthResponse> {
-  const CurrentUserProvider._()
+  CurrentUserProvider._()
     : super(
         from: null,
         argument: null,
@@ -131,12 +131,12 @@ final class CurrentUserProvider
 String _$currentUserHash() => r'4d9410bc980557f91bb2370eff4a97266fb4336c';
 
 @ProviderFor(sendOtpUseCase)
-const sendOtpUseCaseProvider = SendOtpUseCaseProvider._();
+final sendOtpUseCaseProvider = SendOtpUseCaseProvider._();
 
 final class SendOtpUseCaseProvider
     extends $FunctionalProvider<SendOtpUseCase, SendOtpUseCase, SendOtpUseCase>
     with $Provider<SendOtpUseCase> {
-  const SendOtpUseCaseProvider._()
+  SendOtpUseCaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -172,7 +172,7 @@ final class SendOtpUseCaseProvider
 String _$sendOtpUseCaseHash() => r'd95adad92b96eedb8b19433fb83380a86d7242b7';
 
 @ProviderFor(verifyOtpUseCase)
-const verifyOtpUseCaseProvider = VerifyOtpUseCaseProvider._();
+final verifyOtpUseCaseProvider = VerifyOtpUseCaseProvider._();
 
 final class VerifyOtpUseCaseProvider
     extends
@@ -182,7 +182,7 @@ final class VerifyOtpUseCaseProvider
           VerifyOtpUseCase
         >
     with $Provider<VerifyOtpUseCase> {
-  const VerifyOtpUseCaseProvider._()
+  VerifyOtpUseCaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -218,7 +218,7 @@ final class VerifyOtpUseCaseProvider
 String _$verifyOtpUseCaseHash() => r'b12452af9519aceb5eb14a67ec29352415e7426a';
 
 @ProviderFor(claimProfileUseCase)
-const claimProfileUseCaseProvider = ClaimProfileUseCaseProvider._();
+final claimProfileUseCaseProvider = ClaimProfileUseCaseProvider._();
 
 final class ClaimProfileUseCaseProvider
     extends
@@ -228,7 +228,7 @@ final class ClaimProfileUseCaseProvider
           ClaimProfileUseCase
         >
     with $Provider<ClaimProfileUseCase> {
-  const ClaimProfileUseCaseProvider._()
+  ClaimProfileUseCaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -266,12 +266,12 @@ String _$claimProfileUseCaseHash() =>
     r'e1f977326bc516c5284280e0c60931bfb4d901a1';
 
 @ProviderFor(logoutUseCase)
-const logoutUseCaseProvider = LogoutUseCaseProvider._();
+final logoutUseCaseProvider = LogoutUseCaseProvider._();
 
 final class LogoutUseCaseProvider
     extends $FunctionalProvider<LogoutUseCase, LogoutUseCase, LogoutUseCase>
     with $Provider<LogoutUseCase> {
-  const LogoutUseCaseProvider._()
+  LogoutUseCaseProvider._()
     : super(
         from: null,
         argument: null,

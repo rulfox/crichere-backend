@@ -10,12 +10,12 @@ part of 'league_repository_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(appDatabase)
-const appDatabaseProvider = AppDatabaseProvider._();
+final appDatabaseProvider = AppDatabaseProvider._();
 
 final class AppDatabaseProvider
     extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
     with $Provider<AppDatabase> {
-  const AppDatabaseProvider._()
+  AppDatabaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -51,12 +51,12 @@ final class AppDatabaseProvider
 String _$appDatabaseHash() => r'18ce5c8c4d8ddbfe5a7d819d8fb7d5aca76bf416';
 
 @ProviderFor(leagueApi)
-const leagueApiProvider = LeagueApiProvider._();
+final leagueApiProvider = LeagueApiProvider._();
 
 final class LeagueApiProvider
     extends $FunctionalProvider<LeagueApi, LeagueApi, LeagueApi>
     with $Provider<LeagueApi> {
-  const LeagueApiProvider._()
+  LeagueApiProvider._()
     : super(
         from: null,
         argument: null,
@@ -92,7 +92,7 @@ final class LeagueApiProvider
 String _$leagueApiHash() => r'a32233e5bf7943bbb5a2ba502d9f59bda2191d00';
 
 @ProviderFor(leagueRepository)
-const leagueRepositoryProvider = LeagueRepositoryProvider._();
+final leagueRepositoryProvider = LeagueRepositoryProvider._();
 
 final class LeagueRepositoryProvider
     extends
@@ -102,7 +102,7 @@ final class LeagueRepositoryProvider
           LeagueRepository
         >
     with $Provider<LeagueRepository> {
-  const LeagueRepositoryProvider._()
+  LeagueRepositoryProvider._()
     : super(
         from: null,
         argument: null,
@@ -138,7 +138,7 @@ final class LeagueRepositoryProvider
 String _$leagueRepositoryHash() => r'5a2e0034dff60d85433062f65fba2b3604849139';
 
 @ProviderFor(getLeaguesUseCase)
-const getLeaguesUseCaseProvider = GetLeaguesUseCaseProvider._();
+final getLeaguesUseCaseProvider = GetLeaguesUseCaseProvider._();
 
 final class GetLeaguesUseCaseProvider
     extends
@@ -148,7 +148,7 @@ final class GetLeaguesUseCaseProvider
           GetLeaguesUseCase
         >
     with $Provider<GetLeaguesUseCase> {
-  const GetLeaguesUseCaseProvider._()
+  GetLeaguesUseCaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -185,7 +185,7 @@ final class GetLeaguesUseCaseProvider
 String _$getLeaguesUseCaseHash() => r'ee39bd051b37e5c38782da033b1ec751dc587986';
 
 @ProviderFor(getLeagueDetailUseCase)
-const getLeagueDetailUseCaseProvider = GetLeagueDetailUseCaseProvider._();
+final getLeagueDetailUseCaseProvider = GetLeagueDetailUseCaseProvider._();
 
 final class GetLeagueDetailUseCaseProvider
     extends
@@ -195,7 +195,7 @@ final class GetLeagueDetailUseCaseProvider
           GetLeagueDetailUseCase
         >
     with $Provider<GetLeagueDetailUseCase> {
-  const GetLeagueDetailUseCaseProvider._()
+  GetLeagueDetailUseCaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -233,7 +233,7 @@ String _$getLeagueDetailUseCaseHash() =>
     r'e0baa4b9706baa143abd729ed2cd16446dede65a';
 
 @ProviderFor(createLeagueUseCase)
-const createLeagueUseCaseProvider = CreateLeagueUseCaseProvider._();
+final createLeagueUseCaseProvider = CreateLeagueUseCaseProvider._();
 
 final class CreateLeagueUseCaseProvider
     extends
@@ -243,7 +243,7 @@ final class CreateLeagueUseCaseProvider
           CreateLeagueUseCase
         >
     with $Provider<CreateLeagueUseCase> {
-  const CreateLeagueUseCaseProvider._()
+  CreateLeagueUseCaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -281,7 +281,7 @@ String _$createLeagueUseCaseHash() =>
     r'd86449311722e651c52c3aae14221f9c8902a2b5';
 
 @ProviderFor(importPlayersUseCase)
-const importPlayersUseCaseProvider = ImportPlayersUseCaseProvider._();
+final importPlayersUseCaseProvider = ImportPlayersUseCaseProvider._();
 
 final class ImportPlayersUseCaseProvider
     extends
@@ -291,7 +291,7 @@ final class ImportPlayersUseCaseProvider
           ImportPlayersUseCase
         >
     with $Provider<ImportPlayersUseCase> {
-  const ImportPlayersUseCaseProvider._()
+  ImportPlayersUseCaseProvider._()
     : super(
         from: null,
         argument: null,
@@ -329,7 +329,7 @@ String _$importPlayersUseCaseHash() =>
     r'9ec7be43c713bcc41a10ee6b03e5da5dfdc53d65';
 
 @ProviderFor(leagues)
-const leaguesProvider = LeaguesProvider._();
+final leaguesProvider = LeaguesProvider._();
 
 final class LeaguesProvider
     extends
@@ -341,7 +341,7 @@ final class LeaguesProvider
     with
         $FutureModifier<List<domain.League>>,
         $FutureProvider<List<domain.League>> {
-  const LeaguesProvider._()
+  LeaguesProvider._()
     : super(
         from: null,
         argument: null,
@@ -370,7 +370,7 @@ final class LeaguesProvider
 String _$leaguesHash() => r'9f30bdbde32f4b4f2ee13527cdb32d3966f137b3';
 
 @ProviderFor(leagueFranchises)
-const leagueFranchisesProvider = LeagueFranchisesFamily._();
+final leagueFranchisesProvider = LeagueFranchisesFamily._();
 
 final class LeagueFranchisesProvider
     extends
@@ -380,7 +380,7 @@ final class LeagueFranchisesProvider
           FutureOr<List<Franchise>>
         >
     with $FutureModifier<List<Franchise>>, $FutureProvider<List<Franchise>> {
-  const LeagueFranchisesProvider._({
+  LeagueFranchisesProvider._({
     required LeagueFranchisesFamily super.from,
     required String super.argument,
   }) : super(
@@ -428,7 +428,7 @@ String _$leagueFranchisesHash() => r'8c8adb5d495015ac929ad01e8b858cbd0bc1caba';
 
 final class LeagueFranchisesFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<Franchise>>, String> {
-  const LeagueFranchisesFamily._()
+  LeagueFranchisesFamily._()
     : super(
         retry: null,
         name: r'leagueFranchisesProvider',
@@ -445,7 +445,7 @@ final class LeagueFranchisesFamily extends $Family
 }
 
 @ProviderFor(leaguePlayers)
-const leaguePlayersProvider = LeaguePlayersFamily._();
+final leaguePlayersProvider = LeaguePlayersFamily._();
 
 final class LeaguePlayersProvider
     extends
@@ -457,7 +457,7 @@ final class LeaguePlayersProvider
     with
         $FutureModifier<List<LeaguePlayer>>,
         $FutureProvider<List<LeaguePlayer>> {
-  const LeaguePlayersProvider._({
+  LeaguePlayersProvider._({
     required LeaguePlayersFamily super.from,
     required String super.argument,
   }) : super(
@@ -505,7 +505,7 @@ String _$leaguePlayersHash() => r'16f4f316a2afc0d9341a9579d84a70d156f98552';
 
 final class LeaguePlayersFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<LeaguePlayer>>, String> {
-  const LeaguePlayersFamily._()
+  LeaguePlayersFamily._()
     : super(
         retry: null,
         name: r'leaguePlayersProvider',
