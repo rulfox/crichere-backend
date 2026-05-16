@@ -21,7 +21,7 @@ import java.util.*
 class FeeController(private val feeService: FeeService) {
 
     @PostMapping("/fee-obligations")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun createObligation(
         @PathVariable leagueId: UUID,
         @Valid @RequestBody request: FeeObligationCreateRequest
@@ -30,7 +30,7 @@ class FeeController(private val feeService: FeeService) {
     }
 
     @PostMapping("/fee-obligations/{obligationId}/payments")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun recordPayment(
         @PathVariable leagueId: UUID,
         @PathVariable obligationId: UUID,
@@ -41,7 +41,7 @@ class FeeController(private val feeService: FeeService) {
     }
 
     @GetMapping("/fee-obligations")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun getObligations(
         @PathVariable leagueId: UUID,
         @RequestParam(required = false) status: FeeStatus?,
@@ -60,27 +60,23 @@ class FeeController(private val feeService: FeeService) {
     }
 
     @GetMapping("/fee-obligations/{userId}")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId) or #userId.toString() == authentication.name")
     fun getObligationForUser(
         @PathVariable leagueId: UUID,
         @PathVariable userId: UUID,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<FeeObligationDetailResponse> {
-        // Auth check: Admin or the user themselves
-        // In a real app, this check might be in a security service or more complex @PreAuthorize
-        val authUserId = UUID.fromString(user.username)
-        // For simplicity, we'll let the service handle find, but we should check auth here if not admin
-        // But the prompt says "Auth: LEAGUE_ADMIN or the user themselves"
         return ResponseHelper.success(data = feeService.getObligationForUser(leagueId, userId))
     }
 
     @GetMapping("/fees/summary")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun getFeeSummary(@PathVariable leagueId: UUID): ApiResponse<FeeSummaryResponse> {
         return ResponseHelper.success(data = feeService.getFeeSummary(leagueId))
     }
 
     @PatchMapping("/fee-obligations/{obligationId}/waive")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun waiveObligation(
         @PathVariable leagueId: UUID,
         @PathVariable obligationId: UUID,

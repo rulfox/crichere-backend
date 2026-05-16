@@ -6,4 +6,5 @@ import java.util.UUID
 
 interface FranchiseInviteRepository : JpaRepository<FranchiseInvite, UUID> {
     fun findByToken(token: UUID): FranchiseInvite?
+    fun findByFranchiseId(franchiseId: UUID): List<FranchiseInvite>
 }

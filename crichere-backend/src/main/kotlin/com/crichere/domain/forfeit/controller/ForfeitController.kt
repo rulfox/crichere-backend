@@ -21,16 +21,18 @@ import java.util.*
 class ForfeitController(private val forfeitService: ForfeitService) {
 
     @PostMapping("/forfeit")
+    @PreAuthorize("isAuthenticated()")
     fun createRequest(
         @PathVariable leagueId: UUID,
         @Valid @RequestBody request: ForfeitRequestCreateRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<ForfeitRequestResponse> {
+        // Membership check should be done in service or via a custom security expression
         return ResponseHelper.success(data = forfeitService.createRequest(leagueId, UUID.fromString(user.username), request))
     }
 
     @GetMapping("/forfeit-requests")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun getRequests(
         @PathVariable leagueId: UUID,
         @RequestParam(required = false) status: ForfeitStatus?,
@@ -49,7 +51,7 @@ class ForfeitController(private val forfeitService: ForfeitService) {
     }
 
     @PatchMapping("/forfeit-requests/{requestId}/approve")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun approveRequest(
         @PathVariable leagueId: UUID,
         @PathVariable requestId: UUID,
@@ -60,7 +62,7 @@ class ForfeitController(private val forfeitService: ForfeitService) {
     }
 
     @PatchMapping("/forfeit-requests/{requestId}/reject")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun rejectRequest(
         @PathVariable leagueId: UUID,
         @PathVariable requestId: UUID,
@@ -71,11 +73,13 @@ class ForfeitController(private val forfeitService: ForfeitService) {
     }
 
     @PatchMapping("/forfeit-requests/{requestId}/cancel")
+    @PreAuthorize("isAuthenticated()")
     fun cancelRequest(
         @PathVariable leagueId: UUID,
         @PathVariable requestId: UUID,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<ForfeitRequestResponse> {
+        // Ownership check is done in service
         return ResponseHelper.success(data = forfeitService.cancelRequest(requestId, UUID.fromString(user.username)))
     }
 }

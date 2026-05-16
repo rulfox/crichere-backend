@@ -10,7 +10,7 @@ interface PushProvider {
 }
 
 @Component
-@Profile("dev")
+@Profile("dev", "test")
 class DevPushProvider : PushProvider {
     private val logger = LoggerFactory.getLogger(DevPushProvider::class.java)
 

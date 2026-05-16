@@ -93,7 +93,11 @@ data class PlayerAuctionStateResponse(
     val currentHighestBid: Int?,
     val currentHighestBidderId: UUID?,
     val finalPrice: Int?,
-    val soldToFranchiseId: UUID?
+    val soldToFranchiseId: UUID?,
+    val playerName: String? = null,
+    val playerCategory: String? = null,
+    val basePrice: Int? = null,
+    val playerPhoto: String? = null
 )
 
 data class FranchisePurseStateResponse(

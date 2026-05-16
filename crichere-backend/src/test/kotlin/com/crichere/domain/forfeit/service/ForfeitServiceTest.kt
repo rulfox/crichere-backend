@@ -40,6 +40,7 @@ class ForfeitServiceTest {
     @MockK lateinit var feeObligationRepository: FeeObligationRepository
     @MockK lateinit var leaguePlayerRepository: LeaguePlayerRepository
     @MockK lateinit var leagueRepository: LeagueRepository
+    @MockK lateinit var franchiseRepository: com.crichere.domain.franchise.repository.FranchiseRepository
     @MockK lateinit var waitingListService: WaitingListService
     @MockK lateinit var notificationService: NotificationService
 
@@ -50,8 +51,8 @@ class ForfeitServiceTest {
         MockKAnnotations.init(this)
         forfeitService = ForfeitService(
             forfeitRequestRepository, feeService, feeObligationRepository,
-            leaguePlayerRepository, leagueRepository, waitingListService,
-            notificationService
+            leaguePlayerRepository, franchiseRepository, leagueRepository, 
+            waitingListService, notificationService
         )
     }
 

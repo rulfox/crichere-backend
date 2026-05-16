@@ -6,4 +6,5 @@ import java.util.UUID
 
 interface FranchiseRepository : JpaRepository<Franchise, UUID> {
     fun findByLeagueId(leagueId: UUID): List<Franchise>
+    fun findByOwnerId(ownerId: UUID): List<Franchise>
 }

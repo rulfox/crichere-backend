@@ -23,7 +23,7 @@ class PlayerService(
         }
     }
 
-    fun getPlayersInLeague(leagueId: UUID): List<LeaguePlayer> {
-        return leaguePlayerRepository.findByLeagueId(leagueId)
+    fun getPlayersInLeague(leagueId: UUID, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<LeaguePlayer> {
+        return leaguePlayerRepository.findByLeagueId(leagueId, pageable)
     }
 }

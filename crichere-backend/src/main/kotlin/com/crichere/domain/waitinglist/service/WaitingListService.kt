@@ -121,14 +121,20 @@ class WaitingListService(
         if (entry.type == WaitingListType.PLAYER) {
             leaguePlayerRepository.save(LeaguePlayer(
                 leagueId = leagueId,
-                userId = entry.userId
+                userId = entry.userId,
+                auctionEligible = true
             ))
         } else {
             val user = userRepository.findById(entry.userId).get()
+            val existingFranchises = franchiseRepository.findByLeagueId(leagueId)
+            val defaultPurse = existingFranchises.firstOrNull()?.totalPurse ?: 0
+            
             franchiseRepository.save(Franchise(
                 leagueId = leagueId,
                 ownerId = entry.userId,
-                name = "${user.name}'s Franchise"
+                name = "${user.name}'s Franchise",
+                totalPurse = defaultPurse,
+                remainingPurse = defaultPurse
             ))
         }
 

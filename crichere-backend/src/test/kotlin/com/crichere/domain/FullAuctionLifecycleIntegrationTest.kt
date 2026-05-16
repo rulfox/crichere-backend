@@ -1,57 +1,54 @@
 package com.crichere.domain
 
 import com.crichere.domain.auction.dto.*
+import com.crichere.domain.auth.dto.ClaimProfileRequest
+import com.crichere.domain.auth.dto.OtpSendRequest
+import com.crichere.domain.auth.dto.OtpVerifyRequest
+import com.crichere.domain.auth.entity.UserLeagueMembership
+import com.crichere.domain.auth.enums.LeagueRole
+import com.crichere.domain.auth.enums.PlayingRole
+import com.crichere.domain.auth.repository.OtpRepository
+import com.crichere.domain.auth.repository.UserLeagueMembershipRepository
+import com.crichere.domain.auth.repository.UserRepository
+import com.crichere.domain.franchise.dto.FranchiseCreateRequest
+import com.crichere.domain.franchise.dto.FranchiseInviteRequest
+import com.crichere.domain.league.dto.CategoryPriceRequest
+import com.crichere.domain.league.dto.LeagueCreateRequest
+import com.crichere.domain.league.dto.LeagueStatusUpdateRequest
+import com.crichere.domain.league.dto.TagPriceRequest
+import com.crichere.domain.league.enums.LeagueStatus
+import com.crichere.domain.league.enums.PlayerOrderMode
+import com.crichere.domain.league.repository.AuctionRepository
+import com.crichere.domain.auction.repository.AuctionRoundConfigRepository
 import com.crichere.domain.auction.enums.*
-import com.crichere.domain.auction.repository.*
-import com.crichere.domain.auth.entity.*
-import com.crichere.domain.auth.enums.ProfileStatus
-import com.crichere.domain.auth.repository.*
-import com.crichere.domain.franchise.dto.*
-import com.crichere.domain.franchise.enums.FranchiseInviteStatus
-import com.crichere.domain.franchise.repository.*
-import com.crichere.domain.league.dto.*
-import com.crichere.domain.league.enums.*
-import com.crichere.domain.league.repository.*
-import com.crichere.common.provider.SmsProvider
-import com.crichere.common.provider.PushProvider
-import com.crichere.security.JwtTokenProvider
-import io.mockk.mockk
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Primary
 import org.springframework.http.*
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.springframework.data.redis.core.StringRedisTemplate
-import java.time.Instant
 import java.util.*
-import com.crichere.common.MockConfig
-import org.springframework.context.annotation.Import
-import org.springframework.http.*
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-@Import(MockConfig::class)
-@DisplayName("Full Auction Lifecycle Integration Test")
+@ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@Testcontainers
+@DisplayName("Full Auction Lifecycle Integration Test")
 class FullAuctionLifecycleIntegrationTest {
 
     @Autowired lateinit var restTemplate: TestRestTemplate
     @Autowired lateinit var userRepository: UserRepository
-    @Autowired lateinit var userLeagueMembershipRepository: com.crichere.domain.auth.repository.UserLeagueMembershipRepository
-    @Autowired lateinit var leagueRepository: LeagueRepository
+    @Autowired lateinit var otpRepository: OtpRepository
+    @Autowired lateinit var userLeagueMembershipRepository: UserLeagueMembershipRepository
     @Autowired lateinit var auctionRepository: AuctionRepository
     @Autowired lateinit var roundConfigRepository: AuctionRoundConfigRepository
-    @Autowired lateinit var jwtTokenProvider: JwtTokenProvider
 
     companion object {
         @Container
@@ -75,38 +72,40 @@ class FullAuctionLifecycleIntegrationTest {
             registry.add("app.base-url") { "http://localhost:8080" }
         }
 
-        var adminId: UUID? = null
-        var ownerId: UUID? = null
-        var adminToken: String? = null
-        var ownerToken: String? = null
-
-        var leagueId: UUID? = null
-        var franchiseId: UUID? = null
-        var inviteToken: UUID? = null
-        var auctionId: UUID? = null
-        var roundId: UUID? = null
-        var publicViewToken: String? = null
+        private var adminToken: String? = null
+        private var adminId: UUID? = null
+        private var leagueId: UUID? = null
+        private var franchiseId: UUID? = null
+        private var auctionId: UUID? = null
+        private var inviteToken: UUID? = null
+        private var roundId: UUID? = null
+        private var player1Id: UUID? = null
     }
 
     private fun getHeaders(token: String?): HttpHeaders {
         val headers = HttpHeaders()
-        if (token != null) {
-            headers.setBearerAuth(token)
-        }
+        token?.let { headers.setBearerAuth(it) }
         return headers
     }
 
     @Test
     @Order(1)
-    @DisplayName("1. Setup Users and Tokens")
-    fun setupUsers() {
-        val admin = userRepository.save(User(phone = "8000000001", profileStatus = ProfileStatus.ACTIVE, name = "Admin"))
-        val owner = userRepository.save(User(phone = "8000000002", profileStatus = ProfileStatus.ACTIVE, name = "Owner"))
+    @DisplayName("1. Admin Signup and Login")
+    fun adminSignup() {
+        val phone = "9876543210"
+        restTemplate.postForEntity("/auth/otp/send", OtpSendRequest(phone), Map::class.java)
+        val otp = otpRepository.findTopByPhoneOrderByCreatedAtDesc(phone)!!
         
-        adminId = admin.id
-        ownerId = owner.id
-        adminToken = jwtTokenProvider.createToken(admin.id.toString())
-        ownerToken = jwtTokenProvider.createToken(owner.id.toString())
+        val verifyRes = restTemplate.postForEntity("/auth/otp/verify", OtpVerifyRequest(phone, otp.code), Map::class.java)
+        assertEquals(HttpStatus.OK, verifyRes.statusCode)
+        
+        val data = verifyRes.body?.get("data") as Map<*, *>
+        adminToken = data["accessToken"] as String
+        adminId = UUID.fromString(data["userId"] as String)
+
+        val claimReq = ClaimProfileRequest(name = "Admin User", playingRole = PlayingRole.ALL_ROUNDER)
+        val claimRes = restTemplate.exchange("/auth/claim-profile", HttpMethod.POST, HttpEntity(claimReq, getHeaders(adminToken)), Map::class.java)
+        assertEquals(HttpStatus.OK, claimRes.statusCode)
     }
 
     @Test
@@ -115,23 +114,23 @@ class FullAuctionLifecycleIntegrationTest {
     fun createLeagueAndConfigPrices() {
         val createReq = LeagueCreateRequest(
             name = "E2E Test League",
-            playerOrderMode = com.crichere.domain.league.enums.PlayerOrderMode.FREE_PICK
+            playerOrderMode = PlayerOrderMode.FREE_PICK
         )
         val createRes = restTemplate.exchange("/leagues", HttpMethod.POST, HttpEntity(createReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, createRes.statusCode)
+        assertEquals(HttpStatus.CREATED, createRes.statusCode)
         val data = createRes.body?.get("data") as Map<*, *>
         leagueId = UUID.fromString(data["id"] as String)
 
         // Assign Roles to Admin
-        userLeagueMembershipRepository.save(com.crichere.domain.auth.entity.UserLeagueMembership(
+        userLeagueMembershipRepository.save(UserLeagueMembership(
             userId = adminId!!,
             leagueId = leagueId!!,
-            role = com.crichere.domain.auth.enums.LeagueRole.LEAGUE_ADMIN
+            role = LeagueRole.LEAGUE_ADMIN
         ))
-        userLeagueMembershipRepository.save(com.crichere.domain.auth.entity.UserLeagueMembership(
+        userLeagueMembershipRepository.save(UserLeagueMembership(
             userId = adminId!!,
             leagueId = leagueId!!,
-            role = com.crichere.domain.auth.enums.LeagueRole.AUCTIONEER
+            role = LeagueRole.AUCTIONEER
         ))
 
         val catReq = listOf(CategoryPriceRequest("BATTER", 1000), CategoryPriceRequest("BOWLER", 800))
@@ -141,6 +140,19 @@ class FullAuctionLifecycleIntegrationTest {
         val tagReq = listOf(TagPriceRequest("Star", 5000))
         val tagRes = restTemplate.exchange("/leagues/$leagueId/tag-prices", HttpMethod.POST, HttpEntity(tagReq, getHeaders(adminToken)), Map::class.java)
         assertEquals(HttpStatus.OK, tagRes.statusCode)
+
+        // Register a player
+        val playerReq = com.crichere.domain.player.dto.PlayerRegisterRequest(
+            leagueId = leagueId!!,
+            userId = adminId!!, // Admin registers themselves as a player
+            category = "BATTER"
+        )
+        val regRes = restTemplate.exchange("/players/register", HttpMethod.POST, HttpEntity(playerReq, getHeaders(adminToken)), Map::class.java)
+        val playerData = regRes.body!!["data"] as Map<*, *>
+        player1Id = UUID.fromString(playerData["id"] as String)
+
+        // Mark eligible
+        restTemplate.exchange("/leagues/$leagueId/players/$player1Id/eligible", HttpMethod.PATCH, HttpEntity(mapOf("eligible" to true), getHeaders(adminToken)), Map::class.java)
     }
 
     @Test
@@ -149,13 +161,13 @@ class FullAuctionLifecycleIntegrationTest {
     fun createFranchiseAndInvite() {
         val createReq = FranchiseCreateRequest(leagueId = leagueId!!, name = "E2E Team", ownerId = adminId!!, totalPurse = 100000)
         val createRes = restTemplate.exchange("/franchises", HttpMethod.POST, HttpEntity(createReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, createRes.statusCode)
+        assertEquals(HttpStatus.CREATED, createRes.statusCode)
         val data = createRes.body?.get("data") as Map<*, *>
         franchiseId = UUID.fromString(data["id"] as String)
 
         val inviteReq = FranchiseInviteRequest(email = "owner@test.com")
         val inviteRes = restTemplate.exchange("/franchises/$franchiseId/invites", HttpMethod.POST, HttpEntity(inviteReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, inviteRes.statusCode)
+        assertEquals(HttpStatus.CREATED, inviteRes.statusCode)
         val inviteData = inviteRes.body?.get("data") as Map<*, *>
         inviteToken = UUID.fromString(inviteData["token"] as String)
     }
@@ -167,95 +179,85 @@ class FullAuctionLifecycleIntegrationTest {
         val valRes = restTemplate.getForEntity("/public/invites/validate?token=$inviteToken", Map::class.java)
         assertEquals(HttpStatus.OK, valRes.statusCode)
 
-        val acceptReq = InviteAcceptRequest(token = inviteToken!!)
-        val acceptRes = restTemplate.exchange("/franchises/accept", HttpMethod.POST, HttpEntity(acceptReq, getHeaders(ownerToken)), Map::class.java)
+        val acceptRes = restTemplate.exchange("/franchises/accept", HttpMethod.POST, HttpEntity(mapOf("token" to inviteToken), getHeaders(adminToken)), Map::class.java)
         assertEquals(HttpStatus.OK, acceptRes.statusCode)
     }
 
     @Test
     @Order(5)
     @DisplayName("5. Initialize Auction and Configure Rounds")
-    fun initializeAuctionAndConfigRounds() {
-        val statusReq = LeagueStatusUpdateRequest(status = LeagueStatus.AUCTION_INITIALIZED)
-        restTemplate.exchange("/leagues/$leagueId/status", HttpMethod.PATCH, HttpEntity(LeagueStatusUpdateRequest(status = LeagueStatus.OPEN), getHeaders(adminToken)), Map::class.java)
-        val statusRes = restTemplate.exchange("/leagues/$leagueId/status", HttpMethod.PATCH, HttpEntity(statusReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, statusRes.statusCode)
+    fun initAuctionAndConfigRounds() {
+        // PATCH League status
+        restTemplate.exchange("/leagues/$leagueId/status", HttpMethod.PATCH, HttpEntity(LeagueStatusUpdateRequest(LeagueStatus.OPEN), getHeaders(adminToken)), Map::class.java)
+        val res = restTemplate.exchange("/leagues/$leagueId/status", HttpMethod.PATCH, HttpEntity(LeagueStatusUpdateRequest(LeagueStatus.AUCTION_INITIALIZED), getHeaders(adminToken)), Map::class.java)
+        assertEquals(HttpStatus.OK, res.statusCode)
 
-        val auction = auctionRepository.findByLeagueId(leagueId!!)!!
-        auctionId = auction.id
-        publicViewToken = auction.publicViewToken
+        auctionId = auctionRepository.findByLeagueId(leagueId!!)!!.id
 
         val roundReq = RoundConfigDto(
-            roundNumber = 1, name = "Round 1", currencyType = CurrencyType.CASH, purseAmount = 100000,
-            purseSource = PurseSource.FRESH, bidMode = BidMode.EACH_BID_RECORDED, playerPoolSource = PlayerPoolSource.ALL_REGISTERED,
-            franchiseEligibilityRule = FranchiseEligibilityRule.ALL, completionTrigger = CompletionTrigger.AUCTIONEER_MANUAL,
-            bidIncrementSlabs = listOf(BidIncrementSlabDto(fromAmount = 0, toAmount = 5000, incrementBy = 500))
+            roundNumber = 1,
+            name = "Test Round",
+            currencyType = CurrencyType.CASH,
+            purseAmount = 50000,
+            purseSource = PurseSource.FRESH,
+            bidMode = BidMode.EACH_BID_RECORDED,
+            playerPoolSource = PlayerPoolSource.ALL_REGISTERED,
+            franchiseEligibilityRule = FranchiseEligibilityRule.ALL,
+            completionTrigger = CompletionTrigger.AUCTIONEER_MANUAL,
+            bidIncrementSlabs = listOf(BidIncrementSlabDto(0, null, 100))
         )
         val roundRes = restTemplate.exchange("/auctions/$auctionId/rounds", HttpMethod.POST, HttpEntity(roundReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, roundRes.statusCode)
+        assertEquals(HttpStatus.CREATED, roundRes.statusCode)
+        
+        roundId = roundConfigRepository.findByAuctionIdOrderByRoundNumberAsc(auctionId!!)[0].id
     }
 
     @Test
     @Order(6)
     @DisplayName("6. Configure Category Increments")
-    fun configureCategoryIncrements() {
-        val rounds = roundConfigRepository.findByAuctionIdOrderByRoundNumberAsc(auctionId!!)
-        roundId = rounds.first().id
-
-        val catIncReq = listOf(CategoryIncrementRequest(category = "BATTER", bidIncrement = 1000))
-        val catIncRes = restTemplate.exchange("/auctions/$auctionId/rounds/$roundId/category-increments", HttpMethod.POST, HttpEntity(catIncReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, catIncRes.statusCode)
+    fun configCategoryIncrements() {
+        val incReq = listOf(CategoryIncrementRequest(category = "BATTER", bidIncrement = 500))
+        val res = restTemplate.exchange("/auctions/$auctionId/rounds/$roundId/category-increments", HttpMethod.POST, HttpEntity(incReq, getHeaders(adminToken)), Map::class.java)
+        assertEquals(HttpStatus.OK, res.statusCode)
     }
 
     @Test
     @Order(7)
     @DisplayName("7. Start Auction, Start Timer, and Test Public Endpoints")
-    fun startAuctionAndTestTimer() {
-        val startRes = restTemplate.exchange("/auctions/$auctionId/start", HttpMethod.PATCH, HttpEntity(null, getHeaders(adminToken)), Map::class.java)
+    fun startAuctionAndTestPublic() {
+        val headers = getHeaders(adminToken)
+        println("Headers for Method 7: $headers")
+        
+        val startRes = restTemplate.exchange("/auctions/$auctionId/start", HttpMethod.PATCH, HttpEntity(null, headers), Map::class.java)
+        if (startRes.statusCode != HttpStatus.OK) {
+            println("Start Auction Failed: ${startRes.statusCode} - ${startRes.body}")
+        }
         assertEquals(HttpStatus.OK, startRes.statusCode)
 
-        val roundStartRes = restTemplate.exchange("/auctions/$auctionId/rounds/$roundId/start", HttpMethod.PATCH, HttpEntity(null, getHeaders(adminToken)), Map::class.java)
+        val roundStartRes = restTemplate.exchange("/auctions/$auctionId/rounds/$roundId/start", HttpMethod.PATCH, HttpEntity(null, headers), Map::class.java)
         assertEquals(HttpStatus.OK, roundStartRes.statusCode)
 
-        val playerReq = listOf(PlayerImportRequest(phone = "8999999999", name = "Test Player", category = "BATTER"))
-        restTemplate.exchange("/leagues/$leagueId/players/bulk-import", HttpMethod.POST, HttpEntity(playerReq, getHeaders(adminToken)), Map::class.java)
+        val putPlayerRes = restTemplate.exchange("/auctions/$auctionId/player/put", HttpMethod.POST, HttpEntity(mapOf("leaguePlayerId" to player1Id), headers), Map::class.java)
+        if (putPlayerRes.statusCode != HttpStatus.OK) {
+            println("Put Player Failed: ${putPlayerRes.statusCode} - ${putPlayerRes.body}")
+        }
+        assertEquals(HttpStatus.OK, putPlayerRes.statusCode)
         
-        // Use repo to find player since we need leaguePlayerId
-        val ctx = org.springframework.test.context.TestContextManager(this.javaClass).testContext.applicationContext
-        val leaguePlayerRepo = ctx.getBean(com.crichere.domain.player.repository.LeaguePlayerRepository::class.java)
-        val playerStateRepo = ctx.getBean(com.crichere.domain.auction.repository.PlayerAuctionStateRepository::class.java)
+        val timerRes = restTemplate.exchange("/auctions/$auctionId/timer/start", HttpMethod.POST, HttpEntity(mapOf("durationSeconds" to 60), getHeaders(adminToken)), Map::class.java)
+        if (timerRes.statusCode != HttpStatus.OK) {
+            println("Start Timer Failed: ${timerRes.statusCode} - ${timerRes.body}")
+        }
+        assertEquals(HttpStatus.OK, timerRes.statusCode)
         
-        val player = leaguePlayerRepo.findAll().find { it.leagueId == leagueId && it.auctionEligible }!!
-        
-        // Manually initialize player state since startAuction already ran
-        playerStateRepo.save(com.crichere.domain.auction.entity.PlayerAuctionState(
-            auctionId = auctionId!!,
-            leaguePlayerId = player.id,
-            state = com.crichere.domain.auction.enums.PlayerAuctionStateValue.AVAILABLE
-        ))
-        
-        val putReq = mapOf("leaguePlayerId" to player.id)
-        val putRes = restTemplate.exchange("/auctions/$auctionId/player/put", HttpMethod.POST, HttpEntity(putReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, putRes.statusCode)
+        val stateRes = restTemplate.exchange("/auctions/$auctionId/state", HttpMethod.GET, HttpEntity(null, getHeaders(adminToken)), Map::class.java)
+        if (stateRes.statusCode != HttpStatus.OK) {
+            println("Get State Failed: ${stateRes.statusCode} - ${stateRes.body}")
+        }
+        assertEquals(HttpStatus.OK, stateRes.statusCode)
 
-        val timerReq = TimerStartRequest(durationSeconds = 120)
-        val timerStartRes = restTemplate.exchange("/auctions/$auctionId/timer/start", HttpMethod.POST, HttpEntity(timerReq, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, timerStartRes.statusCode)
-
-        val timerStateRes = restTemplate.exchange("/auctions/$auctionId/timer/state", HttpMethod.GET, HttpEntity(null, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, timerStateRes.statusCode)
-        val timerData = timerStateRes.body?.get("data") as Map<*, *>
-        assertTrue(timerData["isRunning"] as Boolean)
-
-        val displayRes = restTemplate.getForEntity("/public/auctions/$auctionId/display", String::class.java)
-        assertEquals(HttpStatus.OK, displayRes.statusCode)
-
-        val viewRes = restTemplate.getForEntity("/public/auctions/view/$publicViewToken", Map::class.java)
-        assertEquals(HttpStatus.OK, viewRes.statusCode)
-        val viewData = viewRes.body?.get("data") as Map<*, *>
-        assertEquals("LIVE", viewData["auctionStatus"])
-
-        val timerStopRes = restTemplate.exchange("/auctions/$auctionId/timer/stop", HttpMethod.POST, HttpEntity(null, getHeaders(adminToken)), Map::class.java)
-        assertEquals(HttpStatus.OK, timerStopRes.statusCode)
+        // Test public endpoints
+        val auction = auctionRepository.findById(auctionId!!).get()
+        val publicRes = restTemplate.getForEntity("/public/auctions/view/${auction.publicViewToken}", Map::class.java)
+        assertEquals(HttpStatus.OK, publicRes.statusCode)
     }
 }

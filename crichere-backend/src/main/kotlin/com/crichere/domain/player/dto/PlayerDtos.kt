@@ -26,5 +26,14 @@ data class LeaguePlayerResponse(
     val basePriceOverride: Int? = null,
     val tag: String? = null,
     val status: LeaguePlayerStatus,
-    val category: String? = null
+    val category: String? = null,
+    val auctionEligible: Boolean = false
+)
+
+data class LeaguePlayerListResponse(
+    val players: List<LeaguePlayerResponse>,
+    val totalElements: Long,
+    val totalPages: Int,
+    val pageNumber: Int,
+    val pageSize: Int
 )

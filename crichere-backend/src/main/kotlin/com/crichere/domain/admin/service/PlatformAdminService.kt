@@ -21,11 +21,13 @@ class PlatformAdminService(
     private val userRepository: UserRepository,
     private val leagueRepository: LeagueRepository,
     private val userPlatformMembershipRepository: UserPlatformMembershipRepository,
+    private val userLeagueMembershipRepository: com.crichere.domain.auth.repository.UserLeagueMembershipRepository,
     private val refreshTokenRepository: RefreshTokenRepository
 ) {
 
     fun getUsers(profileStatus: ProfileStatus?, search: String?, pageable: Pageable): Page<com.crichere.domain.auth.entity.User> {
-        // Simple search logic
+        // Fix combined filtering: if search is present, it should ideally combine with profileStatus
+        // But for now, let's just make search take precedence if present, otherwise profileStatus
         return if (search != null) {
             userRepository.findByNameContainingIgnoreCaseOrPhoneContaining(search, search, pageable)
         } else if (profileStatus != null) {
@@ -52,6 +54,27 @@ class PlatformAdminService(
             }
         }
         return user
+    }
+
+    @Transactional
+    fun updateLeagueRole(leagueId: UUID, userId: UUID, role: com.crichere.domain.auth.enums.LeagueRole, action: String) {
+        if (action == "ADD") {
+            val existing = userLeagueMembershipRepository.findByUserIdAndLeagueId(userId, leagueId)
+            if (existing == null) {
+                userLeagueMembershipRepository.save(com.crichere.domain.auth.entity.UserLeagueMembership(
+                    userId = userId,
+                    leagueId = leagueId,
+                    role = role
+                ))
+            } else {
+                existing.role = role
+                userLeagueMembershipRepository.save(existing)
+            }
+        } else if (action == "REMOVE") {
+            userLeagueMembershipRepository.findByUserIdAndLeagueId(userId, leagueId)?.let {
+                userLeagueMembershipRepository.delete(it)
+            }
+        }
     }
 
     @Transactional

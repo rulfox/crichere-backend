@@ -16,6 +16,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -147,5 +148,36 @@ class LeagueServiceTest {
         assertEquals(500, result[0].price)
         verify { leagueTagBasePriceRepository.deleteAll(any()) }
         verify { leagueTagBasePriceRepository.saveAll(any<List<LeagueTagBasePrice>>()) }
+    }
+
+    @Test
+    @DisplayName("updatePlayerEligibility - success")
+    fun updatePlayerEligibilitySuccess() {
+        val leagueId = UUID.randomUUID()
+        val playerId = UUID.randomUUID()
+        val player = LeaguePlayer(id = playerId, leagueId = leagueId, userId = UUID.randomUUID(), auctionEligible = false)
+
+        every { leaguePlayerRepository.findById(playerId) } returns Optional.of(player)
+        every { leaguePlayerRepository.save(any()) } answers { firstArg() }
+
+        val result = leagueService.updatePlayerEligibility(leagueId, playerId, true)
+
+        assertTrue(result.auctionEligible)
+        verify { leaguePlayerRepository.save(match { it.auctionEligible }) }
+    }
+
+    @Test
+    @DisplayName("removePlayer - success")
+    fun removePlayerSuccess() {
+        val leagueId = UUID.randomUUID()
+        val playerId = UUID.randomUUID()
+        val player = LeaguePlayer(id = playerId, leagueId = leagueId, userId = UUID.randomUUID())
+
+        every { leaguePlayerRepository.findById(playerId) } returns Optional.of(player)
+        every { leaguePlayerRepository.delete(any()) } just runs
+
+        leagueService.removePlayer(leagueId, playerId)
+
+        verify { leaguePlayerRepository.delete(player) }
     }
 }

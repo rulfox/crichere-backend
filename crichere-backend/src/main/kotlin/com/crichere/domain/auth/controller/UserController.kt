@@ -41,7 +41,29 @@ class UserController(private val userService: UserService) {
         return ResponseHelper.success(data = response)
     }
 
+    @GetMapping("/{id}/leagues")
+    fun getUserLeagues(@PathVariable id: UUID): ApiResponse<List<com.crichere.domain.league.dto.LeagueResponse>> {
+        val leagues = userService.getUserLeagues(id)
+        return ResponseHelper.success(data = leagues.map { league ->
+            com.crichere.domain.league.dto.LeagueResponse(
+                id = league.id,
+                name = league.name,
+                format = league.format,
+                rulesUrl = league.rulesUrl,
+                mustSellAll = league.mustSellAll,
+                playerOrderMode = league.playerOrderMode,
+                waitingListMode = league.waitingListMode,
+                logoUrl = league.logoUrl,
+                bannerUrl = league.bannerUrl,
+                status = league.status,
+                auctionDate = league.auctionDate,
+                createdBy = league.createdBy
+            )
+        })
+    }
+
     @PutMapping("/{id}/basic")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('PLATFORM_ADMIN') or #id.toString() == authentication.name")
     fun updateBasicInfo(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UserBasicInfoRequest
@@ -51,6 +73,7 @@ class UserController(private val userService: UserService) {
     }
 
     @PutMapping("/{id}/cricket-profile")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('PLATFORM_ADMIN') or #id.toString() == authentication.name")
     fun updateCricketProfile(
         @PathVariable id: UUID,
         @Valid @RequestBody request: CricketProfileRequest
@@ -60,6 +83,7 @@ class UserController(private val userService: UserService) {
     }
 
     @PutMapping("/{id}/photo")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('PLATFORM_ADMIN') or #id.toString() == authentication.name")
     fun updatePhoto(
         @PathVariable id: UUID,
         @RequestBody request: Map<String, String>
@@ -70,9 +94,14 @@ class UserController(private val userService: UserService) {
     }
 
     @GetMapping("/search")
-    fun searchUsers(@RequestParam query: String): ApiResponse<List<UserResponse>> {
-        val users = userService.searchUsers(query)
-        val response = users.map { user ->
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
+    fun searchUsers(
+        @RequestParam query: String,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ApiResponse<com.crichere.common.response.PageResponse<UserResponse>> {
+        val resultPage = userService.searchUsers(query, org.springframework.data.domain.PageRequest.of(page, size))
+        val response = resultPage.map { user ->
             UserResponse(
                 id = user.id,
                 phone = user.phone,
@@ -92,11 +121,18 @@ class UserController(private val userService: UserService) {
                 state = user.state
             )
         }
-        return ResponseHelper.success(data = response)
+        return ResponseHelper.success(data = com.crichere.common.response.PageResponse(
+            content = response.content,
+            totalElements = response.totalElements,
+            totalPages = response.totalPages,
+            pageNumber = response.number,
+            pageSize = response.size
+        ))
     }
 
     @PostMapping("/ghost")
     @ResponseStatus(HttpStatus.CREATED)
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('LEAGUE_ADMIN') or hasRole('PLATFORM_ADMIN')")
     fun createGhost(
         @Valid @RequestBody request: GhostPlayerRequest,
         @AuthenticationPrincipal admin: UserDetails

@@ -44,6 +44,19 @@ class PlatformAdminController(private val adminService: PlatformAdminService) {
         return ResponseHelper.success(data = result)
     }
 
+    @PatchMapping("/leagues/{leagueId}/users/{userId}/roles")
+    fun updateLeagueRole(
+        @PathVariable leagueId: UUID,
+        @PathVariable userId: UUID,
+        @RequestBody request: Map<String, String>
+    ): ApiResponse<Nothing> {
+        val action = request["action"] ?: throw com.crichere.common.exception.BusinessLogicException("Action is required", "error.action_required")
+        val roleStr = request["role"] ?: throw com.crichere.common.exception.BusinessLogicException("Role is required", "error.role_required")
+        val role = com.crichere.domain.auth.enums.LeagueRole.valueOf(roleStr)
+        adminService.updateLeagueRole(leagueId, userId, role, action)
+        return ResponseHelper.success(message = "League role updated")
+    }
+
     @PatchMapping("/users/{id}/suspend")
     fun suspendUser(
         @PathVariable id: UUID,

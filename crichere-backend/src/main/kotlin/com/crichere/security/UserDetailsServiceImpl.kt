@@ -16,7 +16,8 @@ import java.util.*
 class UserDetailsServiceImpl(
     private val userRepository: UserRepository,
     private val userLeagueMembershipRepository: UserLeagueMembershipRepository,
-    private val userPlatformMembershipRepository: UserPlatformMembershipRepository
+    private val userPlatformMembershipRepository: UserPlatformMembershipRepository,
+    private val franchiseRepository: com.crichere.domain.franchise.repository.FranchiseRepository
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
@@ -34,7 +35,17 @@ class UserDetailsServiceImpl(
         
         val leagueMemberships = userLeagueMembershipRepository.findAllByUserId(userId)
         leagueMemberships.forEach { membership ->
+            // Add generic role for broad checks (if still needed) and scoped role for precise checks
             authorities.add(SimpleGrantedAuthority("ROLE_${membership.role.name}"))
+            authorities.add(SimpleGrantedAuthority("ROLE_${membership.role.name}_${membership.leagueId}"))
+        }
+
+        val franchises = franchiseRepository.findByOwnerId(userId)
+        if (franchises.isNotEmpty()) {
+            authorities.add(SimpleGrantedAuthority("ROLE_FRANCHISE_OWNER"))
+            franchises.forEach { f ->
+                authorities.add(SimpleGrantedAuthority("ROLE_FRANCHISE_OWNER_${f.id}"))
+            }
         }
 
         val platformMembership = userPlatformMembershipRepository.findByUserId(userId)
@@ -45,7 +56,7 @@ class UserDetailsServiceImpl(
         return User.builder()
             .username(user.id.toString())
             .password("") // OTP-only, no password
-            .disabled(user.profileStatus == ProfileStatus.GHOST)
+            .disabled(user.suspended)
             .authorities(authorities)
             .build()
     }

@@ -22,8 +22,8 @@ class UserLeagueMembership(
     val userId: UUID,
     val leagueId: UUID,
     @Enumerated(EnumType.STRING)
-    val role: LeagueRole,
-    val isPrimary: Boolean = false,
+    var role: LeagueRole,
+    var isPrimary: Boolean = false,
     val joinedAt: Instant = Instant.now()
 )
 

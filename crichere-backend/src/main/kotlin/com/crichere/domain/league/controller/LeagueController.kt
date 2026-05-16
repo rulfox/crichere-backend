@@ -23,6 +23,7 @@ class LeagueController(
 ) {
 
     @PostMapping
+    @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
     fun createLeague(
         @AuthenticationPrincipal userDetails: UserDetails,
         @Valid @RequestBody request: LeagueCreateRequest
@@ -45,9 +46,18 @@ class LeagueController(
     }
 
     @GetMapping
-    fun getLeagues(): ApiResponse<List<LeagueResponse>> {
-        val leagues = leagueService.getLeagues()
-        return ResponseHelper.success(data = leagues.map { toResponse(it) })
+    fun getLeagues(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ApiResponse<com.crichere.common.response.PageResponse<LeagueResponse>> {
+        val resultPage = leagueService.getLeagues(org.springframework.data.domain.PageRequest.of(page, size))
+        return ResponseHelper.success(data = com.crichere.common.response.PageResponse(
+            content = resultPage.content.map { toResponse(it) },
+            totalElements = resultPage.totalElements,
+            totalPages = resultPage.totalPages,
+            pageNumber = resultPage.number,
+            pageSize = resultPage.size
+        ))
     }
 
     @GetMapping("/{id}")
@@ -56,7 +66,7 @@ class LeagueController(
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #id)")
     fun updateLeagueStatus(
         @PathVariable id: UUID,
         @RequestBody request: LeagueStatusUpdateRequest
@@ -66,7 +76,7 @@ class LeagueController(
     }
 
     @PostMapping("/{id}/players/bulk-import")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #id)")
     fun bulkImportPlayers(
         @PathVariable id: UUID,
         @Valid @RequestBody request: List<@Valid PlayerImportRequest>
@@ -76,7 +86,7 @@ class LeagueController(
     }
 
     @PostMapping("/{id}/category-prices")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #id)")
     fun updateCategoryPrices(
         @PathVariable id: UUID,
         @RequestBody request: List<CategoryPriceRequest>
@@ -92,7 +102,7 @@ class LeagueController(
     }
 
     @PostMapping("/{id}/tag-prices")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #id)")
     fun updateTagPrices(
         @PathVariable id: UUID,
         @RequestBody request: List<TagPriceRequest>
@@ -105,6 +115,82 @@ class LeagueController(
     fun getTagPrices(@PathVariable id: UUID): ApiResponse<List<TagPriceResponse>> {
         val prices = leagueService.getTagPrices(id)
         return ResponseHelper.success(data = prices.map { TagPriceResponse(it.id, it.tag, it.price) })
+    }
+
+    @GetMapping("/{id}/franchises")
+    fun getFranchises(@PathVariable id: UUID): ApiResponse<List<com.crichere.domain.franchise.dto.FranchiseResponse>> {
+        val franchises = leagueService.getFranchises(id)
+        return ResponseHelper.success(data = franchises.map { f ->
+            com.crichere.domain.franchise.dto.FranchiseResponse(
+                id = f.id,
+                leagueId = f.leagueId,
+                name = f.name,
+                logoUrl = f.logoUrl,
+                ownerId = f.ownerId,
+                totalPurse = f.totalPurse,
+                remainingPurse = f.remainingPurse
+            )
+        })
+    }
+
+    @GetMapping("/{id}/players")
+    fun getPlayers(
+        @PathVariable id: UUID,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ApiResponse<com.crichere.domain.player.dto.LeaguePlayerListResponse> {
+        val resultPage = leagueService.getPlayers(id, org.springframework.data.domain.PageRequest.of(page, size))
+        return ResponseHelper.success(data = com.crichere.domain.player.dto.LeaguePlayerListResponse(
+            players = resultPage.content.map { player ->
+                com.crichere.domain.player.dto.LeaguePlayerResponse(
+                    id = player.id,
+                    leagueId = player.leagueId,
+                    userId = player.userId,
+                    basePrice = leagueService.resolveBasePrice(player),
+                    basePriceOverride = player.basePriceOverride,
+                    tag = player.tag,
+                    status = player.status,
+                    category = player.category,
+                    auctionEligible = player.auctionEligible
+                )
+            },
+            totalElements = resultPage.totalElements,
+            totalPages = resultPage.totalPages,
+            pageNumber = resultPage.number,
+            pageSize = resultPage.size
+        ))
+    }
+
+    @PatchMapping("/{id}/players/{playerId}/eligible")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #id)")
+    fun updatePlayerEligibility(
+        @PathVariable id: UUID,
+        @PathVariable playerId: UUID,
+        @RequestBody request: Map<String, Boolean>
+    ): ApiResponse<com.crichere.domain.player.dto.LeaguePlayerResponse> {
+        val eligible = request["eligible"] ?: throw com.crichere.common.exception.BusinessLogicException("eligible field is required", "error.eligible_required")
+        val player = leagueService.updatePlayerEligibility(id, playerId, eligible)
+        return ResponseHelper.success(data = com.crichere.domain.player.dto.LeaguePlayerResponse(
+            id = player.id,
+            leagueId = player.leagueId,
+            userId = player.userId,
+            basePrice = leagueService.resolveBasePrice(player),
+            basePriceOverride = player.basePriceOverride,
+            tag = player.tag,
+            status = player.status,
+            category = player.category,
+            auctionEligible = player.auctionEligible
+        ))
+    }
+
+    @DeleteMapping("/{id}/players/{playerId}")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #id)")
+    fun removePlayer(
+        @PathVariable id: UUID,
+        @PathVariable playerId: UUID
+    ): ApiResponse<Nothing> {
+        leagueService.removePlayer(id, playerId)
+        return ResponseHelper.success(message = "Player removed from league", messageKey = "success.player_removed")
     }
 
     private fun toResponse(league: League) = LeagueResponse(

@@ -9,5 +9,5 @@ enum class FeeStatus {
 }
 
 enum class PaymentMode {
-    CASH, ONLINE, REFUND
+    CASH, ONLINE, REFUND, WAIVER
 }

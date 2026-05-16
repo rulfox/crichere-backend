@@ -55,6 +55,7 @@ class AuctionServiceTest {
     @MockK lateinit var leagueService: LeagueService
     @MockK lateinit var categoryIncrementRepository: AuctionRoundCategoryIncrementRepository
     @MockK lateinit var meterRegistry: io.micrometer.core.instrument.MeterRegistry
+    @MockK lateinit var poolPlayerRepository: AuctionRoundPoolPlayerRepository
 
     lateinit var auctionService: AuctionService
 
@@ -85,12 +86,10 @@ class AuctionServiceTest {
             auctionRepository, roundConfigRepository, slabRepository, categoryIncrementRepository,
             bidRepository, playerStateRepository, purseRepository, franchiseRepository,
             franchisePlayerRepository, auctionAuditLogRepository, leaguePlayerRepository,
-            userRepository, leagueRepository, redisTemplate, objectMapper,
+            userRepository, leagueRepository, poolPlayerRepository, redisTemplate, objectMapper,
             notificationService, leagueService, meterRegistry
         )
     }
-
-    @Test
     @DisplayName("placeBid - happy path")
     fun placeBidHappyPath() {
         val auction = Auction(id = auctionId, leagueId = UUID.randomUUID(), currentLeaguePlayerId = playerId, currentRoundId = roundId)

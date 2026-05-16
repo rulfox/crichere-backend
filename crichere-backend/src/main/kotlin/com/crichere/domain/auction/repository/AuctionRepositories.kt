@@ -32,6 +32,7 @@ interface BidRepository : JpaRepository<Bid, UUID> {
 interface PlayerAuctionStateRepository : JpaRepository<PlayerAuctionState, UUID> {
     fun findByAuctionIdAndLeaguePlayerId(auctionId: UUID, leaguePlayerId: UUID): Optional<PlayerAuctionState>
     fun findByAuctionId(auctionId: UUID): List<PlayerAuctionState>
+    fun findByAuctionIdAndState(auctionId: UUID, state: com.crichere.domain.auction.enums.PlayerAuctionStateValue, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<PlayerAuctionState>
 }
 
 @Repository
@@ -48,4 +49,10 @@ interface FranchisePlayerRepository : JpaRepository<FranchisePlayer, UUID> {
     fun findByLeaguePlayerId(leaguePlayerId: UUID): Optional<FranchisePlayer>
     fun deleteByLeaguePlayerId(leaguePlayerId: UUID)
     fun findByFranchiseId(franchiseId: UUID): List<FranchisePlayer>
+}
+
+@Repository
+interface AuctionRoundPoolPlayerRepository : JpaRepository<AuctionRoundPoolPlayer, UUID> {
+    fun findByRoundId(roundId: UUID): List<AuctionRoundPoolPlayer>
+    fun deleteByRoundId(roundId: UUID)
 }

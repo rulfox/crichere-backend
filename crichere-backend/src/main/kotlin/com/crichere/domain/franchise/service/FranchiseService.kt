@@ -1,23 +1,31 @@
 package com.crichere.domain.franchise.service
 
 import com.crichere.common.exception.ResourceNotFoundException
+import com.crichere.domain.auction.entity.FranchisePlayer
+import com.crichere.domain.auction.repository.FranchisePlayerRepository
+import com.crichere.domain.auth.repository.UserFranchiseMembershipRepository
+import com.crichere.domain.auth.repository.UserRepository
 import com.crichere.domain.franchise.entity.Franchise
 import com.crichere.domain.franchise.entity.FranchiseInvite
 import com.crichere.domain.franchise.repository.FranchiseInviteRepository
 import com.crichere.domain.franchise.repository.FranchiseRepository
+import com.crichere.domain.league.repository.LeagueRepository
+import com.crichere.domain.player.repository.LeaguePlayerRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.UUID
+import java.util.*
 
 @Service
 class FranchiseService(
     private val franchiseRepository: FranchiseRepository,
     private val franchiseInviteRepository: FranchiseInviteRepository,
-    private val userRepository: com.crichere.domain.auth.repository.UserRepository,
-    private val leagueRepository: com.crichere.domain.league.repository.LeagueRepository,
-    private val membershipRepository: com.crichere.domain.auth.repository.UserFranchiseMembershipRepository,
+    private val userRepository: UserRepository,
+    private val leagueRepository: LeagueRepository,
+    private val membershipRepository: UserFranchiseMembershipRepository,
+    private val franchisePlayerRepository: FranchisePlayerRepository,
+    private val leaguePlayerRepository: LeaguePlayerRepository,
     @org.springframework.beans.factory.annotation.Value("\${app.base-url:http://localhost:8080}")
     private val baseUrl: String
 ) {
@@ -30,6 +38,38 @@ class FranchiseService(
     fun getFranchise(id: UUID): Franchise {
         return franchiseRepository.findById(id).orElseThrow {
             ResourceNotFoundException("Franchise not found with id: $id")
+        }
+    }
+
+    @Transactional
+    fun updateFranchise(id: UUID, request: com.crichere.domain.franchise.dto.FranchiseUpdateRequest): Franchise {
+        val franchise = getFranchise(id)
+        request.name?.let { franchise.name = it }
+        request.logoUrl?.let { franchise.logoUrl = it }
+        request.totalPurse?.let { 
+            val spent = franchise.totalPurse - franchise.remainingPurse
+            franchise.totalPurse = it
+            franchise.remainingPurse = it - spent
+        }
+        return franchiseRepository.save(franchise)
+    }
+
+    fun getInvites(franchiseId: UUID): List<FranchiseInvite> {
+        return franchiseInviteRepository.findByFranchiseId(franchiseId)
+    }
+
+    fun getSquad(franchiseId: UUID): List<com.crichere.domain.auction.dto.AuctionPlayerSummary> {
+        val players = franchisePlayerRepository.findByFranchiseId(franchiseId)
+        return players.map { fp ->
+            val lp = leaguePlayerRepository.findById(fp.leaguePlayerId).get()
+            val user = userRepository.findById(lp.userId).get()
+            com.crichere.domain.auction.dto.AuctionPlayerSummary(
+                playerName = user.name ?: "Unknown",
+                playerCategory = lp.category,
+                finalPrice = fp.boughtPrice,
+                assignmentType = "SOLD",
+                roundNumber = 1
+            )
         }
     }
 
@@ -92,7 +132,10 @@ class FranchiseService(
 
         val franchise = getFranchise(invite.franchiseId)
         
-        // Add membership
+        // Update ownership and membership
+        franchise.ownerId = userId
+        franchiseRepository.save(franchise)
+        
         membershipRepository.save(com.crichere.domain.auth.entity.UserFranchiseMembership(
             userId = userId,
             franchiseId = franchise.id

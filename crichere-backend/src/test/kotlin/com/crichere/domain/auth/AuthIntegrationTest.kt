@@ -104,7 +104,7 @@ class AuthIntegrationTest {
         val userId = body["userId"] as String
 
         val user = userRepository.findById(UUID.fromString(userId)).get()
-        assertEquals(ProfileStatus.ACTIVE, user.profileStatus)
+        assertEquals(ProfileStatus.GHOST, user.profileStatus)
 
         // 3. GET /auth/me
         val headers = HttpHeaders()

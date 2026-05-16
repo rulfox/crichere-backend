@@ -54,6 +54,18 @@ data class InviteValidationResponse(
     val expiresAt: java.time.Instant
 )
 
+data class FranchiseUpdateRequest(
+    val name: String? = null,
+    val logoUrl: String? = null,
+    val totalPurse: Int? = null
+)
+
+data class FranchiseSquadResponse(
+    val franchiseId: UUID,
+    val franchiseName: String,
+    val players: List<com.crichere.domain.auction.dto.AuctionPlayerSummary>
+)
+
 data class InviteAcceptRequest(
     val token: UUID
 )

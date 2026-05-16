@@ -55,4 +55,19 @@ class NotificationController(private val notificationService: NotificationServic
     ): ApiResponse<NotificationResponse> {
         return ResponseHelper.success(data = notificationService.markAsRead(id, UUID.fromString(user.username)))
     }
+
+    @PatchMapping("/read-all")
+    fun markAllAsRead(@AuthenticationPrincipal user: UserDetails): ApiResponse<Nothing> {
+        notificationService.markAllAsRead(UUID.fromString(user.username))
+        return ResponseHelper.success(message = "All notifications marked as read")
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteNotification(
+        @PathVariable id: UUID,
+        @AuthenticationPrincipal user: UserDetails
+    ): ApiResponse<Nothing> {
+        notificationService.deleteNotification(id, UUID.fromString(user.username))
+        return ResponseHelper.success(message = "Notification deleted")
+    }
 }

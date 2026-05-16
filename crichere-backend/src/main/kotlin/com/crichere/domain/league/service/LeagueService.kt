@@ -47,8 +47,8 @@ class LeagueService(
         return savedLeague
     }
 
-    fun getLeagues(): List<League> {
-        return leagueRepository.findAll()
+    fun getLeagues(pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<League> {
+        return leagueRepository.findAll(pageable)
     }
 
     fun getLeague(id: UUID): League {
@@ -163,6 +163,39 @@ class LeagueService(
      */
     fun getTagPrices(leagueId: UUID): List<com.crichere.domain.league.entity.LeagueTagBasePrice> {
         return leagueTagBasePriceRepository.findByLeagueId(leagueId)
+    }
+
+    fun getFranchises(leagueId: UUID): List<com.crichere.domain.franchise.entity.Franchise> {
+        return franchiseRepository.findByLeagueId(leagueId)
+    }
+
+    fun getPlayers(leagueId: UUID, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<LeaguePlayer> {
+        return leaguePlayerRepository.findByLeagueId(leagueId, pageable)
+    }
+
+    @Transactional
+    fun updatePlayerEligibility(leagueId: UUID, playerId: UUID, eligible: Boolean): LeaguePlayer {
+        val player = leaguePlayerRepository.findById(playerId)
+            .orElseThrow { ResourceNotFoundException("Player not found", "error.player_not_found") }
+        
+        if (player.leagueId != leagueId) {
+            throw BusinessLogicException("Player does not belong to this league", "error.player_not_in_league")
+        }
+
+        player.auctionEligible = eligible
+        return leaguePlayerRepository.save(player)
+    }
+
+    @Transactional
+    fun removePlayer(leagueId: UUID, playerId: UUID) {
+        val player = leaguePlayerRepository.findById(playerId)
+            .orElseThrow { ResourceNotFoundException("Player not found", "error.player_not_found") }
+        
+        if (player.leagueId != leagueId) {
+            throw BusinessLogicException("Player does not belong to this league", "error.player_not_in_league")
+        }
+
+        leaguePlayerRepository.delete(player)
     }
 
     @Transactional(readOnly = true)

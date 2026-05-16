@@ -17,6 +17,8 @@ import java.util.*
 @Service
 class UserService(
     private val userRepository: UserRepository,
+    private val userLeagueMembershipRepository: com.crichere.domain.auth.repository.UserLeagueMembershipRepository,
+    private val leagueRepository: com.crichere.domain.league.repository.LeagueRepository,
     private val s3Presigner: S3Presigner,
     @Value("\${crichere.s3.bucket}") private val bucketName: String
 ) {
@@ -25,6 +27,11 @@ class UserService(
         return userRepository.findById(id).orElseThrow {
             ResourceNotFoundException("User not found", "error.user_not_found")
         }
+    }
+
+    fun getUserLeagues(userId: UUID): List<com.crichere.domain.league.entity.League> {
+        val memberships = userLeagueMembershipRepository.findAllByUserId(userId)
+        return memberships.map { leagueRepository.findById(it.leagueId).get() }
     }
 
     @Transactional
@@ -58,14 +65,11 @@ class UserService(
         userRepository.save(user)
     }
 
-    fun searchUsers(query: String): List<User> {
-        // Simple search for now, could be expanded to use specification
-        return userRepository.findAll().filter { 
-            it.name?.contains(query, ignoreCase = true) == true || it.phone.contains(query) 
-        }
+    fun searchUsers(query: String, pageable: org.springframework.data.domain.Pageable): org.springframework.data.domain.Page<User> {
+        return userRepository.findByNameContainingIgnoreCaseOrPhoneContaining(query, query, pageable)
     }
 
-    fun generatePhotoUploadUrl(userId: UUID, extension: String): String {
+    fun generatePhotoUploadUrl(userId: UUID, extension: String): Pair<String, String> {
         val key = "profiles/$userId/photo-${System.currentTimeMillis()}.$extension"
         
         val putObjectRequest = PutObjectRequest.builder()
@@ -79,7 +83,7 @@ class UserService(
             .build()
 
         val presignedRequest = s3Presigner.presignPutObject(presignRequest)
-        return presignedRequest.url().toString()
+        return Pair(presignedRequest.url().toString(), key)
     }
     
     @Transactional

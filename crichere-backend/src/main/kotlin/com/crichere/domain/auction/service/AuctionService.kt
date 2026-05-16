@@ -37,6 +37,7 @@ class AuctionService(
     private val leaguePlayerRepository: LeaguePlayerRepository,
     private val userRepository: com.crichere.domain.auth.repository.UserRepository,
     private val leagueRepository: com.crichere.domain.league.repository.LeagueRepository,
+    private val poolPlayerRepository: AuctionRoundPoolPlayerRepository,
     private val redisTemplate: StringRedisTemplate,
     private val objectMapper: ObjectMapper,
     private val notificationService: com.crichere.domain.notification.service.NotificationService,
@@ -91,7 +92,7 @@ class AuctionService(
         // Initialize PlayerAuctionStates if not already done
         val existingPlayers = playerStateRepository.findByAuctionId(auction.id).map { it.leaguePlayerId }.toSet()
         val players = leaguePlayerRepository.findByLeagueId(auction.leagueId)
-        players.filter { it.id !in existingPlayers }.forEach { player ->
+        players.filter { it.id !in existingPlayers && it.auctionEligible }.forEach { player ->
             playerStateRepository.save(PlayerAuctionState(
                 auctionId = auction.id,
                 leaguePlayerId = player.id,
@@ -707,12 +708,27 @@ class AuctionService(
 
     fun getAuctionByToken(token: String) = auctionRepository.findByPublicViewToken(token) ?: throw ResourceNotFoundException("Auction not found", "error.auction_not_found")
 
+    fun getRounds(auctionId: UUID): List<AuctionRoundConfig> {
+        return roundConfigRepository.findByAuctionIdOrderByRoundNumberAsc(auctionId)
+    }
+
+    fun getRound(roundId: UUID): AuctionRoundConfig {
+        return roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
+    }
+
     fun getStateSnapshot(auctionId: UUID): com.crichere.domain.auction.dto.AuctionStateSnapshot {
         val auction = getAuction(auctionId)
         val league = leagueRepository.findById(auction.leagueId).get()
         val round = auction.currentRoundId?.let { roundConfigRepository.findById(it).orElse(null) }
         val playerState = auction.currentLeaguePlayerId?.let { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, it).orElse(null) }
-        val purses = purseRepository.findByAuctionId(auctionId)
+        
+        val currentRoundIdForPurse = auction.currentRoundId ?: roundConfigRepository.findByAuctionIdOrderByRoundNumberAsc(auctionId).lastOrNull()?.id
+        val purses = if (currentRoundIdForPurse != null) {
+            purseRepository.findByAuctionId(auctionId).filter { it.roundId == currentRoundIdForPurse }
+        } else {
+            emptyList()
+        }
+        
         val lastSeq = auctionAuditLogRepository.findMaxSequenceNumberByAuctionId(auctionId)
         
         return com.crichere.domain.auction.dto.AuctionStateSnapshot(
@@ -732,9 +748,7 @@ class AuctionService(
                     com.crichere.domain.auction.dto.BidIncrementSlabDto(s.fromAmount, s.toAmount, s.incrementBy)
                 }
             )},
-            currentPlayer = playerState?.let { p -> com.crichere.domain.auction.dto.PlayerAuctionStateResponse(
-                p.id, p.auctionId, p.leaguePlayerId, p.state, p.currentHighestBid, p.currentHighestBidderId, p.finalPrice, p.soldToFranchiseId
-            )},
+            currentPlayer = playerState?.let { p -> mapToStateResponse(p) },
             currentHighestBid = playerState?.currentHighestBid,
             currentHighestBidderId = playerState?.currentHighestBidderId,
             franchisePurseStates = purses.map { p -> com.crichere.domain.auction.dto.FranchisePurseStateResponse(
@@ -742,6 +756,25 @@ class AuctionService(
             )},
             timer = getTimerState(auction),
             lastSequenceNumber = lastSeq
+        )
+    }
+
+    fun mapToStateResponse(s: PlayerAuctionState): PlayerAuctionStateResponse {
+        val lp = leaguePlayerRepository.findById(s.leaguePlayerId).get()
+        val user = userRepository.findById(lp.userId).get()
+        return PlayerAuctionStateResponse(
+            id = s.id,
+            auctionId = s.auctionId,
+            leaguePlayerId = s.leaguePlayerId,
+            state = s.state,
+            currentHighestBid = s.currentHighestBid,
+            currentHighestBidderId = s.currentHighestBidderId,
+            finalPrice = s.finalPrice,
+            soldToFranchiseId = s.soldToFranchiseId,
+            playerName = user.name ?: "Unknown",
+            playerCategory = lp.category,
+            basePrice = leagueService.resolveBasePrice(lp),
+            playerPhoto = user.profilePhoto
         )
     }
 
@@ -804,6 +837,16 @@ class AuctionService(
     }
 
     @Transactional
+    fun deleteRound(roundId: UUID) {
+        val round = roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
+        if (round.status != RoundStatus.PENDING) throw BusinessLogicException("Only PENDING rounds can be deleted", "error.invalid_round_status")
+        
+        slabRepository.deleteAll(slabRepository.findByRoundIdOrderByFromAmountAsc(roundId))
+        categoryIncrementRepository.deleteAll(categoryIncrementRepository.findByRoundId(roundId))
+        roundConfigRepository.delete(round)
+    }
+
+    @Transactional
     fun completeRound(auctionId: UUID, roundId: UUID, actorId: UUID): AuctionRoundConfig {
         val round = roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
         round.status = RoundStatus.COMPLETED
@@ -829,10 +872,35 @@ class AuctionService(
         
         return when (round.playerPoolSource) {
             PlayerPoolSource.ALL_REGISTERED -> playerStates.filter { it.state == PlayerAuctionStateValue.AVAILABLE }
-            PlayerPoolSource.UNSOLD_PREVIOUS_ROUND, PlayerPoolSource.UNSOLD_ANY_PREVIOUS_ROUND -> 
+            PlayerPoolSource.UNSOLD_PREVIOUS_ROUND -> {
+                 // Logic to only pick unsold from the immediately preceding round
+                 val prevRounds = roundConfigRepository.findByAuctionIdOrderByRoundNumberAsc(auctionId)
+                 val currentIndex = prevRounds.indexOfFirst { it.id == roundId }
+                 if (currentIndex > 0) {
+                     val prevRoundId = prevRounds[currentIndex - 1].id
+                     // Assuming for now it filters all unsold if we don't have per-round state.
+                     playerStates.filter { it.state == PlayerAuctionStateValue.UNSOLD }
+                 } else {
+                     emptyList()
+                 }
+            }
+            PlayerPoolSource.UNSOLD_ANY_PREVIOUS_ROUND -> 
                 playerStates.filter { it.state == PlayerAuctionStateValue.UNSOLD }
-            PlayerPoolSource.AUCTIONEER_CURATED -> playerStates.filter { it.state == PlayerAuctionStateValue.AVAILABLE } // Default to AVAILABLE for now
+            PlayerPoolSource.AUCTIONEER_CURATED -> {
+                val curatedIds = poolPlayerRepository.findByRoundId(roundId).map { it.leaguePlayerId }.toSet()
+                playerStates.filter { it.leaguePlayerId in curatedIds && (it.state == PlayerAuctionStateValue.AVAILABLE || it.state == PlayerAuctionStateValue.UNSOLD) }
+            }
         }
+    }
+
+    @Transactional
+    fun updatePlayerPool(roundId: UUID, playerIds: List<UUID>) {
+        val round = roundConfigRepository.findById(roundId).orElseThrow { ResourceNotFoundException("Round not found", "error.round_not_found") }
+        if (round.status != RoundStatus.PENDING) throw BusinessLogicException("Can only update pool for PENDING rounds", "error.invalid_round_status")
+        
+        poolPlayerRepository.deleteByRoundId(roundId)
+        val entities = playerIds.map { AuctionRoundPoolPlayer(roundId = roundId, leaguePlayerId = it) }
+        poolPlayerRepository.saveAll(entities)
     }
 
     @Transactional
@@ -874,23 +942,28 @@ class AuctionService(
         val league = leagueRepository.findById(auction.leagueId).get()
         val playerStates = playerStateRepository.findByAuctionId(auctionId)
         val franchises = franchiseRepository.findByLeagueId(auction.leagueId)
+        val rounds = roundConfigRepository.findByAuctionIdOrderByRoundNumberAsc(auctionId)
+        val currentRoundId = auction.currentRoundId ?: rounds.lastOrNull()?.id
         
-        val soldPlayers = playerStates.filter { it.state == PlayerAuctionStateValue.SOLD || it.state == PlayerAuctionStateValue.FORCE_ASSIGNED }
+        val soldPlayers = playerStates.filter { it.state == PlayerAuctionStateValue.SOLD || it.state == PlayerAuctionStateValue.FORCE_ASSIGNED || it.state == PlayerAuctionStateValue.PRE_ASSIGNED }
         val highestSaleState = soldPlayers.maxByOrNull { it.finalPrice ?: 0 }
         
         val franchiseSummaries = franchises.map { f ->
             val fPlayers = franchisePlayerRepository.findByFranchiseId(f.id)
+            val purse = if (currentRoundId != null) purseRepository.findByFranchiseIdAndRoundId(f.id, currentRoundId) else null
             com.crichere.domain.auction.dto.FranchiseSummary(
                 f.id, f.name, fPlayers.size, fPlayers.sumOf { it.boughtPrice.toLong() }, 
-                purseRepository.findByAuctionId(auctionId).find { it.franchiseId == f.id }?.currentAmount ?: 0,
+                purse?.currentAmount ?: f.remainingPurse,
                 fPlayers.map { fp -> 
                     val lp = leaguePlayerRepository.findById(fp.leaguePlayerId).get()
+                    val pState = playerStates.find { it.leaguePlayerId == fp.leaguePlayerId }
+                    val round = rounds.find { it.id == fp.roundId }
                     com.crichere.domain.auction.dto.AuctionPlayerSummary(
                         playerName = userRepository.findById(lp.userId).get().name ?: "Unknown",
                         playerCategory = lp.category,
                         finalPrice = fp.boughtPrice,
-                        assignmentType = "SOLD", // Should be derived from state
-                        roundNumber = 1 // Should be derived from fp.roundId
+                        assignmentType = pState?.state?.name ?: "SOLD",
+                        roundNumber = round?.roundNumber ?: 1
                     )
                 }
             )
@@ -922,16 +995,21 @@ class AuctionService(
     fun getFranchiseDetailedSummary(auctionId: UUID, franchiseId: UUID): com.crichere.domain.auction.dto.FranchiseDetailedSummaryResponse {
         val franchise = franchiseRepository.findById(franchiseId).orElseThrow { ResourceNotFoundException("Franchise not found", "error.franchise_not_found") }
         val fPlayers = franchisePlayerRepository.findByFranchiseId(franchiseId)
-        val purse = purseRepository.findByAuctionId(auctionId).find { it.franchiseId == franchiseId }
+        val rounds = roundConfigRepository.findByAuctionIdOrderByRoundNumberAsc(auctionId)
+        val auction = getAuction(auctionId)
+        val currentRoundId = auction.currentRoundId ?: rounds.lastOrNull()?.id
+        val purse = if (currentRoundId != null) purseRepository.findByFranchiseIdAndRoundId(franchiseId, currentRoundId) else null
         
         val playerSummaries = fPlayers.map { fp ->
             val lp = leaguePlayerRepository.findById(fp.leaguePlayerId).get()
+            val pState = playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, fp.leaguePlayerId).orElse(null)
+            val round = rounds.find { it.id == fp.roundId }
             com.crichere.domain.auction.dto.AuctionPlayerSummary(
                 playerName = userRepository.findById(lp.userId).get().name ?: "Unknown",
                 playerCategory = lp.category,
                 finalPrice = fp.boughtPrice,
-                assignmentType = "SOLD",
-                roundNumber = 1
+                assignmentType = pState?.state?.name ?: "SOLD",
+                roundNumber = round?.roundNumber ?: 1
             )
         }
 
@@ -944,21 +1022,16 @@ class AuctionService(
             franchiseName = franchise.name,
             squadCount = fPlayers.size,
             totalSpent = fPlayers.sumOf { it.boughtPrice.toLong() },
-            remainingPurse = purse?.currentAmount ?: 0,
+            remainingPurse = purse?.currentAmount ?: franchise.remainingPurse,
             categoryBreakdown = categoryBreakdown,
             players = playerSummaries
         )
     }
 
     fun getUnsoldPlayers(auctionId: UUID, pageable: org.springframework.data.domain.Pageable): com.crichere.domain.auction.dto.UnsoldPlayersResponse {
-        val allStates = playerStateRepository.findByAuctionId(auctionId)
-        val unsold = allStates.filter { it.state == PlayerAuctionStateValue.UNSOLD }
+        val unsoldPage = playerStateRepository.findByAuctionIdAndState(auctionId, PlayerAuctionStateValue.UNSOLD, pageable)
         
-        val start = pageable.offset.toInt()
-        val end = (start + pageable.pageSize).coerceAtMost(unsold.size)
-        val paginated = if (start < unsold.size) unsold.subList(start, end) else emptyList()
-
-        val summaries = paginated.map { s ->
+        val summaries = unsoldPage.content.map { s ->
             val lp = leaguePlayerRepository.findById(s.leaguePlayerId).get()
             com.crichere.domain.auction.dto.AuctionPlayerSummary(
                 playerName = userRepository.findById(lp.userId).get().name ?: "Unknown",
@@ -971,10 +1044,10 @@ class AuctionService(
 
         return com.crichere.domain.auction.dto.UnsoldPlayersResponse(
             players = summaries,
-            totalElements = unsold.size.toLong(),
-            totalPages = if (pageable.pageSize > 0) (unsold.size + pageable.pageSize - 1) / pageable.pageSize else 0,
-            pageNumber = pageable.pageNumber,
-            pageSize = pageable.pageSize
+            totalElements = unsoldPage.totalElements,
+            totalPages = unsoldPage.totalPages,
+            pageNumber = unsoldPage.number,
+            pageSize = unsoldPage.size
         )
     }
 

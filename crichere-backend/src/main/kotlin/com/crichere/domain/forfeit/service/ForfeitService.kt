@@ -13,6 +13,7 @@ import com.crichere.domain.forfeit.entity.ForfeitRequest
 import com.crichere.domain.forfeit.enums.FeeRefundDecision
 import com.crichere.domain.forfeit.enums.ForfeitStatus
 import com.crichere.domain.forfeit.repository.ForfeitRequestRepository
+import com.crichere.domain.franchise.repository.FranchiseRepository
 import com.crichere.domain.league.repository.LeagueRepository
 import com.crichere.domain.league.service.LeagueService
 import com.crichere.domain.player.repository.LeaguePlayerRepository
@@ -30,6 +31,7 @@ class ForfeitService(
     private val feeService: FeeService,
     private val feeObligationRepository: FeeObligationRepository,
     private val leaguePlayerRepository: LeaguePlayerRepository,
+    private val franchiseRepository: FranchiseRepository,
     private val leagueRepository: LeagueRepository,
     private val waitingListService: WaitingListService,
     private val notificationService: com.crichere.domain.notification.service.NotificationService
@@ -40,7 +42,13 @@ class ForfeitService(
         forfeitRequestRepository.findByLeagueIdAndUserIdAndStatus(leagueId, userId, ForfeitStatus.PENDING)
             .ifPresent { throw AlreadyExistsException("A pending forfeit request already exists", "error.pending_forfeit_exists") }
 
-        // Participant validation logic should go here (check if user is in league)
+        // Participant validation
+        val isPlayer = leaguePlayerRepository.findByLeagueIdAndUserId(leagueId, userId) != null
+        val isFranchiseOwner = franchiseRepository.findByLeagueId(leagueId).any { it.ownerId == userId }
+        
+        if (!isPlayer && !isFranchiseOwner) {
+            throw BusinessLogicException("User is not a participant in this league", "error.not_league_participant")
+        }
         
         val forfeitRequest = forfeitRequestRepository.save(ForfeitRequest(
             leagueId = leagueId,
@@ -73,36 +81,45 @@ class ForfeitService(
 
         val obligation = feeObligationRepository.findByLeagueIdAndUserIdAndFeeType(
             leagueId, forfeitRequest.userId, if (forfeitRequest.type == com.crichere.domain.forfeit.enums.ForfeitType.PLAYER) com.crichere.domain.fee.enums.FeeType.PLAYER_FEE else com.crichere.domain.fee.enums.FeeType.FRANCHISE_FEE
-        ).orElseThrow { ResourceNotFoundException("Fee obligation not found", "error.fee_obligation_not_found") }
+        ).orElse(null)
 
-        if (request.feeRefundDecision == FeeRefundDecision.PARTIAL_REFUND) {
-            if (request.feeRefundAmount == null || request.feeRefundAmount < 0 || request.feeRefundAmount > obligation.paidAmount) {
-                throw BusinessLogicException("Invalid refund amount", "error.invalid_refund_amount")
+        if (obligation != null) {
+            if (request.feeRefundDecision == FeeRefundDecision.PARTIAL_REFUND) {
+                if (request.feeRefundAmount == null || request.feeRefundAmount < 0 || request.feeRefundAmount > obligation.paidAmount) {
+                    throw BusinessLogicException("Invalid refund amount", "error.invalid_refund_amount")
+                }
+            }
+            
+            forfeitRequest.feeRefundAmount = when(request.feeRefundDecision) {
+                FeeRefundDecision.FULL_REFUND -> obligation.paidAmount
+                FeeRefundDecision.PARTIAL_REFUND -> request.feeRefundAmount
+                FeeRefundDecision.NO_REFUND -> 0
+            }
+
+            // Waive obligation
+            obligation.status = FeeStatus.WAIVED
+            feeObligationRepository.save(obligation)
+
+            // Refund payment
+            if (forfeitRequest.feeRefundAmount!! > 0) {
+                feeService.recordPayment(leagueId, obligation.id, FeePaymentRequest(
+                    amount = -forfeitRequest.feeRefundAmount!!,
+                    paymentMode = PaymentMode.REFUND,
+                    notes = "Refund on forfeit approval"
+                ), adminId)
+            }
+        } else {
+            forfeitRequest.feeRefundAmount = 0
+            if (request.feeRefundDecision != FeeRefundDecision.NO_REFUND) {
+                 // Option to warn or ignore. Audit says it fails, so we'll just force NO_REFUND.
+                 forfeitRequest.feeRefundDecision = FeeRefundDecision.NO_REFUND
             }
         }
 
         forfeitRequest.status = ForfeitStatus.APPROVED
         forfeitRequest.resolvedAt = Instant.now()
         forfeitRequest.feeRefundDecision = request.feeRefundDecision
-        forfeitRequest.feeRefundAmount = when(request.feeRefundDecision) {
-            FeeRefundDecision.FULL_REFUND -> obligation.paidAmount
-            FeeRefundDecision.PARTIAL_REFUND -> request.feeRefundAmount
-            FeeRefundDecision.NO_REFUND -> 0
-        }
         forfeitRequest.adminNotes = request.adminNotes
-
-        // Waive obligation
-        obligation.status = FeeStatus.WAIVED
-        feeObligationRepository.save(obligation)
-
-        // Refund payment
-        if (forfeitRequest.feeRefundAmount!! > 0) {
-            feeService.recordPayment(leagueId, obligation.id, FeePaymentRequest(
-                amount = -forfeitRequest.feeRefundAmount!!,
-                paymentMode = PaymentMode.REFUND,
-                notes = "Refund on forfeit approval"
-            ), adminId)
-        }
 
         // De-eligible player
         val player = leaguePlayerRepository.findByLeagueIdAndUserId(leagueId, forfeitRequest.userId)

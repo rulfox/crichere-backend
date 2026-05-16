@@ -39,6 +39,7 @@ class NewFeaturesTest {
     private val leaguePlayerRepository = mockk<LeaguePlayerRepository>()
     private val userRepository = mockk<com.crichere.domain.auth.repository.UserRepository>()
     private val leagueRepository = mockk<LeagueRepository>()
+    private val poolPlayerRepository = mockk<AuctionRoundPoolPlayerRepository>()
     private val redisTemplate = mockk<StringRedisTemplate>()
     private val objectMapper = mockk<ObjectMapper>()
     private val notificationService = mockk<NotificationService>()
@@ -61,7 +62,7 @@ class NewFeaturesTest {
             auctionRepository, roundConfigRepository, slabRepository, categoryIncrementRepository,
             bidRepository, playerStateRepository, purseRepository, franchiseRepository,
             franchisePlayerRepository, auctionAuditLogRepository, leaguePlayerRepository,
-            userRepository, leagueRepository, redisTemplate, objectMapper,
+            userRepository, leagueRepository, poolPlayerRepository, redisTemplate, objectMapper,
             notificationService, leagueService, meterRegistry
         )
     }
@@ -211,16 +212,47 @@ class NewFeaturesTest {
     }
 
     @Test
-    @DisplayName("regeneratePublicViewToken - success")
-    fun regenerateTokenSuccess() {
-        val auction = Auction(id = auctionId, leagueId = UUID.randomUUID(), publicViewToken = "old-token")
-        every { auctionRepository.findById(auctionId) } returns Optional.of(auction)
-        every { auctionRepository.save(any()) } answers { firstArg() }
+    @DisplayName("updatePlayerPool - success")
+    fun updatePlayerPoolSuccess() {
+        val playerIds = listOf(UUID.randomUUID(), UUID.randomUUID())
+        val round = AuctionRoundConfig(id = roundId, auctionId = auctionId, roundNumber = 1, currencyType = CurrencyType.CASH, purseSource = PurseSource.FRESH, bidMode = BidMode.EACH_BID_RECORDED, playerPoolSource = PlayerPoolSource.AUCTIONEER_CURATED, franchiseEligibilityRule = FranchiseEligibilityRule.ALL, completionTrigger = CompletionTrigger.AUCTIONEER_MANUAL)
+        round.status = RoundStatus.PENDING
 
-        val result = auctionService.regeneratePublicViewToken(auctionId)
+        every { roundConfigRepository.findById(roundId) } returns Optional.of(round)
+        every { poolPlayerRepository.deleteByRoundId(roundId) } just runs
+        every { poolPlayerRepository.saveAll(any<List<AuctionRoundPoolPlayer>>()) } answers { firstArg() }
 
-        assertNotEquals("old-token", result.publicViewToken)
-        assertEquals(64, result.publicViewToken.length)
-        verify { auctionRepository.save(any()) }
+        auctionService.updatePlayerPool(roundId, playerIds)
+
+        verify { poolPlayerRepository.deleteByRoundId(roundId) }
+        verify { poolPlayerRepository.saveAll(match<List<AuctionRoundPoolPlayer>> { it.size == 2 }) }
+    }
+
+    @Test
+    @DisplayName("getPlayerPool - curated logic")
+    fun getPlayerPoolCurated() {
+        val player1Id = UUID.randomUUID()
+        val player2Id = UUID.randomUUID()
+        val round = AuctionRoundConfig(id = roundId, auctionId = auctionId, roundNumber = 1, currencyType = CurrencyType.CASH, purseSource = PurseSource.FRESH, bidMode = BidMode.EACH_BID_RECORDED, playerPoolSource = PlayerPoolSource.AUCTIONEER_CURATED, franchiseEligibilityRule = FranchiseEligibilityRule.ALL, completionTrigger = CompletionTrigger.AUCTIONEER_MANUAL)
+        
+        val playerStates = listOf(
+            PlayerAuctionState(auctionId = auctionId, leaguePlayerId = player1Id, state = PlayerAuctionStateValue.AVAILABLE),
+            PlayerAuctionState(auctionId = auctionId, leaguePlayerId = player2Id, state = PlayerAuctionStateValue.AVAILABLE),
+            PlayerAuctionState(auctionId = auctionId, leaguePlayerId = UUID.randomUUID(), state = PlayerAuctionStateValue.AVAILABLE)
+        )
+        val poolEntities = listOf(
+            AuctionRoundPoolPlayer(roundId = roundId, leaguePlayerId = player1Id),
+            AuctionRoundPoolPlayer(roundId = roundId, leaguePlayerId = player2Id)
+        )
+
+        every { roundConfigRepository.findById(roundId) } returns Optional.of(round)
+        every { playerStateRepository.findByAuctionId(auctionId) } returns playerStates
+        every { poolPlayerRepository.findByRoundId(roundId) } returns poolEntities
+
+        val result = auctionService.getPlayerPool(auctionId, roundId)
+
+        assertEquals(2, result.size)
+        assertTrue(result.any { it.leaguePlayerId == player1Id })
+        assertTrue(result.any { it.leaguePlayerId == player2Id })
     }
 }

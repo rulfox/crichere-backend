@@ -21,7 +21,7 @@ class StorageController(private val userService: UserService) {
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<Map<String, String>> {
         val extension = request.fileName.substringAfterLast(".", "jpg")
-        val url = userService.generatePhotoUploadUrl(UUID.fromString(user.username), extension)
-        return ResponseHelper.success(data = mapOf("url" to url))
+        val (url, key) = userService.generatePhotoUploadUrl(UUID.fromString(user.username), extension)
+        return ResponseHelper.success(data = mapOf("url" to url, "s3Key" to key))
     }
 }

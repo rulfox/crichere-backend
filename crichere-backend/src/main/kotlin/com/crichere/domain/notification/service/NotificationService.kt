@@ -75,6 +75,27 @@ class NotificationService(
     }
 
     @Transactional
+    fun markAllAsRead(userId: UUID) {
+        val unread = inAppNotificationRepository.findByUserIdAndReadAtIsNullOrderByCreatedAtDesc(userId, Pageable.unpaged())
+        unread.forEach { 
+            it.readAt = Instant.now()
+            inAppNotificationRepository.save(it)
+        }
+    }
+
+    @Transactional
+    fun deleteNotification(notificationId: UUID, userId: UUID) {
+        val notification = inAppNotificationRepository.findById(notificationId)
+            .orElseThrow { ResourceNotFoundException("Notification not found") }
+        
+        if (notification.userId != userId) {
+            throw com.crichere.common.exception.UnauthorizedException("Cannot delete someone else's notification")
+        }
+
+        inAppNotificationRepository.delete(notification)
+    }
+
+    @Transactional
     fun createAndSend(userId: UUID, type: NotificationType, title: String, body: String, payload: Map<String, Any?> = emptyMap()) {
         inAppNotificationRepository.save(InAppNotification(
             userId = userId,

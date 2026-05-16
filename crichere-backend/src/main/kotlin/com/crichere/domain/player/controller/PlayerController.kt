@@ -18,6 +18,7 @@ class PlayerController(
 ) {
 
     @PostMapping("/register")
+    @org.springframework.security.access.prepost.PreAuthorize("hasRole('PLATFORM_ADMIN') or #request.userId.toString() == authentication.name")
     fun registerPlayer(@Valid @RequestBody request: PlayerRegisterRequest): ApiResponse<LeaguePlayerResponse> {
         val player = playerService.registerPlayer(
             LeaguePlayer(
@@ -36,7 +37,8 @@ class PlayerController(
             basePriceOverride = player.basePriceOverride,
             tag = player.tag,
             status = player.status,
-            category = player.category
+            category = player.category,
+            auctionEligible = player.auctionEligible
         )
         return ResponseHelper.success(data = response, message = "Player registered successfully", messageKey = "success.player_registered")
     }
@@ -52,26 +54,9 @@ class PlayerController(
             basePriceOverride = player.basePriceOverride,
             tag = player.tag,
             status = player.status,
-            category = player.category
+            category = player.category,
+            auctionEligible = player.auctionEligible
         )
-        return ResponseHelper.success(data = response)
-    }
-
-    @GetMapping("/league/{leagueId}")
-    fun getPlayersInLeague(@PathVariable leagueId: UUID): ApiResponse<List<LeaguePlayerResponse>> {
-        val players = playerService.getPlayersInLeague(leagueId)
-        val response = players.map { player ->
-            LeaguePlayerResponse(
-                id = player.id,
-                leagueId = player.leagueId,
-                userId = player.userId,
-                basePrice = player.basePrice,
-                basePriceOverride = player.basePriceOverride,
-                tag = player.tag,
-                status = player.status,
-                category = player.category
-            )
-        }
         return ResponseHelper.success(data = response)
     }
 }

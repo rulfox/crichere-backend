@@ -136,7 +136,7 @@ class FeeService(
         feePaymentRepository.save(FeePayment(
             obligationId = obligationId,
             amount = 0,
-            paymentMode = PaymentMode.CASH,
+            paymentMode = PaymentMode.WAIVER,
             notes = "WAIVED: $reason",
             recordedBy = recordedBy
         ))

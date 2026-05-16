@@ -38,7 +38,7 @@ class AuthService(
 
         var user = userRepository.findByPhone(phone)
         if (user == null) {
-            user = User(phone = phone, profileStatus = ProfileStatus.ACTIVE)
+            user = User(phone = phone, profileStatus = ProfileStatus.GHOST)
             userRepository.save(user)
         }
 
@@ -96,7 +96,7 @@ class AuthService(
             ResourceNotFoundException("User not found", "error.user_not_found")
         }
 
-        if (user.profileStatus != ProfileStatus.GHOST) {
+        if (user.claimedAt != null) {
             throw BusinessLogicException("Profile already claimed", "error.profile_already_claimed")
         }
 

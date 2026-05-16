@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("dev")
+@Profile("dev", "test")
 class Msg91SmsProvider : SmsProvider {
     private val logger = LoggerFactory.getLogger(Msg91SmsProvider::class.java)
 
