@@ -5,6 +5,7 @@ import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../providers/admin_providers.dart';
 import '../../../../features/league/domain/entities/league.dart';
+import '../../../../core/router/app_router.gr.dart';
 
 @RoutePage()
 class PlatformAdminScreen extends ConsumerWidget {
@@ -56,9 +57,27 @@ class PlatformAdminScreen extends ConsumerWidget {
                 // Leagues Table/List
                 Expanded(
                   child: leaguesAsync.when(
-                    data: (leagues) => isWide 
-                      ? _LeaguesTable(leagues: leagues)
-                      : _LeaguesListView(leagues: leagues),
+                    data: (leagues) {
+                      void onManage(League l) => context.router.push(LeagueDetailRoute(leagueId: l.id));
+                      void onSuspend(League l) async {
+                        try {
+                          await ref.read(adminRepositoryProvider).suspendLeague(l.id, true, null);
+                          ref.invalidate(adminLeaguesProvider);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('${l.name} has been suspended.')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                          }
+                        }
+                      }
+                      return isWide
+                        ? _LeaguesTable(leagues: leagues, onManage: onManage, onSuspend: onSuspend)
+                        : _LeaguesListView(leagues: leagues, onManage: onManage, onSuspend: onSuspend);
+                    },
                     loading: () => const Center(child: CircularProgressIndicator()),
                     error: (e, _) => Text('Error loading leagues: $e', style: CricTextStyle.body),
                   ),
@@ -112,7 +131,9 @@ class _MetricCard extends StatelessWidget {
 
 class _LeaguesTable extends StatelessWidget {
   final List<League> leagues;
-  const _LeaguesTable({required this.leagues});
+  final void Function(League) onManage;
+  final void Function(League) onSuspend;
+  const _LeaguesTable({required this.leagues, required this.onManage, required this.onSuspend});
 
   @override
   Widget build(BuildContext context) {
@@ -140,9 +161,9 @@ class _LeaguesTable extends StatelessWidget {
             DataCell(Text(l.auctionDate?.toIso8601String().split('T')[0] ?? 'N/A', style: CricTextStyle.caption)),
             DataCell(Row(
               children: [
-                TextButton(onPressed: () {}, child: Text('MANAGE', style: CricTextStyle.badge.copyWith(color: CricColor.gold))),
+                TextButton(onPressed: () => onManage(l), child: Text('MANAGE', style: CricTextStyle.badge.copyWith(color: CricColor.gold))),
                 const SizedBox(width: 8),
-                TextButton(onPressed: () {}, child: Text('SUSPEND', style: CricTextStyle.badge.copyWith(color: CricColor.red))),
+                TextButton(onPressed: () => onSuspend(l), child: Text('SUSPEND', style: CricTextStyle.badge.copyWith(color: CricColor.red))),
               ],
             )),
           ])).toList(),
@@ -154,7 +175,9 @@ class _LeaguesTable extends StatelessWidget {
 
 class _LeaguesListView extends StatelessWidget {
   final List<League> leagues;
-  const _LeaguesListView({required this.leagues});
+  final void Function(League) onManage;
+  final void Function(League) onSuspend;
+  const _LeaguesListView({required this.leagues, required this.onManage, required this.onSuspend});
 
   @override
   Widget build(BuildContext context) {
@@ -182,13 +205,13 @@ class _LeaguesListView extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () {}, child: Text('SUSPEND', style: CricTextStyle.badge.copyWith(color: CricColor.red))),
+                    TextButton(onPressed: () => onSuspend(l), child: Text('SUSPEND', style: CricTextStyle.badge.copyWith(color: CricColor.red))),
                     const SizedBox(width: 12),
                     ElevatedButton(
                       style: CricButtonStyle.primary.copyWith(
                         minimumSize: const WidgetStatePropertyAll(Size(80, 32)),
                       ),
-                      onPressed: () {},
+                      onPressed: () => onManage(l),
                       child: const Text('MANAGE', style: TextStyle(fontSize: 10)),
                     ),
                   ],

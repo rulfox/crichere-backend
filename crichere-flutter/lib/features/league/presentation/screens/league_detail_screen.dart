@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../providers/league_repository_provider.dart';
@@ -35,7 +36,9 @@ class LeagueDetailScreen extends ConsumerWidget {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.share_outlined, color: CricColor.gold),
-                  onPressed: () {},
+                  onPressed: () => SharePlus.instance.share(
+                    ShareParams(text: 'Check out ${league.name} on Crichere! https://crichere.com'),
+                  ),
                 ),
               ],
             ),
@@ -86,13 +89,13 @@ class LeagueDetailScreen extends ConsumerWidget {
   }
 }
 
-class _OverviewTab extends StatelessWidget {
+class _OverviewTab extends ConsumerWidget {
   final domain.League league;
 
   const _OverviewTab({required this.league});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(CricSpacing.page),
       child: Column(
@@ -154,7 +157,21 @@ class _OverviewTab extends StatelessWidget {
           ),
           const SizedBox(height: CricSpacing.md),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () async {
+              try {
+                await ref.read(leagueRepositoryProvider).joinWaitlist(league.id);
+                ref.invalidate(waitlistProvider(league.id));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('You have joined the waitlist!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                }
+              }
+            },
             style: CricButtonStyle.ghost.copyWith(
               minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 50)),
             ),

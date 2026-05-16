@@ -6,6 +6,7 @@ import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../../../../core/router/app_router.gr.dart';
 import '../../domain/entities/auth_enums.dart';
+import '../providers/auth_repository_provider.dart';
 
 @RoutePage()
 class ProfileSetupScreen extends HookConsumerWidget {
@@ -129,9 +130,17 @@ class ProfileSetupScreen extends HookConsumerWidget {
                       }
                       isLoading.value = true;
                       try {
-                        // For now just navigate home, we will wire up the full profile update later
+                        final user = await ref.read(currentUserProvider.future);
+                        await ref.read(authRepositoryProvider).updateCricketProfile(
+                          user.userId ?? '',
+                          role.value!,
+                          battingStyle.value?.name ?? '',
+                          bowlingStyle.value?.name ?? '',
+                        );
+                        if (!context.mounted) return;
                         context.router.replaceAll([const HomeRoute()]);
                       } catch (e) {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(e.toString())),
                         );

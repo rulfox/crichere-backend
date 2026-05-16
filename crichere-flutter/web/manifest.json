@@ -1,11 +1,11 @@
 {
-    "name": "crichere_flutter",
-    "short_name": "crichere_flutter",
+    "name": "Crichere",
+    "short_name": "Crichere",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#060C1A",
+    "theme_color": "#F59E0B",
+    "description": "India's cricket league auction platform.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

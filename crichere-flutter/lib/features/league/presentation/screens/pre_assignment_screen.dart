@@ -1,12 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
+import '../../domain/entities/league_player.dart';
 import '../providers/league_repository_provider.dart';
+import '../../../auction/presentation/providers/auction_provider.dart';
 
 @RoutePage()
-class PreAssignmentScreen extends ConsumerWidget {
+class PreAssignmentScreen extends HookConsumerWidget {
   final String leagueId;
 
   const PreAssignmentScreen({super.key, required this.leagueId});
@@ -15,6 +18,8 @@ class PreAssignmentScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final playersAsync = ref.watch(leaguePlayersProvider(leagueId));
     final franchisesAsync = ref.watch(leagueFranchisesProvider(leagueId));
+    // franchiseId -> {'CAPTAIN': player, 'ICON': player}
+    final selections = useState<Map<String, Map<String, LeaguePlayer?>>>({});
 
     return Scaffold(
       backgroundColor: CricColor.appBg,
@@ -39,14 +44,10 @@ class PreAssignmentScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(CricSpacing.base),
                 color: CricColor.navyMid,
-                child: Column(
-                  children: [
-                    Text(
-                      'Assign Captains and Icons to franchises. These players will be removed from the auction pool.',
-                      style: CricTextStyle.caption,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                child: Text(
+                  'Assign Captains and Icons to franchises. These players will be removed from the auction pool.',
+                  style: CricTextStyle.caption,
+                  textAlign: TextAlign.center,
                 ),
               ),
               Expanded(
@@ -55,6 +56,7 @@ class PreAssignmentScreen extends ConsumerWidget {
                   itemCount: franchises.length,
                   itemBuilder: (context, index) {
                     final franchise = franchises[index];
+                    final franchiseSelections = selections.value[franchise.id] ?? {};
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: CricCard(
@@ -66,14 +68,20 @@ class PreAssignmentScreen extends ConsumerWidget {
                             const SizedBox(height: 12),
                             _AssignmentSlot(
                               label: '★ CAPTAIN',
-                              assignedPlayer: 'Unassigned',
-                              onTap: () => _showPlayerPicker(context, players, 'CAPTAIN'),
+                              assignedPlayer: franchiseSelections['CAPTAIN']?.playerName ?? 'Unassigned',
+                              isAssigned: franchiseSelections['CAPTAIN'] != null,
+                              onTap: () => _showPlayerPicker(
+                                context, ref, players, franchise.id, 'CAPTAIN', selections,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             _AssignmentSlot(
-                              label: '★ ICON',
-                              assignedPlayer: 'Unassigned',
-                              onTap: () => _showPlayerPicker(context, players, 'ICON'),
+                              label: '⚡ ICON',
+                              assignedPlayer: franchiseSelections['ICON']?.playerName ?? 'Unassigned',
+                              isAssigned: franchiseSelections['ICON'] != null,
+                              onTap: () => _showPlayerPicker(
+                                context, ref, players, franchise.id, 'ICON', selections,
+                              ),
                             ),
                           ],
                         ),
@@ -84,21 +92,28 @@ class PreAssignmentScreen extends ConsumerWidget {
               ),
             ],
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text('Error loading franchises: $e')),
+          loading: () => const Center(child: CircularProgressIndicator(color: CricColor.gold)),
+          error: (e, _) => Center(child: Text('Error loading franchises: $e', style: CricTextStyle.body.copyWith(color: CricColor.red))),
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error loading players: $e')),
+        loading: () => const Center(child: CircularProgressIndicator(color: CricColor.gold)),
+        error: (e, _) => Center(child: Text('Error loading players: $e', style: CricTextStyle.body.copyWith(color: CricColor.red))),
       ),
     );
   }
 
-  void _showPlayerPicker(BuildContext context, List<dynamic> players, String type) {
+  void _showPlayerPicker(
+    BuildContext context,
+    WidgetRef ref,
+    List<LeaguePlayer> players,
+    String franchiseId,
+    String type,
+    ValueNotifier<Map<String, Map<String, LeaguePlayer?>>> selections,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: CricColor.navy,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) => Column(
+      builder: (ctx) => Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(24),
@@ -107,13 +122,36 @@ class PreAssignmentScreen extends ConsumerWidget {
           Expanded(
             child: ListView.builder(
               itemCount: players.length,
-              itemBuilder: (context, index) {
+              itemBuilder: (_, index) {
                 final p = players[index];
+                final isSelected = selections.value[franchiseId]?[type]?.playerId == p.playerId;
                 return ListTile(
-                  leading: const AvatarCircle(name: '', radius: 16),
+                  leading: AvatarCircle(name: p.playerName, radius: 16),
                   title: Text(p.playerName, style: CricTextStyle.body),
                   subtitle: Text('Base: ₹${p.basePriceOverride ?? 1000}', style: CricTextStyle.caption),
-                  onTap: () => Navigator.pop(context),
+                  trailing: isSelected ? const Icon(Icons.check_circle, color: CricColor.green) : null,
+                  onTap: () async {
+                    Navigator.pop(ctx);
+                    try {
+                      await ref.read(auctionRepositoryProvider).preAssign(
+                        leagueId,
+                        p.playerId,
+                        franchiseId,
+                        type,
+                      );
+                      // Update local state to reflect the selection
+                      final updated = Map<String, Map<String, LeaguePlayer?>>.from(selections.value);
+                      updated[franchiseId] = Map<String, LeaguePlayer?>.from(updated[franchiseId] ?? {});
+                      updated[franchiseId]![type] = p;
+                      selections.value = updated;
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to assign: $e')),
+                        );
+                      }
+                    }
+                  },
                 );
               },
             ),
@@ -127,9 +165,15 @@ class PreAssignmentScreen extends ConsumerWidget {
 class _AssignmentSlot extends StatelessWidget {
   final String label;
   final String assignedPlayer;
+  final bool isAssigned;
   final VoidCallback onTap;
 
-  const _AssignmentSlot({required this.label, required this.assignedPlayer, required this.onTap});
+  const _AssignmentSlot({
+    required this.label,
+    required this.assignedPlayer,
+    required this.isAssigned,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +184,7 @@ class _AssignmentSlot extends StatelessWidget {
         decoration: BoxDecoration(
           color: CricColor.slate3,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: CricColor.borderMid),
+          border: Border.all(color: isAssigned ? CricColor.green.withValues(alpha: 0.4) : CricColor.borderMid),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,10 +193,17 @@ class _AssignmentSlot extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: CricTextStyle.overline.copyWith(color: CricColor.gold)),
-                Text(assignedPlayer, style: CricTextStyle.body),
+                Text(
+                  assignedPlayer,
+                  style: CricTextStyle.body.copyWith(color: isAssigned ? CricColor.textPrimary : CricColor.textDim),
+                ),
               ],
             ),
-            const Icon(Icons.add_circle_outline, color: CricColor.gold, size: 20),
+            Icon(
+              isAssigned ? Icons.check_circle : Icons.add_circle_outline,
+              color: isAssigned ? CricColor.green : CricColor.gold,
+              size: 20,
+            ),
           ],
         ),
       ),

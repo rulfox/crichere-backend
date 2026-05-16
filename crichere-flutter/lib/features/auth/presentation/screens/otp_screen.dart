@@ -20,9 +20,12 @@ class OtpScreen extends HookConsumerWidget {
     final controllers = List.generate(6, (_) => useTextEditingController());
     final focusNodes = List.generate(6, (_) => useFocusNode());
     final isLoading = useState(false);
+    final isResending = useState(false);
     final timeLeft = useState(300);
+    final resendTrigger = useState(0);
 
     useEffect(() {
+      timeLeft.value = 300;
       final timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (timeLeft.value > 0) {
           timeLeft.value--;
@@ -31,9 +34,28 @@ class OtpScreen extends HookConsumerWidget {
         }
       });
       return timer.cancel;
-    }, []);
+    }, [resendTrigger.value]);
 
     String getOtp() => controllers.map((c) => c.text).join();
+
+    Future<void> handleResend() async {
+      isResending.value = true;
+      try {
+        await ref.read(sendOtpUseCaseProvider).call(phone);
+        resendTrigger.value++;
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('OTP resent successfully')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        }
+      } finally {
+        isResending.value = false;
+      }
+    }
 
     return Scaffold(
       backgroundColor: CricColor.appBg,
@@ -52,8 +74,10 @@ class OtpScreen extends HookConsumerWidget {
                     controllers: controllers,
                     focusNodes: focusNodes,
                     isLoading: isLoading,
+                    isResending: isResending,
                     timeLeft: timeLeft.value,
                     onVerify: () => _handleVerify(context, ref, getOtp(), isLoading),
+                    onResend: handleResend,
                   ),
                 ),
               ],
@@ -67,8 +91,10 @@ class OtpScreen extends HookConsumerWidget {
                 controllers: controllers,
                 focusNodes: focusNodes,
                 isLoading: isLoading,
+                isResending: isResending,
                 timeLeft: timeLeft.value,
                 onVerify: () => _handleVerify(context, ref, getOtp(), isLoading),
+                onResend: handleResend,
               ),
             ),
           );
@@ -149,16 +175,20 @@ class _OtpVerifyForm extends StatelessWidget {
   final List<TextEditingController> controllers;
   final List<FocusNode> focusNodes;
   final ValueNotifier<bool> isLoading;
+  final ValueNotifier<bool> isResending;
   final int timeLeft;
   final VoidCallback onVerify;
+  final VoidCallback onResend;
 
   const _OtpVerifyForm({
     required this.phone,
     required this.controllers,
     required this.focusNodes,
     required this.isLoading,
+    required this.isResending,
     required this.timeLeft,
     required this.onVerify,
+    required this.onResend,
   });
 
   String formatTime(int seconds) {
@@ -244,8 +274,10 @@ class _OtpVerifyForm extends StatelessWidget {
         const SizedBox(height: 16),
         Center(
           child: TextButton(
-            onPressed: timeLeft > 0 ? null : () {},
-            child: Text('RESEND OTP', style: CricTextStyle.badge.copyWith(color: timeLeft > 0 ? CricColor.textFaint : CricColor.gold)),
+            onPressed: timeLeft > 0 || isResending.value ? null : onResend,
+            child: isResending.value
+                ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: CricColor.gold))
+                : Text('RESEND OTP', style: CricTextStyle.badge.copyWith(color: timeLeft > 0 ? CricColor.textFaint : CricColor.gold)),
           ),
         ),
         const SizedBox(height: 64),

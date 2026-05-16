@@ -101,7 +101,16 @@ class _WebDashboardLayout extends HookConsumerWidget {
               _SidebarItem(icon: Icons.explore_outlined, label: 'Discover', isSelected: selectedIndex == 1, onTap: () => onIndexChanged(1)),
               const SizedBox(height: 16),
               const _SidebarSection(title: 'MANAGEMENT'),
-              _SidebarItem(icon: Icons.account_balance_wallet_outlined, label: 'Fees & Forfeits', onTap: () {}),
+              _SidebarItem(
+                icon: Icons.account_balance_wallet_outlined,
+                label: 'Fees & Forfeits',
+                onTap: () {
+                  final leagues = leaguesAsync.asData?.value;
+                  if (leagues != null && leagues.isNotEmpty) {
+                    context.router.push(FeeManagementRoute(leagueId: leagues.first.id));
+                  }
+                },
+              ),
               _SidebarItem(
                 icon: Icons.admin_panel_settings_outlined, 
                 label: 'Platform Admin', 
@@ -340,7 +349,12 @@ class _AdminOverview extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  final leagues = leaguesAsync.asData?.value;
+                  if (leagues != null && leagues.isNotEmpty) {
+                    context.router.push(FeeManagementRoute(leagueId: leagues.first.id));
+                  }
+                },
                 child: Text('VIEW →', style: CricTextStyle.badge.copyWith(color: CricColor.red)),
               ),
             ],
@@ -367,8 +381,8 @@ class _AdminOverview extends StatelessWidget {
                     Row(
                       children: [
                         _AdminAction(icon: Icons.settings_outlined, label: 'MANAGE', onTap: () => context.router.push(LeagueDetailRoute(leagueId: league.id))),
-                        _AdminAction(icon: Icons.gavel_outlined, label: 'AUCTION', onTap: () {}),
-                        _AdminAction(icon: Icons.edit_outlined, label: 'EDIT', onTap: () {}),
+                        _AdminAction(icon: Icons.gavel_outlined, label: 'AUCTION', onTap: () => context.router.push(AuctioneerPanelRoute(auctionId: league.id))),
+                        _AdminAction(icon: Icons.edit_outlined, label: 'EDIT', onTap: () => context.router.push(LeagueDetailRoute(leagueId: league.id))),
                       ],
                     ),
                   ],
