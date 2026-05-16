@@ -10,7 +10,7 @@ part of 'connectivity_service.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(connectivity)
-final connectivityProvider = ConnectivityProvider._();
+const connectivityProvider = ConnectivityProvider._();
 
 final class ConnectivityProvider
     extends
@@ -22,7 +22,7 @@ final class ConnectivityProvider
     with
         $FutureModifier<ConnectivityResult>,
         $StreamProvider<ConnectivityResult> {
-  ConnectivityProvider._()
+  const ConnectivityProvider._()
     : super(
         from: null,
         argument: null,

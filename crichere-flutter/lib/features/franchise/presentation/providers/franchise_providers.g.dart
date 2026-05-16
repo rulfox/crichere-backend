@@ -10,12 +10,12 @@ part of 'franchise_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(franchiseApi)
-final franchiseApiProvider = FranchiseApiProvider._();
+const franchiseApiProvider = FranchiseApiProvider._();
 
 final class FranchiseApiProvider
     extends $FunctionalProvider<FranchiseApi, FranchiseApi, FranchiseApi>
     with $Provider<FranchiseApi> {
-  FranchiseApiProvider._()
+  const FranchiseApiProvider._()
     : super(
         from: null,
         argument: null,
@@ -51,7 +51,7 @@ final class FranchiseApiProvider
 String _$franchiseApiHash() => r'b58267e47c932d0723bbf8eec9366b9fae9684d9';
 
 @ProviderFor(franchiseRepository)
-final franchiseRepositoryProvider = FranchiseRepositoryProvider._();
+const franchiseRepositoryProvider = FranchiseRepositoryProvider._();
 
 final class FranchiseRepositoryProvider
     extends
@@ -61,7 +61,7 @@ final class FranchiseRepositoryProvider
           FranchiseRepository
         >
     with $Provider<FranchiseRepository> {
-  FranchiseRepositoryProvider._()
+  const FranchiseRepositoryProvider._()
     : super(
         from: null,
         argument: null,
@@ -99,7 +99,7 @@ String _$franchiseRepositoryHash() =>
     r'b02d29f3e2d0f4012c94196b57dfa61ef030a8ff';
 
 @ProviderFor(squad)
-final squadProvider = SquadFamily._();
+const squadProvider = SquadFamily._();
 
 final class SquadProvider
     extends
@@ -109,7 +109,7 @@ final class SquadProvider
           FutureOr<FranchiseSquad>
         >
     with $FutureModifier<FranchiseSquad>, $FutureProvider<FranchiseSquad> {
-  SquadProvider._({
+  const SquadProvider._({
     required SquadFamily super.from,
     required String super.argument,
   }) : super(
@@ -157,7 +157,7 @@ String _$squadHash() => r'0195654ff99023c1e83db9d3cc14490a5ece7fe2';
 
 final class SquadFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<FranchiseSquad>, String> {
-  SquadFamily._()
+  const SquadFamily._()
     : super(
         retry: null,
         name: r'squadProvider',

@@ -10,7 +10,7 @@ part of 'forfeit_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(forfeitRequests)
-final forfeitRequestsProvider = ForfeitRequestsFamily._();
+const forfeitRequestsProvider = ForfeitRequestsFamily._();
 
 final class ForfeitRequestsProvider
     extends
@@ -22,7 +22,7 @@ final class ForfeitRequestsProvider
     with
         $FutureModifier<List<ForfeitRequest>>,
         $FutureProvider<List<ForfeitRequest>> {
-  ForfeitRequestsProvider._({
+  const ForfeitRequestsProvider._({
     required ForfeitRequestsFamily super.from,
     required String super.argument,
   }) : super(
@@ -70,7 +70,7 @@ String _$forfeitRequestsHash() => r'520d6894494b02e911bad5b591fd53588789e8db';
 
 final class ForfeitRequestsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<ForfeitRequest>>, String> {
-  ForfeitRequestsFamily._()
+  const ForfeitRequestsFamily._()
     : super(
         retry: null,
         name: r'forfeitRequestsProvider',

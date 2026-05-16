@@ -10,7 +10,7 @@ part of 'fee_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(feeObligations)
-final feeObligationsProvider = FeeObligationsFamily._();
+const feeObligationsProvider = FeeObligationsFamily._();
 
 final class FeeObligationsProvider
     extends
@@ -22,7 +22,7 @@ final class FeeObligationsProvider
     with
         $FutureModifier<List<FeeObligation>>,
         $FutureProvider<List<FeeObligation>> {
-  FeeObligationsProvider._({
+  const FeeObligationsProvider._({
     required FeeObligationsFamily super.from,
     required String super.argument,
   }) : super(
@@ -70,7 +70,7 @@ String _$feeObligationsHash() => r'1293509da9775f704d168e2c4aa90cd7b392618a';
 
 final class FeeObligationsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<FeeObligation>>, String> {
-  FeeObligationsFamily._()
+  const FeeObligationsFamily._()
     : super(
         retry: null,
         name: r'feeObligationsProvider',
