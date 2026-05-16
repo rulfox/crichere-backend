@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:eventsource/eventsource.dart';
+import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:crichere_flutter/core/network/api_endpoints.dart';
 import 'package:crichere_flutter/core/providers/auth_provider.dart';
@@ -15,6 +15,7 @@ part 'auction_provider.g.dart';
 @riverpod
 Stream<AuctionEvent> auctionEvents(Ref ref, String auctionId) async* {
   final api = ref.watch(auctionApiProvider);
+  final dio = ref.watch(dioClientProvider).dio;
   int backoffSeconds = 2;
   const int maxBackoff = 30;
 
@@ -22,18 +23,34 @@ Stream<AuctionEvent> auctionEvents(Ref ref, String auctionId) async* {
     try {
       // 1. Mandated Sync: Fetch current state first
       await api.getAuctionState(auctionId);
-      // Sync current state before opening SSE stream
-      
-      // 2. Open SSE stream
+
+      // 2. Open SSE stream via dio (replaces eventsource package)
       final url = '${ApiEndpoints.baseUrl}/auctions/$auctionId/events';
-      final eventSource = await EventSource.connect(url);
-      
+      final response = await dio.get<ResponseBody>(
+        url,
+        options: Options(
+          responseType: ResponseType.stream,
+          headers: {
+            'Accept': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+          },
+        ),
+      );
+
       backoffSeconds = 2;
 
-      await for (final event in eventSource) {
-        if (event.data != null) {
-          final json = jsonDecode(event.data!);
-          yield AuctionEvent.fromJson(json);
+      final lines = response.data!.stream
+          .cast<List<int>>()
+          .transform(utf8.decoder)
+          .transform(const LineSplitter());
+
+      await for (final line in lines) {
+        if (line.startsWith('data:')) {
+          final data = line.substring(5).trim();
+          if (data.isNotEmpty) {
+            final json = jsonDecode(data);
+            yield AuctionEvent.fromJson(json);
+          }
         }
       }
     } catch (e) {

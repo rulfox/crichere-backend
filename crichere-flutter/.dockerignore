@@ -1,0 +1,15 @@
+# Generated files that contain host-machine absolute paths — must be
+# regenerated inside the container by `flutter pub get`.
+.dart_tool/
+
+# Build output
+build/
+
+# IDE and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Test files not needed for production build
+test/
