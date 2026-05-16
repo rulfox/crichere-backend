@@ -8,7 +8,12 @@ part 'auth_provider.g.dart';
 
 @riverpod
 FlutterSecureStorage storage(Ref ref) {
-  return const FlutterSecureStorage();
+  return const FlutterSecureStorage(
+    webOptions: WebOptions(
+      dbName: 'crichere_secure',
+      useSessionStorage: false,
+    ),
+  );
 }
 
 @riverpod

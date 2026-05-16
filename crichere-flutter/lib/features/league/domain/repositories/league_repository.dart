@@ -10,6 +10,7 @@ abstract class LeagueRepository {
   Future<List<League>> getLeagues({bool forceRefresh = false});
   Future<League> getLeagueDetail(String id);
   Future<League> createLeague(LeagueCreateRequest request);
+  Future<League> updateLeagueStatus(String leagueId, String status);
   // B3: Changed from File to list of player maps
   Future<void> importPlayers(String leagueId, List<Map<String, dynamic>> players);
   Future<List<Franchise>> getFranchises(String leagueId);

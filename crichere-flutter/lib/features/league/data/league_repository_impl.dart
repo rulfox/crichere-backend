@@ -72,6 +72,11 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
+  Future<domain.League> updateLeagueStatus(String leagueId, String status) async {
+    return await _api.updateLeagueStatus(leagueId, {'status': status});
+  }
+
+  @override
   Future<void> importPlayers(String leagueId, List<Map<String, dynamic>> players) async {
     await _api.importPlayers(leagueId, players);
   }

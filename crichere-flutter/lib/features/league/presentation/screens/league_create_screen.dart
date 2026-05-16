@@ -156,9 +156,9 @@ class LeagueCreateScreen extends HookConsumerWidget {
                           ),
                         );
                         
-                        // importPlayers now expects JSON list — file import via CSV removed
-                        // Players can be imported via the backend dashboard or API directly
-                        
+                        // Immediately publish the league (DRAFT → OPEN) so it's usable
+                        await ref.read(leagueRepositoryProvider).updateLeagueStatus(league.id, 'OPEN');
+
                         if (context.mounted) {
                           context.router.pop();
                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('League created successfully!')));

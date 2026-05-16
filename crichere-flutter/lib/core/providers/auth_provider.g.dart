@@ -54,7 +54,7 @@ final class StorageProvider
   }
 }
 
-String _$storageHash() => r'db8a2ca64a99913dd5fc19fa5cb71bf32e8f7104';
+String _$storageHash() => r'761ff87866e39e11cec107815dd9af26b6ad108a';
 
 @ProviderFor(dioClient)
 final dioClientProvider = DioClientProvider._();

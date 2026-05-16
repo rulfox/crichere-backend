@@ -129,7 +129,7 @@ class _OverviewTab extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const StatusChip(type: StatusType.live),
+                          StatusChip(type: StatusChip.fromLeagueStatus(league.status)),
                           const SizedBox(width: CricSpacing.sm),
                           Text('Organised by ${league.createdBy}', style: CricTextStyle.caption),
                         ],
@@ -148,6 +148,33 @@ class _OverviewTab extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: CricSpacing.xl),
+          if (league.status == 'DRAFT')
+            Padding(
+              padding: const EdgeInsets.only(bottom: CricSpacing.md),
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  try {
+                    await ref.read(leagueRepositoryProvider).updateLeagueStatus(league.id, 'OPEN');
+                    ref.invalidate(leaguesProvider);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('League published! Players can now register.')),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                    }
+                  }
+                },
+                icon: const Icon(Icons.publish, size: 18),
+                label: const Text('PUBLISH LEAGUE'),
+                style: CricButtonStyle.primary.copyWith(
+                  minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 50)),
+                  backgroundColor: const WidgetStatePropertyAll(CricColor.green),
+                ),
+              ),
+            ),
           ElevatedButton(
             onPressed: () => context.router.push(LiveAuctionViewerRoute(auctionId: league.id)),
             style: CricButtonStyle.primary.copyWith(

@@ -23,6 +23,12 @@ abstract class LeagueApi {
   @POST('/leagues')
   Future<League> createLeague(@Body() LeagueCreateRequest request);
 
+  @PATCH('/leagues/{id}/status')
+  Future<League> updateLeagueStatus(
+    @Path('id') String leagueId,
+    @Body() Map<String, dynamic> body,
+  );
+
   // B3: was /import (MultiPart) → /bulk-import (JSON list of PlayerImportRequest)
   @POST('/leagues/{id}/players/bulk-import')
   Future<void> importPlayers(

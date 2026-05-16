@@ -10,7 +10,8 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-    AutoRoute(page: PhoneEntryRoute.page, initial: true, guards: [authGuard]),
+    AutoRoute(page: SplashRoute.page, initial: true), // no guard — reads token and routes
+    AutoRoute(page: PhoneEntryRoute.page, guards: [authGuard]),
     AutoRoute(page: OtpRoute.page, guards: [authGuard]),
     AutoRoute(page: ClaimProfileRoute.page, guards: [authGuard]),
     AutoRoute(page: ProfileSetupRoute.page, guards: [authGuard]),
