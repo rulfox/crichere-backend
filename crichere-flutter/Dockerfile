@@ -1,9 +1,9 @@
 # ──────────────────────────────────────────────
 # Stage 1: Build Flutter web app
 # ──────────────────────────────────────────────
-# Pin to 3.24.5: last stable before --web-renderer was removed
-# This version supports --web-renderer=html to bypass WASM dry-run issues
-FROM ghcr.io/cirruslabs/flutter:3.24.5 AS builder
+# 3.41.9: Dart 3.11.5, satisfies sdk >=3.8.0. --web-renderer removed in 3.29.0;
+# running as non-root already avoids the WASM seccomp dry-run issue.
+FROM ghcr.io/cirruslabs/flutter:3.41.9 AS builder
 
 # Disable telemetry and pre-download web tooling as root.
 # This warms the SDK cache so the non-root build step needs no SDK writes.
@@ -37,8 +37,8 @@ COPY --chown=builder:builder . .
 ARG API_BASE_URL=https://api.crichere.com/api/v1
 ARG ENV=prod
 
-# Build Flutter for web using HTML renderer (pure JS, no WASM dependency)
-RUN flutter build web --release --web-renderer=html \
+# Build Flutter for web (CanvasKit default; non-root user avoids WASM seccomp issue)
+RUN flutter build web --release \
     --dart-define=API_BASE_URL=${API_BASE_URL} \
     --dart-define=ENV=${ENV}
 
