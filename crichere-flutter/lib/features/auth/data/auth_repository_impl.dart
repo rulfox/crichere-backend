@@ -4,6 +4,8 @@ import '../domain/entities/auth_enums.dart';
 import 'auth_api.dart';
 import 'models/auth_request.dart';
 import 'models/auth_response.dart';
+import '../../../core/network/page_response.dart';
+import '../../league/domain/entities/league.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthApi _api;
@@ -62,6 +64,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AuthResponse> getUser(String id) async {
+    return await _api.getUser(id);
+  }
+
+  @override
+  Future<List<League>> getUserLeagues(String id) async {
+    return await _api.getUserLeagues(id);
+  }
+
+  @override
   Future<AuthResponse> refreshToken(String token) async {
     final response = await _api.refreshToken(RefreshRequest(refreshToken: token));
     if (response.accessToken != null) {
@@ -73,7 +85,6 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> updateCricketProfile(String userId, PlayingRole role, String battingStyle, String bowlingStyle) async {
-    // Basic mapping from text to enum if possible, else null
     BattingStyle? batStyle;
     if (battingStyle.toUpperCase() == 'RHB') batStyle = BattingStyle.rightHand;
     if (battingStyle.toUpperCase() == 'LHB') batStyle = BattingStyle.leftHand;
@@ -90,5 +101,10 @@ class AuthRepositoryImpl implements AuthRepository {
         bowlingStyle: bowlStyle,
       ),
     );
+  }
+
+  @override
+  Future<PageResponse<AuthResponse>> searchUsers(String query, {int? page, int? size}) async {
+    return await _api.searchUsers(query, page: page, size: size);
   }
 }

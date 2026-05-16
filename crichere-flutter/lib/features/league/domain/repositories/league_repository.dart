@@ -7,14 +7,15 @@ import '../../../financials/domain/entities/forfeit_entities.dart';
 import '../entities/waitlist_entities.dart';
 
 abstract class LeagueRepository {
-  Future<List<League>> getLeagues({bool forceRefresh = false});
+  Future<List<League>> getLeagues({bool forceRefresh = false, int? page, int? size});
   Future<League> getLeagueDetail(String id);
   Future<League> createLeague(LeagueCreateRequest request);
   Future<League> updateLeagueStatus(String leagueId, String status);
-  // B3: Changed from File to list of player maps
   Future<void> importPlayers(String leagueId, List<Map<String, dynamic>> players);
   Future<List<Franchise>> getFranchises(String leagueId);
-  Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId);
+  Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId, {int? page, int? size});
+  Future<LeaguePlayer> updatePlayerEligibility(String leagueId, String playerId, bool eligible);
+  Future<void> removePlayer(String leagueId, String playerId);
 
   // Fees
   Future<List<FeeObligation>> getFeeObligations(String leagueId);

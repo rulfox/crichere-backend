@@ -4,6 +4,7 @@ import '../../data/franchise_api.dart';
 import '../../data/franchise_repository_impl.dart';
 import '../../domain/repositories/franchise_repository.dart';
 import '../../domain/entities/franchise_squad.dart';
+import '../../domain/entities/franchise.dart';
 
 part 'franchise_providers.g.dart';
 
@@ -20,6 +21,11 @@ FranchiseRepository franchiseRepository(Ref ref) {
 }
 
 @riverpod
-Future<FranchiseSquad> squad(Ref ref, String franchiseId) {
+Future<Franchise> franchise(Ref ref, String id) {
+  return ref.watch(franchiseRepositoryProvider).getFranchise(id);
+}
+
+@riverpod
+Future<FranchiseSquadResponse> squad(Ref ref, String franchiseId) {
   return ref.watch(franchiseRepositoryProvider).getSquad(franchiseId);
 }

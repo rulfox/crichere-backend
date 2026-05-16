@@ -9,17 +9,28 @@ class FranchiseRepositoryImpl implements FranchiseRepository {
 
   FranchiseRepositoryImpl(this._api);
 
-  // E1: /franchises/{id}/squad doesn't exist. Squad data lives in
-  // GET /auctions/{id}/summary/franchises/{franchiseId}.
-  // Returning empty squad until screen is wired with auctionId.
   @override
-  Future<FranchiseSquad> getSquad(String franchiseId) async {
-    return FranchiseSquad(
-      franchiseId: franchiseId,
-      franchiseName: '',
-      purseRemaining: 0,
-      players: [],
-    );
+  Future<Franchise> getFranchise(String id) async {
+    return await _api.getFranchise(id);
+  }
+
+  @override
+  Future<Franchise> updateFranchise(String id, {String? name, String? logoUrl, int? totalPurse}) async {
+    return await _api.updateFranchise(id, {
+      if (name != null) 'name': name,
+      if (logoUrl != null) 'logoUrl': logoUrl,
+      if (totalPurse != null) 'totalPurse': totalPurse,
+    });
+  }
+
+  @override
+  Future<FranchiseSquadResponse> getSquad(String franchiseId) async {
+    return await _api.getSquad(franchiseId);
+  }
+
+  @override
+  Future<List<FranchiseInvite>> getInvites(String franchiseId) async {
+    return await _api.getInvites(franchiseId);
   }
 
   @override

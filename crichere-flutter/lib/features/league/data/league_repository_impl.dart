@@ -17,8 +17,8 @@ class LeagueRepositoryImpl implements LeagueRepository {
   LeagueRepositoryImpl(this._api, this._db);
 
   @override
-  Future<List<domain.League>> getLeagues({bool forceRefresh = false}) async {
-    if (!forceRefresh) {
+  Future<List<domain.League>> getLeagues({bool forceRefresh = false, int? page, int? size}) async {
+    if (!forceRefresh && page == null) {
       final cached = await (_db.select(_db.leagues)).get();
       if (cached.isNotEmpty) {
         return cached.map((e) => domain.League(
@@ -38,25 +38,28 @@ class LeagueRepositoryImpl implements LeagueRepository {
       }
     }
 
-    final remote = await _api.getLeagues();
+    final paged = await _api.getLeagues(page: page, size: size);
+    final remote = paged.content;
     
-    await _db.batch((batch) {
-      batch.deleteAll(_db.leagues);
-      batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
-        id: e.id,
-        name: e.name,
-        format: Value(e.format),
-        rulesUrl: Value(e.rulesUrl),
-        mustSellAll: Value(e.mustSellAll),
-        playerOrderMode: Value(e.playerOrderMode),
-        waitingListMode: Value(e.waitingListMode),
-        logoUrl: Value(e.logoUrl),
-        bannerUrl: Value(e.bannerUrl),
-        status: e.status,
-        auctionDate: Value(e.auctionDate),
-        createdBy: e.createdBy,
-      )).toList());
-    });
+    if (page == null || page == 0) {
+      await _db.batch((batch) {
+        batch.deleteAll(_db.leagues);
+        batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
+          id: e.id,
+          name: e.name,
+          format: Value(e.format),
+          rulesUrl: Value(e.rulesUrl),
+          mustSellAll: Value(e.mustSellAll),
+          playerOrderMode: Value(e.playerOrderMode),
+          waitingListMode: Value(e.waitingListMode),
+          logoUrl: Value(e.logoUrl),
+          bannerUrl: Value(e.bannerUrl),
+          status: e.status,
+          auctionDate: Value(e.auctionDate),
+          createdBy: e.createdBy,
+        )).toList());
+      });
+    }
 
     return remote;
   }
@@ -81,19 +84,28 @@ class LeagueRepositoryImpl implements LeagueRepository {
     await _api.importPlayers(leagueId, players);
   }
 
-  // B2: No list-franchises-by-league backend endpoint exists.
-  // Return empty list; franchise data available via auction summary.
   @override
   Future<List<Franchise>> getFranchises(String leagueId) async {
-    return [];
+    return await _api.getFranchises(leagueId);
   }
 
   @override
-  Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId) async {
-    return await _api.getLeaguePlayers(leagueId);
+  Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId, {int? page, int? size}) async {
+    final paged = await _api.getLeaguePlayers(leagueId, page: page, size: size);
+    return paged.content;
   }
 
-  // Fees — unwrap paginated response, extract obligation from detail wrapper
+  @override
+  Future<LeaguePlayer> updatePlayerEligibility(String leagueId, String playerId, bool eligible) async {
+    return await _api.updatePlayerEligibility(leagueId, playerId, {'eligible': eligible});
+  }
+
+  @override
+  Future<void> removePlayer(String leagueId, String playerId) async {
+    await _api.removePlayer(leagueId, playerId);
+  }
+
+  // Fees
   @override
   Future<List<FeeObligation>> getFeeObligations(String leagueId) async {
     final paged = await _api.getFeeObligations(leagueId);
@@ -117,7 +129,7 @@ class LeagueRepositoryImpl implements LeagueRepository {
     });
   }
 
-  // Forfeits — unwrap paginated response
+  // Forfeits
   @override
   Future<List<ForfeitRequest>> getForfeitRequests(String leagueId) async {
     final paged = await _api.getForfeitRequests(leagueId);
@@ -141,7 +153,7 @@ class LeagueRepositoryImpl implements LeagueRepository {
     });
   }
 
-  // Waitlist — unwrap paginated response
+  // Waitlist
   @override
   Future<List<WaitlistEntry>> getWaitlist(String leagueId) async {
     final paged = await _api.getWaitlist(leagueId);
@@ -150,7 +162,6 @@ class LeagueRepositoryImpl implements LeagueRepository {
 
   @override
   Future<WaitlistEntry> joinWaitlist(String leagueId) async {
-    // Backend requires type field; default to PLAYER for player self-registration
     return await _api.joinWaitlist(leagueId, {'type': 'PLAYER'});
   }
 

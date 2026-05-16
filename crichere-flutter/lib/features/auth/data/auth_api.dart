@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
+import '../../../core/network/page_response.dart';
+import '../../league/domain/entities/league.dart';
 import 'models/auth_request.dart';
 import 'models/auth_response.dart';
 
@@ -31,6 +33,9 @@ abstract class AuthApi {
   @GET('/users/{id}')
   Future<AuthResponse> getUser(@Path('id') String id);
 
+  @GET('/users/{id}/leagues')
+  Future<List<League>> getUserLeagues(@Path('id') String id);
+
   @PUT('/users/{id}/basic')
   Future<void> updateBasicInfo(@Path('id') String id, @Body() UserBasicInfoRequest request);
 
@@ -41,5 +46,9 @@ abstract class AuthApi {
   Future<void> updatePhoto(@Path('id') String id, @Body() Map<String, String> request);
 
   @GET('/users/search')
-  Future<List<AuthResponse>> searchUsers(@Query('query') String query);
+  Future<PageResponse<AuthResponse>> searchUsers(
+    @Query('query') String query, {
+    @Query('page') int? page,
+    @Query('size') int? size,
+  });
 }

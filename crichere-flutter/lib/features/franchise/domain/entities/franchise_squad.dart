@@ -1,17 +1,28 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'franchise_player.dart';
 
 part 'franchise_squad.freezed.dart';
 part 'franchise_squad.g.dart';
 
 @freezed
-abstract class FranchiseSquad with _$FranchiseSquad {
-  const factory FranchiseSquad({
+class AuctionPlayerSummary with _$AuctionPlayerSummary {
+  const factory AuctionPlayerSummary({
+    required String playerName,
+    String? playerCategory,
+    int? finalPrice,
+    String? assignmentType,
+    int? roundNumber,
+  }) = _AuctionPlayerSummary;
+
+  factory AuctionPlayerSummary.fromJson(Map<String, dynamic> json) => _$AuctionPlayerSummaryFromJson(json);
+}
+
+@freezed
+class FranchiseSquadResponse with _$FranchiseSquadResponse {
+  const factory FranchiseSquadResponse({
     required String franchiseId,
     required String franchiseName,
-    required int purseRemaining,
-    required List<FranchisePlayer> players,
-  }) = _FranchiseSquad;
+    required List<AuctionPlayerSummary> players,
+  }) = _FranchiseSquadResponse;
 
-  factory FranchiseSquad.fromJson(Map<String, dynamic> json) => _$FranchiseSquadFromJson(json);
+  factory FranchiseSquadResponse.fromJson(Map<String, dynamic> json) => _$FranchiseSquadResponseFromJson(json);
 }
