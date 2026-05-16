@@ -1,6 +1,11 @@
+import 'dart:typed_data';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
 import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../providers/auction_provider.dart';
@@ -211,6 +216,50 @@ class _ExportsTab extends ConsumerWidget {
   final AuctionSummary summary;
   const _ExportsTab({required this.summary});
 
+  String get _replayLink => 'https://crichere.com/view/${summary.auctionId}';
+
+  Future<void> _shareLink(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _replayLink));
+    await SharePlus.instance.share(ShareParams(text: 'Check out this auction replay: $_replayLink'));
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Link copied and ready to share!')),
+      );
+    }
+  }
+
+  Future<void> _downloadPdf(BuildContext context) async {
+    try {
+      final doc = pw.Document();
+      doc.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          build: (ctx) => [
+            pw.Header(level: 0, child: pw.Text('Auction Report', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold))),
+            pw.SizedBox(height: 16),
+            pw.Text('Total Players Sold: ${summary.totalPlayersSold}'),
+            pw.Text('Total Amount Spent: ₹${summary.totalAmountSpent}'),
+            pw.SizedBox(height: 24),
+            pw.Header(level: 1, child: pw.Text('Top Buys', style: pw.TextStyle(fontSize: 16))),
+            ...summary.topBuys.map((b) => pw.Text('${b.playerName} → ${b.franchiseName}: ₹${b.amount}')),
+            pw.SizedBox(height: 24),
+            pw.Header(level: 1, child: pw.Text('Franchise Results', style: pw.TextStyle(fontSize: 16))),
+            ...summary.franchiseResults.map((f) => pw.Text(
+              '${f.franchiseName}: ${f.playersCount} players, ₹${f.totalSpent} spent, ₹${f.remainingPurse} remaining',
+            )),
+          ],
+        ),
+      );
+      final bytes = Uint8List.fromList(await doc.save());
+      final file = XFile.fromData(bytes, name: 'auction_report.pdf', mimeType: 'application/pdf');
+      await SharePlus.instance.share(ShareParams(files: [file]));
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF error: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView(
@@ -224,42 +273,35 @@ class _ExportsTab extends ConsumerWidget {
             children: [
               Text('PUBLIC AUCTION REPLAY', style: CricTextStyle.overline),
               const SizedBox(height: 12),
-              Text(
-                'Anyone can view the full auction replay without logging in.',
-                style: CricTextStyle.caption,
-              ),
+              Text('Anyone can view the full auction replay without logging in.', style: CricTextStyle.caption),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: CricColor.slate3,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'https://app.crichere.in/view/${summary.auctionId.substring(0, 8)}...',
-                        style: CricTextStyle.mono.copyWith(color: CricColor.gold),
-                        overflow: TextOverflow.ellipsis,
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: _replayLink));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Link copied!')));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: CricColor.slate3, borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(_replayLink, style: CricTextStyle.mono.copyWith(color: CricColor.gold), overflow: TextOverflow.ellipsis),
                       ),
-                    ),
-                    const Icon(Icons.copy_outlined, color: CricColor.textFaint, size: 16),
-                  ],
+                      const Icon(Icons.copy_outlined, color: CricColor.textFaint, size: 16),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.share, size: 16),
-                      label: const Text('SHARE LINK'),
-                      style: CricButtonStyle.ghost,
-                    ),
-                  ),
-                ],
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => _shareLink(context),
+                  icon: const Icon(Icons.share, size: 16),
+                  label: const Text('SHARE LINK'),
+                  style: CricButtonStyle.ghost,
+                ),
               ),
             ],
           ),
@@ -268,9 +310,7 @@ class _ExportsTab extends ConsumerWidget {
         const SectionHeader(title: 'REPORTS & EXPORTS'),
         const SizedBox(height: 12),
         CricCard(
-          onTap: () {
-            // Full Auction Report PDF
-          },
+          onTap: () => _downloadPdf(context),
           child: const ListTile(
             leading: Icon(Icons.picture_as_pdf, color: CricColor.red),
             title: Text('Full Auction Report', style: TextStyle(color: Colors.white)),
@@ -280,9 +320,9 @@ class _ExportsTab extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         CricCard(
-          onTap: () {
-            // Excel Export
-          },
+          onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Excel export available on your league dashboard at crichere.com')),
+          ),
           child: const ListTile(
             leading: Icon(Icons.table_chart, color: CricColor.green),
             title: Text('Auction Data', style: TextStyle(color: Colors.white)),
@@ -292,9 +332,9 @@ class _ExportsTab extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         CricCard(
-          onTap: () {
-            // Share Squad Image
-          },
+          onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Squad image export coming soon!')),
+          ),
           child: const ListTile(
             leading: Icon(Icons.image_outlined, color: CricColor.blue),
             title: Text('Squad Images', style: TextStyle(color: Colors.white)),

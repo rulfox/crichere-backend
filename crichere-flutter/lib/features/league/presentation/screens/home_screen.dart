@@ -259,32 +259,37 @@ class _PlayerOverview extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader(title: 'LIVE NOW'),
-        CricCard(
-          padding: const EdgeInsets.all(CricSpacing.base),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        leaguesAsync.when(
+          data: (leagues) {
+            final liveLeague = leagues.where((l) => l.status == 'AUCTION_LIVE').firstOrNull;
+            if (liveLeague == null) {
+              return CricCard(
+                padding: const EdgeInsets.all(CricSpacing.base),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: CricSpacing.md),
+                    child: Text('No live auctions right now', style: CricTextStyle.body.copyWith(color: CricColor.textDim)),
+                  ),
+                ),
+              );
+            }
+            return CricCard(
+              padding: const EdgeInsets.all(CricSpacing.base),
+              onTap: () => context.router.push(LiveAuctionViewerRoute(auctionId: liveLeague.id)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const StatusChip(type: StatusType.live, customLabel: 'ROUND 1'),
-                  Text('47 viewers', style: CricTextStyle.caption),
+                  const StatusChip(type: StatusType.live),
+                  const SizedBox(height: CricSpacing.md),
+                  Text(liveLeague.name, style: CricTextStyle.displayLg.copyWith(fontSize: 24)),
+                  const SizedBox(height: CricSpacing.xs),
+                  Text('Auction in progress · Tap to join', style: CricTextStyle.body),
                 ],
               ),
-              const SizedBox(height: CricSpacing.md),
-              Text('TechCup 2026', style: CricTextStyle.displayLg.copyWith(fontSize: 24)),
-              const SizedBox(height: CricSpacing.xs),
-              Text('Player 23 of 120 up for bid', style: CricTextStyle.body),
-              const SizedBox(height: CricSpacing.md),
-              Row(
-                children: [
-                  const CricBadge(label: '₹2k', type: CricBadgeType.gold),
-                  const SizedBox(width: CricSpacing.sm),
-                  Text('Current highest bid', style: CricTextStyle.caption),
-                ],
-              ),
-            ],
-          ),
+            );
+          },
+          loading: () => ShimmerLoading.rectangular(height: 80),
+          error: (_, __) => const SizedBox.shrink(),
         ),
         const SizedBox(height: CricSpacing.lg),
         const SectionHeader(title: 'MY LEAGUES', actionLabel: 'See all'),
@@ -303,7 +308,7 @@ class _PlayerOverview extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(league.name, style: CricTextStyle.headingMd),
-                          Text('${league.status.toUpperCase()} · 8 Franchises', style: CricTextStyle.caption),
+                          Text(league.status.toUpperCase(), style: CricTextStyle.caption),
                         ],
                       ),
                     ),
@@ -343,8 +348,8 @@ class _AdminOverview extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('4 FEE PAYMENTS DUE', style: CricTextStyle.badge.copyWith(color: CricColor.red)),
-                    Text('₹2,000 pending across TechCup 2026', style: CricTextStyle.caption),
+                    Text('FEE PAYMENTS DUE', style: CricTextStyle.badge.copyWith(color: CricColor.red)),
+                    Text('Pending payments in your leagues', style: CricTextStyle.caption),
                   ],
                 ),
               ),

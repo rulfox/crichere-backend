@@ -1,11 +1,22 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart' hide Notification;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import 'package:crichere_flutter/core/database/app_database.dart';
 import 'package:crichere_flutter/features/league/presentation/providers/league_repository_provider.dart';
 import 'package:drift/drift.dart' hide Column;
+
+String _formatTime(DateTime dt) {
+  final now = DateTime.now();
+  final diff = now.difference(dt);
+  if (diff.inMinutes < 1) return 'just now';
+  if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+  if (diff.inHours < 24) return '${diff.inHours}h ago';
+  if (diff.inDays < 7) return '${diff.inDays}d ago';
+  return DateFormat('d MMM').format(dt);
+}
 
 @RoutePage()
 class NotificationScreen extends ConsumerWidget {
@@ -82,7 +93,7 @@ class NotificationScreen extends ConsumerWidget {
                             Text(n.message, style: CricTextStyle.body.copyWith(fontSize: 13)),
                             const SizedBox(height: 6),
                             Text(
-                              '2 hours ago', // Dummy time formatting
+                              _formatTime(n.receivedAt),
                               style: CricTextStyle.caption.copyWith(fontSize: 10),
                             ),
                           ],

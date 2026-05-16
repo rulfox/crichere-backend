@@ -54,7 +54,23 @@ class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
         ],
       ),
       body: squadAsync.when(
-        data: (squad) => Column(
+        data: (squad) => squad.players.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(CricSpacing.xxl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.group_outlined, color: CricColor.textFaint, size: 64),
+                    const SizedBox(height: CricSpacing.md),
+                    Text('No players yet', style: CricTextStyle.headingMd),
+                    const SizedBox(height: CricSpacing.sm),
+                    Text('Players will appear here after the auction', style: CricTextStyle.caption, textAlign: TextAlign.center),
+                  ],
+                ),
+              ),
+            )
+          : Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(CricSpacing.page),
@@ -169,7 +185,7 @@ class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      'crichere.app/invite/TS-2026-abc123xyz',
+                      'https://crichere.com/invite/${widget.franchiseId}',
                       style: CricTextStyle.mono.copyWith(color: CricColor.gold),
                     ),
                   ),

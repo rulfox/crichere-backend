@@ -74,12 +74,24 @@ class PlatformAdminScreen extends ConsumerWidget {
                           }
                         }
                       }
+                      if (leagues.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.sports_cricket, color: CricColor.textFaint, size: 64),
+                              const SizedBox(height: 16),
+                              Text('No leagues on platform yet', style: CricTextStyle.headingMd),
+                            ],
+                          ),
+                        );
+                      }
                       return isWide
                         ? _LeaguesTable(leagues: leagues, onManage: onManage, onSuspend: onSuspend)
                         : _LeaguesListView(leagues: leagues, onManage: onManage, onSuspend: onSuspend);
                     },
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, _) => Text('Error loading leagues: $e', style: CricTextStyle.body),
+                    loading: () => const Center(child: CircularProgressIndicator(color: CricColor.gold)),
+                    error: (e, _) => CricErrorView(error: e),
                   ),
                 ),
               ],

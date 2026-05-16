@@ -131,14 +131,14 @@ class _OverviewTab extends ConsumerWidget {
                         children: [
                           const StatusChip(type: StatusType.live),
                           const SizedBox(width: CricSpacing.sm),
-                          Text('By Rahul Kumar · Mumbai', style: CricTextStyle.caption),
+                          Text('Organised by ${league.createdBy}', style: CricTextStyle.caption),
                         ],
                       ),
                       const SizedBox(height: CricSpacing.md),
                       Text(league.name, style: CricTextStyle.displayLg.copyWith(fontSize: 24)),
                       const SizedBox(height: CricSpacing.md),
                       Text(
-                        'India\'s most competitive local cricket league with real-time bidding.',
+                        '${league.format ?? 'Cricket'} league · Real-time auction bidding',
                         style: CricTextStyle.body,
                       ),
                     ],
@@ -330,7 +330,7 @@ class _WaitlistTab extends ConsumerWidget {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator(color: CricColor.gold)),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => CricErrorView(error: e),
     );
   }
 }
@@ -373,7 +373,7 @@ class _PlayersTab extends ConsumerWidget {
         },
       ),
       loading: () => const Center(child: CircularProgressIndicator(color: CricColor.gold)),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => CricErrorView(error: e),
     );
   }
 }
@@ -430,7 +430,7 @@ class _FranchisesTab extends ConsumerWidget {
         },
       ),
       loading: () => const Center(child: CircularProgressIndicator(color: CricColor.gold)),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => CricErrorView(error: e),
     );
   }
 }

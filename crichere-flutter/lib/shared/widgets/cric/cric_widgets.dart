@@ -7,3 +7,4 @@ export 'purse_bar.dart';
 export 'avatar_circle.dart';
 export 'section_header.dart';
 export 'cric_bottom_nav.dart';
+export 'cric_error_view.dart';
