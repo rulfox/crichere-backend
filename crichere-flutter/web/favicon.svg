@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Dark background circle -->
+  <circle cx="32" cy="32" r="32" fill="#060C1A"/>
+  <!-- Cricket ball -->
+  <circle cx="32" cy="32" r="20" fill="#DC2626"/>
+  <!-- Seam - vertical curve left -->
+  <path d="M32 13 Q37 22 37 32 Q37 42 32 51" stroke="#F1F5F9" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- Seam - vertical curve right -->
+  <path d="M32 13 Q27 22 27 32 Q27 42 32 51" stroke="#F1F5F9" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- Seam - horizontal top -->
+  <path d="M14 24 Q23 26 32 26 Q41 26 50 24" stroke="#F1F5F9" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- Seam - horizontal bottom -->
+  <path d="M14 40 Q23 38 32 38 Q41 38 50 40" stroke="#F1F5F9" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <!-- Gold "C" letter overlay -->
+  <text x="32" y="37" font-family="Arial, sans-serif" font-size="18" font-weight="900" fill="#F59E0B" text-anchor="middle" opacity="0.85">C</text>
+</svg>
