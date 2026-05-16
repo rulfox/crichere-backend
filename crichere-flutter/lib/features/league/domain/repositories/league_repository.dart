@@ -1,4 +1,3 @@
-import 'dart:io';
 import '../entities/league.dart';
 import '../entities/league_player.dart';
 import '../../../franchise/domain/entities/franchise.dart';
@@ -11,7 +10,8 @@ abstract class LeagueRepository {
   Future<List<League>> getLeagues({bool forceRefresh = false});
   Future<League> getLeagueDetail(String id);
   Future<League> createLeague(LeagueCreateRequest request);
-  Future<void> importPlayers(String leagueId, File file);
+  // B3: Changed from File to list of player maps
+  Future<void> importPlayers(String leagueId, List<Map<String, dynamic>> players);
   Future<List<Franchise>> getFranchises(String leagueId);
   Future<List<LeaguePlayer>> getLeaguePlayers(String leagueId);
 
@@ -31,5 +31,3 @@ abstract class LeagueRepository {
   Future<void> promoteFromWaitlist(String leagueId, String entryId);
   Future<void> withdrawFromWaitlist(String leagueId, String entryId);
 }
-
-

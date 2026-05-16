@@ -15,7 +15,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuctionSummary {
 
- String get auctionId; String get leagueName; int get totalPlayersSold; int get totalAmountSpent; List<TopBuy> get topBuys; List<FranchiseResult> get franchiseResults; List<String> get unsoldPlayerIds; DateTime get completedAt;
+ String get auctionId; String get leagueId; String get leagueName;// A13: backend uses totalSold not totalPlayersSold
+@JsonKey(name: 'totalSold') int get totalPlayersSold;// A13: backend uses totalSpent not totalAmountSpent
+@JsonKey(name: 'totalSpent') int get totalAmountSpent; int get totalPlayers; int get totalUnsold;// A13: backend uses highestSale (singular), not topBuys (list)
+@JsonKey(name: 'highestSale') TopBuy? get topBuy;// A13: backend uses franchiseSummaries not franchiseResults
+@JsonKey(name: 'franchiseSummaries') List<FranchiseResult> get franchiseResults; DateTime? get completedAt;
 /// Create a copy of AuctionSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +32,16 @@ $AuctionSummaryCopyWith<AuctionSummary> get copyWith => _$AuctionSummaryCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuctionSummary&&(identical(other.auctionId, auctionId) || other.auctionId == auctionId)&&(identical(other.leagueName, leagueName) || other.leagueName == leagueName)&&(identical(other.totalPlayersSold, totalPlayersSold) || other.totalPlayersSold == totalPlayersSold)&&(identical(other.totalAmountSpent, totalAmountSpent) || other.totalAmountSpent == totalAmountSpent)&&const DeepCollectionEquality().equals(other.topBuys, topBuys)&&const DeepCollectionEquality().equals(other.franchiseResults, franchiseResults)&&const DeepCollectionEquality().equals(other.unsoldPlayerIds, unsoldPlayerIds)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuctionSummary&&(identical(other.auctionId, auctionId) || other.auctionId == auctionId)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.leagueName, leagueName) || other.leagueName == leagueName)&&(identical(other.totalPlayersSold, totalPlayersSold) || other.totalPlayersSold == totalPlayersSold)&&(identical(other.totalAmountSpent, totalAmountSpent) || other.totalAmountSpent == totalAmountSpent)&&(identical(other.totalPlayers, totalPlayers) || other.totalPlayers == totalPlayers)&&(identical(other.totalUnsold, totalUnsold) || other.totalUnsold == totalUnsold)&&(identical(other.topBuy, topBuy) || other.topBuy == topBuy)&&const DeepCollectionEquality().equals(other.franchiseResults, franchiseResults)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,auctionId,leagueName,totalPlayersSold,totalAmountSpent,const DeepCollectionEquality().hash(topBuys),const DeepCollectionEquality().hash(franchiseResults),const DeepCollectionEquality().hash(unsoldPlayerIds),completedAt);
+int get hashCode => Object.hash(runtimeType,auctionId,leagueId,leagueName,totalPlayersSold,totalAmountSpent,totalPlayers,totalUnsold,topBuy,const DeepCollectionEquality().hash(franchiseResults),completedAt);
 
 @override
 String toString() {
-  return 'AuctionSummary(auctionId: $auctionId, leagueName: $leagueName, totalPlayersSold: $totalPlayersSold, totalAmountSpent: $totalAmountSpent, topBuys: $topBuys, franchiseResults: $franchiseResults, unsoldPlayerIds: $unsoldPlayerIds, completedAt: $completedAt)';
+  return 'AuctionSummary(auctionId: $auctionId, leagueId: $leagueId, leagueName: $leagueName, totalPlayersSold: $totalPlayersSold, totalAmountSpent: $totalAmountSpent, totalPlayers: $totalPlayers, totalUnsold: $totalUnsold, topBuy: $topBuy, franchiseResults: $franchiseResults, completedAt: $completedAt)';
 }
 
 
@@ -48,11 +52,11 @@ abstract mixin class $AuctionSummaryCopyWith<$Res>  {
   factory $AuctionSummaryCopyWith(AuctionSummary value, $Res Function(AuctionSummary) _then) = _$AuctionSummaryCopyWithImpl;
 @useResult
 $Res call({
- String auctionId, String leagueName, int totalPlayersSold, int totalAmountSpent, List<TopBuy> topBuys, List<FranchiseResult> franchiseResults, List<String> unsoldPlayerIds, DateTime completedAt
+ String auctionId, String leagueId, String leagueName,@JsonKey(name: 'totalSold') int totalPlayersSold,@JsonKey(name: 'totalSpent') int totalAmountSpent, int totalPlayers, int totalUnsold,@JsonKey(name: 'highestSale') TopBuy? topBuy,@JsonKey(name: 'franchiseSummaries') List<FranchiseResult> franchiseResults, DateTime? completedAt
 });
 
 
-
+$TopBuyCopyWith<$Res>? get topBuy;
 
 }
 /// @nodoc
@@ -65,20 +69,34 @@ class _$AuctionSummaryCopyWithImpl<$Res>
 
 /// Create a copy of AuctionSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? auctionId = null,Object? leagueName = null,Object? totalPlayersSold = null,Object? totalAmountSpent = null,Object? topBuys = null,Object? franchiseResults = null,Object? unsoldPlayerIds = null,Object? completedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? auctionId = null,Object? leagueId = null,Object? leagueName = null,Object? totalPlayersSold = null,Object? totalAmountSpent = null,Object? totalPlayers = null,Object? totalUnsold = null,Object? topBuy = freezed,Object? franchiseResults = null,Object? completedAt = freezed,}) {
   return _then(_self.copyWith(
 auctionId: null == auctionId ? _self.auctionId : auctionId // ignore: cast_nullable_to_non_nullable
+as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,leagueName: null == leagueName ? _self.leagueName : leagueName // ignore: cast_nullable_to_non_nullable
 as String,totalPlayersSold: null == totalPlayersSold ? _self.totalPlayersSold : totalPlayersSold // ignore: cast_nullable_to_non_nullable
 as int,totalAmountSpent: null == totalAmountSpent ? _self.totalAmountSpent : totalAmountSpent // ignore: cast_nullable_to_non_nullable
-as int,topBuys: null == topBuys ? _self.topBuys : topBuys // ignore: cast_nullable_to_non_nullable
-as List<TopBuy>,franchiseResults: null == franchiseResults ? _self.franchiseResults : franchiseResults // ignore: cast_nullable_to_non_nullable
-as List<FranchiseResult>,unsoldPlayerIds: null == unsoldPlayerIds ? _self.unsoldPlayerIds : unsoldPlayerIds // ignore: cast_nullable_to_non_nullable
-as List<String>,completedAt: null == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as int,totalPlayers: null == totalPlayers ? _self.totalPlayers : totalPlayers // ignore: cast_nullable_to_non_nullable
+as int,totalUnsold: null == totalUnsold ? _self.totalUnsold : totalUnsold // ignore: cast_nullable_to_non_nullable
+as int,topBuy: freezed == topBuy ? _self.topBuy : topBuy // ignore: cast_nullable_to_non_nullable
+as TopBuy?,franchiseResults: null == franchiseResults ? _self.franchiseResults : franchiseResults // ignore: cast_nullable_to_non_nullable
+as List<FranchiseResult>,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
+/// Create a copy of AuctionSummary
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TopBuyCopyWith<$Res>? get topBuy {
+    if (_self.topBuy == null) {
+    return null;
+  }
 
+  return $TopBuyCopyWith<$Res>(_self.topBuy!, (value) {
+    return _then(_self.copyWith(topBuy: value));
+  });
+}
 }
 
 
@@ -160,10 +178,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String auctionId,  String leagueName,  int totalPlayersSold,  int totalAmountSpent,  List<TopBuy> topBuys,  List<FranchiseResult> franchiseResults,  List<String> unsoldPlayerIds,  DateTime completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String auctionId,  String leagueId,  String leagueName, @JsonKey(name: 'totalSold')  int totalPlayersSold, @JsonKey(name: 'totalSpent')  int totalAmountSpent,  int totalPlayers,  int totalUnsold, @JsonKey(name: 'highestSale')  TopBuy? topBuy, @JsonKey(name: 'franchiseSummaries')  List<FranchiseResult> franchiseResults,  DateTime? completedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuctionSummary() when $default != null:
-return $default(_that.auctionId,_that.leagueName,_that.totalPlayersSold,_that.totalAmountSpent,_that.topBuys,_that.franchiseResults,_that.unsoldPlayerIds,_that.completedAt);case _:
+return $default(_that.auctionId,_that.leagueId,_that.leagueName,_that.totalPlayersSold,_that.totalAmountSpent,_that.totalPlayers,_that.totalUnsold,_that.topBuy,_that.franchiseResults,_that.completedAt);case _:
   return orElse();
 
 }
@@ -181,10 +199,10 @@ return $default(_that.auctionId,_that.leagueName,_that.totalPlayersSold,_that.to
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String auctionId,  String leagueName,  int totalPlayersSold,  int totalAmountSpent,  List<TopBuy> topBuys,  List<FranchiseResult> franchiseResults,  List<String> unsoldPlayerIds,  DateTime completedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String auctionId,  String leagueId,  String leagueName, @JsonKey(name: 'totalSold')  int totalPlayersSold, @JsonKey(name: 'totalSpent')  int totalAmountSpent,  int totalPlayers,  int totalUnsold, @JsonKey(name: 'highestSale')  TopBuy? topBuy, @JsonKey(name: 'franchiseSummaries')  List<FranchiseResult> franchiseResults,  DateTime? completedAt)  $default,) {final _that = this;
 switch (_that) {
 case _AuctionSummary():
-return $default(_that.auctionId,_that.leagueName,_that.totalPlayersSold,_that.totalAmountSpent,_that.topBuys,_that.franchiseResults,_that.unsoldPlayerIds,_that.completedAt);case _:
+return $default(_that.auctionId,_that.leagueId,_that.leagueName,_that.totalPlayersSold,_that.totalAmountSpent,_that.totalPlayers,_that.totalUnsold,_that.topBuy,_that.franchiseResults,_that.completedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +219,10 @@ return $default(_that.auctionId,_that.leagueName,_that.totalPlayersSold,_that.to
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String auctionId,  String leagueName,  int totalPlayersSold,  int totalAmountSpent,  List<TopBuy> topBuys,  List<FranchiseResult> franchiseResults,  List<String> unsoldPlayerIds,  DateTime completedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String auctionId,  String leagueId,  String leagueName, @JsonKey(name: 'totalSold')  int totalPlayersSold, @JsonKey(name: 'totalSpent')  int totalAmountSpent,  int totalPlayers,  int totalUnsold, @JsonKey(name: 'highestSale')  TopBuy? topBuy, @JsonKey(name: 'franchiseSummaries')  List<FranchiseResult> franchiseResults,  DateTime? completedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _AuctionSummary() when $default != null:
-return $default(_that.auctionId,_that.leagueName,_that.totalPlayersSold,_that.totalAmountSpent,_that.topBuys,_that.franchiseResults,_that.unsoldPlayerIds,_that.completedAt);case _:
+return $default(_that.auctionId,_that.leagueId,_that.leagueName,_that.totalPlayersSold,_that.totalAmountSpent,_that.totalPlayers,_that.totalUnsold,_that.topBuy,_that.franchiseResults,_that.completedAt);case _:
   return null;
 
 }
@@ -216,35 +234,30 @@ return $default(_that.auctionId,_that.leagueName,_that.totalPlayersSold,_that.to
 @JsonSerializable()
 
 class _AuctionSummary implements AuctionSummary {
-  const _AuctionSummary({required this.auctionId, required this.leagueName, required this.totalPlayersSold, required this.totalAmountSpent, required final  List<TopBuy> topBuys, required final  List<FranchiseResult> franchiseResults, required final  List<String> unsoldPlayerIds, required this.completedAt}): _topBuys = topBuys,_franchiseResults = franchiseResults,_unsoldPlayerIds = unsoldPlayerIds;
+  const _AuctionSummary({required this.auctionId, required this.leagueId, required this.leagueName, @JsonKey(name: 'totalSold') required this.totalPlayersSold, @JsonKey(name: 'totalSpent') required this.totalAmountSpent, required this.totalPlayers, required this.totalUnsold, @JsonKey(name: 'highestSale') this.topBuy, @JsonKey(name: 'franchiseSummaries') required final  List<FranchiseResult> franchiseResults, this.completedAt}): _franchiseResults = franchiseResults;
   factory _AuctionSummary.fromJson(Map<String, dynamic> json) => _$AuctionSummaryFromJson(json);
 
 @override final  String auctionId;
+@override final  String leagueId;
 @override final  String leagueName;
-@override final  int totalPlayersSold;
-@override final  int totalAmountSpent;
- final  List<TopBuy> _topBuys;
-@override List<TopBuy> get topBuys {
-  if (_topBuys is EqualUnmodifiableListView) return _topBuys;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_topBuys);
-}
-
+// A13: backend uses totalSold not totalPlayersSold
+@override@JsonKey(name: 'totalSold') final  int totalPlayersSold;
+// A13: backend uses totalSpent not totalAmountSpent
+@override@JsonKey(name: 'totalSpent') final  int totalAmountSpent;
+@override final  int totalPlayers;
+@override final  int totalUnsold;
+// A13: backend uses highestSale (singular), not topBuys (list)
+@override@JsonKey(name: 'highestSale') final  TopBuy? topBuy;
+// A13: backend uses franchiseSummaries not franchiseResults
  final  List<FranchiseResult> _franchiseResults;
-@override List<FranchiseResult> get franchiseResults {
+// A13: backend uses franchiseSummaries not franchiseResults
+@override@JsonKey(name: 'franchiseSummaries') List<FranchiseResult> get franchiseResults {
   if (_franchiseResults is EqualUnmodifiableListView) return _franchiseResults;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_franchiseResults);
 }
 
- final  List<String> _unsoldPlayerIds;
-@override List<String> get unsoldPlayerIds {
-  if (_unsoldPlayerIds is EqualUnmodifiableListView) return _unsoldPlayerIds;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_unsoldPlayerIds);
-}
-
-@override final  DateTime completedAt;
+@override final  DateTime? completedAt;
 
 /// Create a copy of AuctionSummary
 /// with the given fields replaced by the non-null parameter values.
@@ -259,16 +272,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuctionSummary&&(identical(other.auctionId, auctionId) || other.auctionId == auctionId)&&(identical(other.leagueName, leagueName) || other.leagueName == leagueName)&&(identical(other.totalPlayersSold, totalPlayersSold) || other.totalPlayersSold == totalPlayersSold)&&(identical(other.totalAmountSpent, totalAmountSpent) || other.totalAmountSpent == totalAmountSpent)&&const DeepCollectionEquality().equals(other._topBuys, _topBuys)&&const DeepCollectionEquality().equals(other._franchiseResults, _franchiseResults)&&const DeepCollectionEquality().equals(other._unsoldPlayerIds, _unsoldPlayerIds)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuctionSummary&&(identical(other.auctionId, auctionId) || other.auctionId == auctionId)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.leagueName, leagueName) || other.leagueName == leagueName)&&(identical(other.totalPlayersSold, totalPlayersSold) || other.totalPlayersSold == totalPlayersSold)&&(identical(other.totalAmountSpent, totalAmountSpent) || other.totalAmountSpent == totalAmountSpent)&&(identical(other.totalPlayers, totalPlayers) || other.totalPlayers == totalPlayers)&&(identical(other.totalUnsold, totalUnsold) || other.totalUnsold == totalUnsold)&&(identical(other.topBuy, topBuy) || other.topBuy == topBuy)&&const DeepCollectionEquality().equals(other._franchiseResults, _franchiseResults)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,auctionId,leagueName,totalPlayersSold,totalAmountSpent,const DeepCollectionEquality().hash(_topBuys),const DeepCollectionEquality().hash(_franchiseResults),const DeepCollectionEquality().hash(_unsoldPlayerIds),completedAt);
+int get hashCode => Object.hash(runtimeType,auctionId,leagueId,leagueName,totalPlayersSold,totalAmountSpent,totalPlayers,totalUnsold,topBuy,const DeepCollectionEquality().hash(_franchiseResults),completedAt);
 
 @override
 String toString() {
-  return 'AuctionSummary(auctionId: $auctionId, leagueName: $leagueName, totalPlayersSold: $totalPlayersSold, totalAmountSpent: $totalAmountSpent, topBuys: $topBuys, franchiseResults: $franchiseResults, unsoldPlayerIds: $unsoldPlayerIds, completedAt: $completedAt)';
+  return 'AuctionSummary(auctionId: $auctionId, leagueId: $leagueId, leagueName: $leagueName, totalPlayersSold: $totalPlayersSold, totalAmountSpent: $totalAmountSpent, totalPlayers: $totalPlayers, totalUnsold: $totalUnsold, topBuy: $topBuy, franchiseResults: $franchiseResults, completedAt: $completedAt)';
 }
 
 
@@ -279,11 +292,11 @@ abstract mixin class _$AuctionSummaryCopyWith<$Res> implements $AuctionSummaryCo
   factory _$AuctionSummaryCopyWith(_AuctionSummary value, $Res Function(_AuctionSummary) _then) = __$AuctionSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- String auctionId, String leagueName, int totalPlayersSold, int totalAmountSpent, List<TopBuy> topBuys, List<FranchiseResult> franchiseResults, List<String> unsoldPlayerIds, DateTime completedAt
+ String auctionId, String leagueId, String leagueName,@JsonKey(name: 'totalSold') int totalPlayersSold,@JsonKey(name: 'totalSpent') int totalAmountSpent, int totalPlayers, int totalUnsold,@JsonKey(name: 'highestSale') TopBuy? topBuy,@JsonKey(name: 'franchiseSummaries') List<FranchiseResult> franchiseResults, DateTime? completedAt
 });
 
 
-
+@override $TopBuyCopyWith<$Res>? get topBuy;
 
 }
 /// @nodoc
@@ -296,21 +309,35 @@ class __$AuctionSummaryCopyWithImpl<$Res>
 
 /// Create a copy of AuctionSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? auctionId = null,Object? leagueName = null,Object? totalPlayersSold = null,Object? totalAmountSpent = null,Object? topBuys = null,Object? franchiseResults = null,Object? unsoldPlayerIds = null,Object? completedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? auctionId = null,Object? leagueId = null,Object? leagueName = null,Object? totalPlayersSold = null,Object? totalAmountSpent = null,Object? totalPlayers = null,Object? totalUnsold = null,Object? topBuy = freezed,Object? franchiseResults = null,Object? completedAt = freezed,}) {
   return _then(_AuctionSummary(
 auctionId: null == auctionId ? _self.auctionId : auctionId // ignore: cast_nullable_to_non_nullable
+as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,leagueName: null == leagueName ? _self.leagueName : leagueName // ignore: cast_nullable_to_non_nullable
 as String,totalPlayersSold: null == totalPlayersSold ? _self.totalPlayersSold : totalPlayersSold // ignore: cast_nullable_to_non_nullable
 as int,totalAmountSpent: null == totalAmountSpent ? _self.totalAmountSpent : totalAmountSpent // ignore: cast_nullable_to_non_nullable
-as int,topBuys: null == topBuys ? _self._topBuys : topBuys // ignore: cast_nullable_to_non_nullable
-as List<TopBuy>,franchiseResults: null == franchiseResults ? _self._franchiseResults : franchiseResults // ignore: cast_nullable_to_non_nullable
-as List<FranchiseResult>,unsoldPlayerIds: null == unsoldPlayerIds ? _self._unsoldPlayerIds : unsoldPlayerIds // ignore: cast_nullable_to_non_nullable
-as List<String>,completedAt: null == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as int,totalPlayers: null == totalPlayers ? _self.totalPlayers : totalPlayers // ignore: cast_nullable_to_non_nullable
+as int,totalUnsold: null == totalUnsold ? _self.totalUnsold : totalUnsold // ignore: cast_nullable_to_non_nullable
+as int,topBuy: freezed == topBuy ? _self.topBuy : topBuy // ignore: cast_nullable_to_non_nullable
+as TopBuy?,franchiseResults: null == franchiseResults ? _self._franchiseResults : franchiseResults // ignore: cast_nullable_to_non_nullable
+as List<FranchiseResult>,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
+/// Create a copy of AuctionSummary
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TopBuyCopyWith<$Res>? get topBuy {
+    if (_self.topBuy == null) {
+    return null;
+  }
 
+  return $TopBuyCopyWith<$Res>(_self.topBuy!, (value) {
+    return _then(_self.copyWith(topBuy: value));
+  });
+}
 }
 
 
@@ -586,7 +613,8 @@ as int,
 /// @nodoc
 mixin _$FranchiseResult {
 
- String get franchiseId; String get franchiseName; int get totalSpent; int get playersCount; int get remainingPurse;
+ String get franchiseId; String get franchiseName;// A13: backend uses squadCount not playersCount
+@JsonKey(name: 'squadCount') int get playersCount; int get totalSpent; int get remainingPurse;
 /// Create a copy of FranchiseResult
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -599,16 +627,16 @@ $FranchiseResultCopyWith<FranchiseResult> get copyWith => _$FranchiseResultCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FranchiseResult&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.playersCount, playersCount) || other.playersCount == playersCount)&&(identical(other.remainingPurse, remainingPurse) || other.remainingPurse == remainingPurse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FranchiseResult&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.playersCount, playersCount) || other.playersCount == playersCount)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.remainingPurse, remainingPurse) || other.remainingPurse == remainingPurse));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,totalSpent,playersCount,remainingPurse);
+int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,playersCount,totalSpent,remainingPurse);
 
 @override
 String toString() {
-  return 'FranchiseResult(franchiseId: $franchiseId, franchiseName: $franchiseName, totalSpent: $totalSpent, playersCount: $playersCount, remainingPurse: $remainingPurse)';
+  return 'FranchiseResult(franchiseId: $franchiseId, franchiseName: $franchiseName, playersCount: $playersCount, totalSpent: $totalSpent, remainingPurse: $remainingPurse)';
 }
 
 
@@ -619,7 +647,7 @@ abstract mixin class $FranchiseResultCopyWith<$Res>  {
   factory $FranchiseResultCopyWith(FranchiseResult value, $Res Function(FranchiseResult) _then) = _$FranchiseResultCopyWithImpl;
 @useResult
 $Res call({
- String franchiseId, String franchiseName, int totalSpent, int playersCount, int remainingPurse
+ String franchiseId, String franchiseName,@JsonKey(name: 'squadCount') int playersCount, int totalSpent, int remainingPurse
 });
 
 
@@ -636,12 +664,12 @@ class _$FranchiseResultCopyWithImpl<$Res>
 
 /// Create a copy of FranchiseResult
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? totalSpent = null,Object? playersCount = null,Object? remainingPurse = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? playersCount = null,Object? totalSpent = null,Object? remainingPurse = null,}) {
   return _then(_self.copyWith(
 franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
 as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
-as String,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
-as int,playersCount: null == playersCount ? _self.playersCount : playersCount // ignore: cast_nullable_to_non_nullable
+as String,playersCount: null == playersCount ? _self.playersCount : playersCount // ignore: cast_nullable_to_non_nullable
+as int,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
 as int,remainingPurse: null == remainingPurse ? _self.remainingPurse : remainingPurse // ignore: cast_nullable_to_non_nullable
 as int,
   ));
@@ -728,10 +756,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName,  int totalSpent,  int playersCount,  int remainingPurse)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName, @JsonKey(name: 'squadCount')  int playersCount,  int totalSpent,  int remainingPurse)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FranchiseResult() when $default != null:
-return $default(_that.franchiseId,_that.franchiseName,_that.totalSpent,_that.playersCount,_that.remainingPurse);case _:
+return $default(_that.franchiseId,_that.franchiseName,_that.playersCount,_that.totalSpent,_that.remainingPurse);case _:
   return orElse();
 
 }
@@ -749,10 +777,10 @@ return $default(_that.franchiseId,_that.franchiseName,_that.totalSpent,_that.pla
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName,  int totalSpent,  int playersCount,  int remainingPurse)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String franchiseId,  String franchiseName, @JsonKey(name: 'squadCount')  int playersCount,  int totalSpent,  int remainingPurse)  $default,) {final _that = this;
 switch (_that) {
 case _FranchiseResult():
-return $default(_that.franchiseId,_that.franchiseName,_that.totalSpent,_that.playersCount,_that.remainingPurse);case _:
+return $default(_that.franchiseId,_that.franchiseName,_that.playersCount,_that.totalSpent,_that.remainingPurse);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -769,10 +797,10 @@ return $default(_that.franchiseId,_that.franchiseName,_that.totalSpent,_that.pla
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String franchiseId,  String franchiseName,  int totalSpent,  int playersCount,  int remainingPurse)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String franchiseId,  String franchiseName, @JsonKey(name: 'squadCount')  int playersCount,  int totalSpent,  int remainingPurse)?  $default,) {final _that = this;
 switch (_that) {
 case _FranchiseResult() when $default != null:
-return $default(_that.franchiseId,_that.franchiseName,_that.totalSpent,_that.playersCount,_that.remainingPurse);case _:
+return $default(_that.franchiseId,_that.franchiseName,_that.playersCount,_that.totalSpent,_that.remainingPurse);case _:
   return null;
 
 }
@@ -784,13 +812,14 @@ return $default(_that.franchiseId,_that.franchiseName,_that.totalSpent,_that.pla
 @JsonSerializable()
 
 class _FranchiseResult implements FranchiseResult {
-  const _FranchiseResult({required this.franchiseId, required this.franchiseName, required this.totalSpent, required this.playersCount, required this.remainingPurse});
+  const _FranchiseResult({required this.franchiseId, required this.franchiseName, @JsonKey(name: 'squadCount') required this.playersCount, required this.totalSpent, required this.remainingPurse});
   factory _FranchiseResult.fromJson(Map<String, dynamic> json) => _$FranchiseResultFromJson(json);
 
 @override final  String franchiseId;
 @override final  String franchiseName;
+// A13: backend uses squadCount not playersCount
+@override@JsonKey(name: 'squadCount') final  int playersCount;
 @override final  int totalSpent;
-@override final  int playersCount;
 @override final  int remainingPurse;
 
 /// Create a copy of FranchiseResult
@@ -806,16 +835,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FranchiseResult&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.playersCount, playersCount) || other.playersCount == playersCount)&&(identical(other.remainingPurse, remainingPurse) || other.remainingPurse == remainingPurse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FranchiseResult&&(identical(other.franchiseId, franchiseId) || other.franchiseId == franchiseId)&&(identical(other.franchiseName, franchiseName) || other.franchiseName == franchiseName)&&(identical(other.playersCount, playersCount) || other.playersCount == playersCount)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.remainingPurse, remainingPurse) || other.remainingPurse == remainingPurse));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,totalSpent,playersCount,remainingPurse);
+int get hashCode => Object.hash(runtimeType,franchiseId,franchiseName,playersCount,totalSpent,remainingPurse);
 
 @override
 String toString() {
-  return 'FranchiseResult(franchiseId: $franchiseId, franchiseName: $franchiseName, totalSpent: $totalSpent, playersCount: $playersCount, remainingPurse: $remainingPurse)';
+  return 'FranchiseResult(franchiseId: $franchiseId, franchiseName: $franchiseName, playersCount: $playersCount, totalSpent: $totalSpent, remainingPurse: $remainingPurse)';
 }
 
 
@@ -826,7 +855,7 @@ abstract mixin class _$FranchiseResultCopyWith<$Res> implements $FranchiseResult
   factory _$FranchiseResultCopyWith(_FranchiseResult value, $Res Function(_FranchiseResult) _then) = __$FranchiseResultCopyWithImpl;
 @override @useResult
 $Res call({
- String franchiseId, String franchiseName, int totalSpent, int playersCount, int remainingPurse
+ String franchiseId, String franchiseName,@JsonKey(name: 'squadCount') int playersCount, int totalSpent, int remainingPurse
 });
 
 
@@ -843,12 +872,12 @@ class __$FranchiseResultCopyWithImpl<$Res>
 
 /// Create a copy of FranchiseResult
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? totalSpent = null,Object? playersCount = null,Object? remainingPurse = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? franchiseId = null,Object? franchiseName = null,Object? playersCount = null,Object? totalSpent = null,Object? remainingPurse = null,}) {
   return _then(_FranchiseResult(
 franchiseId: null == franchiseId ? _self.franchiseId : franchiseId // ignore: cast_nullable_to_non_nullable
 as String,franchiseName: null == franchiseName ? _self.franchiseName : franchiseName // ignore: cast_nullable_to_non_nullable
-as String,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
-as int,playersCount: null == playersCount ? _self.playersCount : playersCount // ignore: cast_nullable_to_non_nullable
+as String,playersCount: null == playersCount ? _self.playersCount : playersCount // ignore: cast_nullable_to_non_nullable
+as int,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
 as int,remainingPurse: null == remainingPurse ? _self.remainingPurse : remainingPurse // ignore: cast_nullable_to_non_nullable
 as int,
   ));

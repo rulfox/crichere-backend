@@ -302,7 +302,7 @@ class _WaitlistTab extends ConsumerWidget {
                     backgroundColor: CricColor.slate3,
                     child: Text('${entry.position}', style: CricTextStyle.badge.copyWith(color: CricColor.gold)),
                   ),
-                  title: Text(entry.playerName, style: CricTextStyle.headingMd),
+                  title: Text('User ${entry.userId.substring(0, 8)}…', style: CricTextStyle.headingMd),
                   subtitle: Text('Joined ${entry.createdAt.toString().split(' ')[0]}', style: CricTextStyle.caption),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -360,7 +360,7 @@ class _PlayersTab extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(player.playerName, style: CricTextStyle.headingMd),
+                        Text(player.playerName ?? 'Player ${player.playerId.substring(0, 8)}', style: CricTextStyle.headingMd),
                         Text('Base: ₹${player.basePriceOverride ?? "1k"}', style: CricTextStyle.caption),
                       ],
                     ),

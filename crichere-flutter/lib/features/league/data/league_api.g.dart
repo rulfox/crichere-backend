@@ -103,65 +103,22 @@ class _LeagueApi implements LeagueApi {
   }
 
   @override
-  Future<void> importPlayers(String leagueId, File file) async {
+  Future<void> importPlayers(String leagueId, dynamic players) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = FormData();
-    _data.files.add(
-      MapEntry(
-        'file',
-        MultipartFile.fromFileSync(
-          file.path,
-          filename: file.path.split(Platform.pathSeparator).last,
-        ),
-      ),
-    );
+    final _data = players;
     final _options = _setStreamType<void>(
-      Options(
-            method: 'POST',
-            headers: _headers,
-            extra: _extra,
-            contentType: 'multipart/form-data',
-          )
+      Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/leagues/${leagueId}/players/import',
+            '/leagues/${leagueId}/players/bulk-import',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     await _dio.fetch<void>(_options);
-  }
-
-  @override
-  Future<List<Franchise>> getLeagueFranchises(String leagueId) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<Franchise>>(
-      Options(method: 'GET', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/leagues/${leagueId}/franchises',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<Franchise> _value;
-    try {
-      _value = _result.data!
-          .map((dynamic i) => Franchise.fromJson(i as Map<String, dynamic>))
-          .toList();
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options, response: _result);
-      rethrow;
-    }
-    return _value;
   }
 
   @override
@@ -174,7 +131,7 @@ class _LeagueApi implements LeagueApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/leagues/${leagueId}/players',
+            '/players/league/${leagueId}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -194,12 +151,12 @@ class _LeagueApi implements LeagueApi {
   }
 
   @override
-  Future<List<FeeObligation>> getFeeObligations(String leagueId) async {
+  Future<FeeObligationListResponse> getFeeObligations(String leagueId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<FeeObligation>>(
+    final _options = _setStreamType<FeeObligationListResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -209,12 +166,10 @@ class _LeagueApi implements LeagueApi {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<FeeObligation> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late FeeObligationListResponse _value;
     try {
-      _value = _result.data!
-          .map((dynamic i) => FeeObligation.fromJson(i as Map<String, dynamic>))
-          .toList();
+      _value = FeeObligationListResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
@@ -279,12 +234,12 @@ class _LeagueApi implements LeagueApi {
   }
 
   @override
-  Future<List<ForfeitRequest>> getForfeitRequests(String leagueId) async {
+  Future<ForfeitRequestListResponse> getForfeitRequests(String leagueId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<ForfeitRequest>>(
+    final _options = _setStreamType<ForfeitRequestListResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -294,14 +249,10 @@ class _LeagueApi implements LeagueApi {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<ForfeitRequest> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ForfeitRequestListResponse _value;
     try {
-      _value = _result.data!
-          .map(
-            (dynamic i) => ForfeitRequest.fromJson(i as Map<String, dynamic>),
-          )
-          .toList();
+      _value = ForfeitRequestListResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
@@ -365,12 +316,12 @@ class _LeagueApi implements LeagueApi {
   }
 
   @override
-  Future<List<WaitlistEntry>> getWaitlist(String leagueId) async {
+  Future<WaitlistPagedResponse> getWaitlist(String leagueId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<List<WaitlistEntry>>(
+    final _options = _setStreamType<WaitlistPagedResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -380,12 +331,10 @@ class _LeagueApi implements LeagueApi {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<WaitlistEntry> _value;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late WaitlistPagedResponse _value;
     try {
-      _value = _result.data!
-          .map((dynamic i) => WaitlistEntry.fromJson(i as Map<String, dynamic>))
-          .toList();
+      _value = WaitlistPagedResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
@@ -394,11 +343,15 @@ class _LeagueApi implements LeagueApi {
   }
 
   @override
-  Future<WaitlistEntry> joinWaitlist(String leagueId) async {
+  Future<WaitlistEntry> joinWaitlist(
+    String leagueId,
+    Map<String, dynamic> body,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<WaitlistEntry>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(

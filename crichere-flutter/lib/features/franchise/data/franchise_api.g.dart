@@ -20,25 +20,25 @@ class _FranchiseApi implements FranchiseApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<FranchiseSquad> getSquad(String franchiseId) async {
+  Future<Franchise> getFranchise(String franchiseId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<FranchiseSquad>(
+    final _options = _setStreamType<Franchise>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/franchises/${franchiseId}/squad',
+            '/franchises/${franchiseId}',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late FranchiseSquad _value;
+    late Franchise _value;
     try {
-      _value = FranchiseSquad.fromJson(_result.data!);
+      _value = Franchise.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

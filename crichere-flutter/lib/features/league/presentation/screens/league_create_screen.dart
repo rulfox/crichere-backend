@@ -152,16 +152,12 @@ class LeagueCreateScreen extends HookConsumerWidget {
                           LeagueCreateRequest(
                             name: nameController.text,
                             format: format.value,
-                            basePrice: int.tryParse(basePrice.text) ?? 1000,
-                            purseAmount: int.tryParse(purse.text) ?? 40000,
-                            maxPlayersPerFranchise: int.tryParse(maxPlayers.text) ?? 15,
                             waitingListMode: waitingListMode.value,
                           ),
                         );
                         
-                        if (selectedFile.value != null) {
-                          await ref.read(importPlayersUseCaseProvider).call(league.id, selectedFile.value!);
-                        }
+                        // importPlayers now expects JSON list — file import via CSV removed
+                        // Players can be imported via the backend dashboard or API directly
                         
                         if (context.mounted) {
                           context.router.pop();

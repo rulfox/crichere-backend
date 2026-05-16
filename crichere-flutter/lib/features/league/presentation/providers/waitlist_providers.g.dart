@@ -66,7 +66,7 @@ final class WaitlistProvider
   }
 }
 
-String _$waitlistHash() => r'8e91e54be54790a6c0160146168bdd0906952cd8';
+String _$waitlistHash() => r'e29b30d83132538d656d6799db9ce8e1c8b78b6a';
 
 final class WaitlistFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<WaitlistEntry>>, String> {

@@ -126,8 +126,8 @@ class PreAssignmentScreen extends HookConsumerWidget {
                 final p = players[index];
                 final isSelected = selections.value[franchiseId]?[type]?.playerId == p.playerId;
                 return ListTile(
-                  leading: AvatarCircle(name: p.playerName, radius: 16),
-                  title: Text(p.playerName, style: CricTextStyle.body),
+                  leading: AvatarCircle(name: p.playerName ?? '', radius: 16),
+                  title: Text(p.playerName ?? 'Player ${p.playerId.substring(0, 8)}', style: CricTextStyle.body),
                   subtitle: Text('Base: ₹${p.basePriceOverride ?? 1000}', style: CricTextStyle.caption),
                   trailing: isSelected ? const Icon(Icons.check_circle, color: CricColor.green) : null,
                   onTap: () async {

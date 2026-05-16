@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Franchise {
 
- String get id; String get leagueId; String get name; String? get logoUrl; int get startingPurse; int get currentPurse;
+ String get id; String get leagueId; String get name; String? get logoUrl; String? get ownerId;// E2: backend fields are totalPurse and remainingPurse
+@JsonKey(name: 'totalPurse') int get startingPurse;@JsonKey(name: 'remainingPurse') int get currentPurse;
 /// Create a copy of Franchise
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +29,16 @@ $FranchiseCopyWith<Franchise> get copyWith => _$FranchiseCopyWithImpl<Franchise>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Franchise&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.name, name) || other.name == name)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.startingPurse, startingPurse) || other.startingPurse == startingPurse)&&(identical(other.currentPurse, currentPurse) || other.currentPurse == currentPurse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Franchise&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.name, name) || other.name == name)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.startingPurse, startingPurse) || other.startingPurse == startingPurse)&&(identical(other.currentPurse, currentPurse) || other.currentPurse == currentPurse));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,leagueId,name,logoUrl,startingPurse,currentPurse);
+int get hashCode => Object.hash(runtimeType,id,leagueId,name,logoUrl,ownerId,startingPurse,currentPurse);
 
 @override
 String toString() {
-  return 'Franchise(id: $id, leagueId: $leagueId, name: $name, logoUrl: $logoUrl, startingPurse: $startingPurse, currentPurse: $currentPurse)';
+  return 'Franchise(id: $id, leagueId: $leagueId, name: $name, logoUrl: $logoUrl, ownerId: $ownerId, startingPurse: $startingPurse, currentPurse: $currentPurse)';
 }
 
 
@@ -48,7 +49,7 @@ abstract mixin class $FranchiseCopyWith<$Res>  {
   factory $FranchiseCopyWith(Franchise value, $Res Function(Franchise) _then) = _$FranchiseCopyWithImpl;
 @useResult
 $Res call({
- String id, String leagueId, String name, String? logoUrl, int startingPurse, int currentPurse
+ String id, String leagueId, String name, String? logoUrl, String? ownerId,@JsonKey(name: 'totalPurse') int startingPurse,@JsonKey(name: 'remainingPurse') int currentPurse
 });
 
 
@@ -65,12 +66,13 @@ class _$FranchiseCopyWithImpl<$Res>
 
 /// Create a copy of Franchise
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? leagueId = null,Object? name = null,Object? logoUrl = freezed,Object? startingPurse = null,Object? currentPurse = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? leagueId = null,Object? name = null,Object? logoUrl = freezed,Object? ownerId = freezed,Object? startingPurse = null,Object? currentPurse = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
+as String?,ownerId: freezed == ownerId ? _self.ownerId : ownerId // ignore: cast_nullable_to_non_nullable
 as String?,startingPurse: null == startingPurse ? _self.startingPurse : startingPurse // ignore: cast_nullable_to_non_nullable
 as int,currentPurse: null == currentPurse ? _self.currentPurse : currentPurse // ignore: cast_nullable_to_non_nullable
 as int,
@@ -158,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String leagueId,  String name,  String? logoUrl,  int startingPurse,  int currentPurse)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String leagueId,  String name,  String? logoUrl,  String? ownerId, @JsonKey(name: 'totalPurse')  int startingPurse, @JsonKey(name: 'remainingPurse')  int currentPurse)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Franchise() when $default != null:
-return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.startingPurse,_that.currentPurse);case _:
+return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.ownerId,_that.startingPurse,_that.currentPurse);case _:
   return orElse();
 
 }
@@ -179,10 +181,10 @@ return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.startingP
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String leagueId,  String name,  String? logoUrl,  int startingPurse,  int currentPurse)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String leagueId,  String name,  String? logoUrl,  String? ownerId, @JsonKey(name: 'totalPurse')  int startingPurse, @JsonKey(name: 'remainingPurse')  int currentPurse)  $default,) {final _that = this;
 switch (_that) {
 case _Franchise():
-return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.startingPurse,_that.currentPurse);case _:
+return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.ownerId,_that.startingPurse,_that.currentPurse);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +201,10 @@ return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.startingP
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String leagueId,  String name,  String? logoUrl,  int startingPurse,  int currentPurse)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String leagueId,  String name,  String? logoUrl,  String? ownerId, @JsonKey(name: 'totalPurse')  int startingPurse, @JsonKey(name: 'remainingPurse')  int currentPurse)?  $default,) {final _that = this;
 switch (_that) {
 case _Franchise() when $default != null:
-return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.startingPurse,_that.currentPurse);case _:
+return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.ownerId,_that.startingPurse,_that.currentPurse);case _:
   return null;
 
 }
@@ -214,15 +216,17 @@ return $default(_that.id,_that.leagueId,_that.name,_that.logoUrl,_that.startingP
 @JsonSerializable()
 
 class _Franchise extends Franchise {
-  const _Franchise({required this.id, required this.leagueId, required this.name, this.logoUrl, required this.startingPurse, required this.currentPurse}): super._();
+  const _Franchise({required this.id, required this.leagueId, required this.name, this.logoUrl, this.ownerId, @JsonKey(name: 'totalPurse') required this.startingPurse, @JsonKey(name: 'remainingPurse') required this.currentPurse}): super._();
   factory _Franchise.fromJson(Map<String, dynamic> json) => _$FranchiseFromJson(json);
 
 @override final  String id;
 @override final  String leagueId;
 @override final  String name;
 @override final  String? logoUrl;
-@override final  int startingPurse;
-@override final  int currentPurse;
+@override final  String? ownerId;
+// E2: backend fields are totalPurse and remainingPurse
+@override@JsonKey(name: 'totalPurse') final  int startingPurse;
+@override@JsonKey(name: 'remainingPurse') final  int currentPurse;
 
 /// Create a copy of Franchise
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +241,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Franchise&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.name, name) || other.name == name)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.startingPurse, startingPurse) || other.startingPurse == startingPurse)&&(identical(other.currentPurse, currentPurse) || other.currentPurse == currentPurse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Franchise&&(identical(other.id, id) || other.id == id)&&(identical(other.leagueId, leagueId) || other.leagueId == leagueId)&&(identical(other.name, name) || other.name == name)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.ownerId, ownerId) || other.ownerId == ownerId)&&(identical(other.startingPurse, startingPurse) || other.startingPurse == startingPurse)&&(identical(other.currentPurse, currentPurse) || other.currentPurse == currentPurse));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,leagueId,name,logoUrl,startingPurse,currentPurse);
+int get hashCode => Object.hash(runtimeType,id,leagueId,name,logoUrl,ownerId,startingPurse,currentPurse);
 
 @override
 String toString() {
-  return 'Franchise(id: $id, leagueId: $leagueId, name: $name, logoUrl: $logoUrl, startingPurse: $startingPurse, currentPurse: $currentPurse)';
+  return 'Franchise(id: $id, leagueId: $leagueId, name: $name, logoUrl: $logoUrl, ownerId: $ownerId, startingPurse: $startingPurse, currentPurse: $currentPurse)';
 }
 
 
@@ -257,7 +261,7 @@ abstract mixin class _$FranchiseCopyWith<$Res> implements $FranchiseCopyWith<$Re
   factory _$FranchiseCopyWith(_Franchise value, $Res Function(_Franchise) _then) = __$FranchiseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String leagueId, String name, String? logoUrl, int startingPurse, int currentPurse
+ String id, String leagueId, String name, String? logoUrl, String? ownerId,@JsonKey(name: 'totalPurse') int startingPurse,@JsonKey(name: 'remainingPurse') int currentPurse
 });
 
 
@@ -274,12 +278,13 @@ class __$FranchiseCopyWithImpl<$Res>
 
 /// Create a copy of Franchise
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? leagueId = null,Object? name = null,Object? logoUrl = freezed,Object? startingPurse = null,Object? currentPurse = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? leagueId = null,Object? name = null,Object? logoUrl = freezed,Object? ownerId = freezed,Object? startingPurse = null,Object? currentPurse = null,}) {
   return _then(_Franchise(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,leagueId: null == leagueId ? _self.leagueId : leagueId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
+as String?,ownerId: freezed == ownerId ? _self.ownerId : ownerId // ignore: cast_nullable_to_non_nullable
 as String?,startingPurse: null == startingPurse ? _self.startingPurse : startingPurse // ignore: cast_nullable_to_non_nullable
 as int,currentPurse: null == currentPurse ? _self.currentPurse : currentPurse // ignore: cast_nullable_to_non_nullable
 as int,

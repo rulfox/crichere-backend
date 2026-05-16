@@ -3,21 +3,49 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'fee_entities.freezed.dart';
 part 'fee_entities.g.dart';
 
+// Matches backend FeeObligationResponse (wrapped inside FeeObligationDetailResponse)
 @freezed
 abstract class FeeObligation with _$FeeObligation {
   const factory FeeObligation({
     required String id,
     required String leagueId,
-    required String entityId, // PlayerId or FranchiseId
-    required String entityName,
-    required String feeType, // PLAYER_FEE, FRANCHISE_FEE
+    required String userId,
+    String? franchiseId,
+    required String feeType,
     required int totalAmount,
+    int? minimumToRegister,
     required int paidAmount,
-    required String status, // UNPAID, PARTIALLY_PAID, PAID, WAIVED
-    required bool auctionEligible,
+    required String status,
+    required DateTime createdAt,
+    required DateTime updatedAt,
   }) = _FeeObligation;
 
   factory FeeObligation.fromJson(Map<String, dynamic> json) => _$FeeObligationFromJson(json);
+}
+
+// Matches backend FeeObligationDetailResponse {obligation, payments}
+@freezed
+abstract class FeeObligationDetail with _$FeeObligationDetail {
+  const factory FeeObligationDetail({
+    required FeeObligation obligation,
+    required List<FeePayment> payments,
+  }) = _FeeObligationDetail;
+
+  factory FeeObligationDetail.fromJson(Map<String, dynamic> json) => _$FeeObligationDetailFromJson(json);
+}
+
+// Matches backend FeeObligationListResponse (paginated)
+@freezed
+abstract class FeeObligationListResponse with _$FeeObligationListResponse {
+  const factory FeeObligationListResponse({
+    required List<FeeObligationDetail> obligations,
+    required int totalElements,
+    required int totalPages,
+    required int pageNumber,
+    required int pageSize,
+  }) = _FeeObligationListResponse;
+
+  factory FeeObligationListResponse.fromJson(Map<String, dynamic> json) => _$FeeObligationListResponseFromJson(json);
 }
 
 @freezed

@@ -116,8 +116,8 @@ class _SummaryTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: CricSpacing.xl),
-          const SectionHeader(title: ' TOP BUYS'),
-          ...summary.topBuys.map((buy) => Padding(
+          const SectionHeader(title: ' TOP BUY'),
+          if (summary.topBuy != null) Padding(
             padding: const EdgeInsets.only(bottom: CricSpacing.sm),
             child: CricCard(
               child: Row(
@@ -128,16 +128,16 @@ class _SummaryTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(buy.playerName, style: CricTextStyle.headingMd),
-                        Text(buy.franchiseName, style: CricTextStyle.caption),
+                        Text(summary.topBuy!.playerName, style: CricTextStyle.headingMd),
+                        Text(summary.topBuy!.franchiseName, style: CricTextStyle.caption),
                       ],
                     ),
                   ),
-                  Text('₹${buy.amount}', style: CricTextStyle.headingMd.copyWith(color: CricColor.gold)),
+                  Text('₹${summary.topBuy!.amount}', style: CricTextStyle.headingMd.copyWith(color: CricColor.gold)),
                 ],
               ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -194,20 +194,23 @@ class _UnsoldTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (summary.unsoldPlayerIds.isEmpty) {
+    if (summary.totalUnsold == 0) {
       return const Center(child: Text('All players sold!', style: TextStyle(color: Colors.white)));
     }
-    return ListView.builder(
-      padding: const EdgeInsets.all(CricSpacing.page),
-      itemCount: summary.unsoldPlayerIds.length,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: CricSpacing.sm),
-          child: CricCard(
-            child: Text('Player ${summary.unsoldPlayerIds[index]}', style: CricTextStyle.body),
-          ),
-        );
-      },
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(CricSpacing.xxl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.person_off_outlined, color: CricColor.textFaint, size: 48),
+            const SizedBox(height: 16),
+            Text('${summary.totalUnsold} unsold player${summary.totalUnsold == 1 ? '' : 's'}', style: CricTextStyle.headingMd),
+            const SizedBox(height: 8),
+            Text('Detailed unsold list available via the league dashboard', style: CricTextStyle.caption, textAlign: TextAlign.center),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -240,8 +243,8 @@ class _ExportsTab extends ConsumerWidget {
             pw.Text('Total Players Sold: ${summary.totalPlayersSold}'),
             pw.Text('Total Amount Spent: ₹${summary.totalAmountSpent}'),
             pw.SizedBox(height: 24),
-            pw.Header(level: 1, child: pw.Text('Top Buys', style: pw.TextStyle(fontSize: 16))),
-            ...summary.topBuys.map((b) => pw.Text('${b.playerName} → ${b.franchiseName}: ₹${b.amount}')),
+            pw.Header(level: 1, child: pw.Text('Top Buy', style: pw.TextStyle(fontSize: 16))),
+            if (summary.topBuy != null) pw.Text('${summary.topBuy!.playerName} → ${summary.topBuy!.franchiseName}: ₹${summary.topBuy!.amount}'),
             pw.SizedBox(height: 24),
             pw.Header(level: 1, child: pw.Text('Franchise Results', style: pw.TextStyle(fontSize: 16))),
             ...summary.franchiseResults.map((f) => pw.Text(

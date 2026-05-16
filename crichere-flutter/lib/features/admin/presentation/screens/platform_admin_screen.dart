@@ -13,7 +13,7 @@ class PlatformAdminScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final metricsAsync = ref.watch(platformMetricsProvider);
+    // F1: platformMetricsProvider removed — /admin/metrics does not exist
     final leaguesAsync = ref.watch(adminLeaguesProvider);
 
     return Scaffold(
@@ -30,9 +30,9 @@ class PlatformAdminScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Metrics Overview
-                metricsAsync.when(
-                  data: (metrics) => GridView.count(
+                // Metrics placeholder — backend /admin/metrics endpoint not available
+                leaguesAsync.when(
+                  data: (leagues) => GridView.count(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisCount: isWide ? 4 : 2,
@@ -40,14 +40,14 @@ class PlatformAdminScreen extends ConsumerWidget {
                     mainAxisSpacing: 16,
                     childAspectRatio: isWide ? 2.5 : 2,
                     children: [
-                      _MetricCard(label: 'Total Users', value: metrics.totalUsers.toString(), icon: Icons.people_outline),
-                      _MetricCard(label: 'Active Leagues', value: metrics.activeLeagues.toString(), icon: Icons.emoji_events_outlined),
-                      _MetricCard(label: 'Live Auctions', value: metrics.ongoingAuctions.toString(), icon: Icons.gavel_outlined, color: CricColor.red),
-                      _MetricCard(label: 'Total Revenue', value: '₹${metrics.totalRevenue}', icon: Icons.payments_outlined, color: CricColor.green),
+                      _MetricCard(label: 'Total Leagues', value: leagues.length.toString(), icon: Icons.emoji_events_outlined),
+                      _MetricCard(label: 'Live Auctions', value: leagues.where((l) => l.status == 'AUCTION_LIVE').length.toString(), icon: Icons.gavel_outlined, color: CricColor.red),
+                      _MetricCard(label: 'Active', value: leagues.where((l) => l.status == 'ACTIVE').length.toString(), icon: Icons.check_circle_outline, color: CricColor.green),
+                      _MetricCard(label: 'Completed', value: leagues.where((l) => l.status == 'COMPLETED').length.toString(), icon: Icons.done_all, color: CricColor.textDim),
                     ],
                   ),
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Text('Error loading metrics: $e', style: CricTextStyle.body),
+                  loading: () => const SizedBox.shrink(),
+                  error: (e, _) => const SizedBox.shrink(),
                 ),
                 
                 const SizedBox(height: 32),

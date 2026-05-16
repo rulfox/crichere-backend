@@ -12,8 +12,10 @@ abstract class Franchise with _$Franchise {
     required String leagueId,
     required String name,
     String? logoUrl,
-    required int startingPurse,
-    required int currentPurse,
+    String? ownerId,
+    // E2: backend fields are totalPurse and remainingPurse
+    @JsonKey(name: 'totalPurse') required int startingPurse,
+    @JsonKey(name: 'remainingPurse') required int currentPurse,
   }) = _Franchise;
 
   factory Franchise.fromJson(Map<String, dynamic> json) => _$FranchiseFromJson(json);

@@ -6,5 +6,5 @@ part 'waitlist_providers.g.dart';
 
 @riverpod
 Future<List<WaitlistEntry>> waitlist(Ref ref, String leagueId) {
-  return ref.watch(leagueRepositoryProvider).getWaitlist(leagueId);
+  return ref.read(leagueRepositoryProvider).getWaitlist(leagueId);
 }

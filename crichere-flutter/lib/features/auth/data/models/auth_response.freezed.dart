@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthResponse {
 
- String? get accessToken; String? get refreshToken; String? get userId; String? get phone; String? get name; ProfileStatus? get profileStatus; bool get isNewUser; String? get profileId;
+ String? get accessToken; String? get refreshToken;@JsonKey(readValue: _readUserId) String? get userId; String? get phone; String? get name; ProfileStatus? get profileStatus; bool get isNewUser; String? get profileId;
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $AuthResponseCopyWith<$Res>  {
   factory $AuthResponseCopyWith(AuthResponse value, $Res Function(AuthResponse) _then) = _$AuthResponseCopyWithImpl;
 @useResult
 $Res call({
- String? accessToken, String? refreshToken, String? userId, String? phone, String? name, ProfileStatus? profileStatus, bool isNewUser, String? profileId
+ String? accessToken, String? refreshToken,@JsonKey(readValue: _readUserId) String? userId, String? phone, String? name, ProfileStatus? profileStatus, bool isNewUser, String? profileId
 });
 
 
@@ -160,7 +160,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken,  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken, @JsonKey(readValue: _readUserId)  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
 return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_that.name,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
@@ -181,7 +181,7 @@ return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken,  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? accessToken,  String? refreshToken, @JsonKey(readValue: _readUserId)  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse():
 return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_that.name,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
@@ -201,7 +201,7 @@ return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? accessToken,  String? refreshToken,  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? accessToken,  String? refreshToken, @JsonKey(readValue: _readUserId)  String? userId,  String? phone,  String? name,  ProfileStatus? profileStatus,  bool isNewUser,  String? profileId)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
 return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_that.name,_that.profileStatus,_that.isNewUser,_that.profileId);case _:
@@ -216,12 +216,12 @@ return $default(_that.accessToken,_that.refreshToken,_that.userId,_that.phone,_t
 @JsonSerializable()
 
 class _AuthResponse extends AuthResponse {
-  const _AuthResponse({this.accessToken, this.refreshToken, this.userId, this.phone, this.name, this.profileStatus, this.isNewUser = false, this.profileId}): super._();
+  const _AuthResponse({this.accessToken, this.refreshToken, @JsonKey(readValue: _readUserId) this.userId, this.phone, this.name, this.profileStatus, this.isNewUser = false, this.profileId}): super._();
   factory _AuthResponse.fromJson(Map<String, dynamic> json) => _$AuthResponseFromJson(json);
 
 @override final  String? accessToken;
 @override final  String? refreshToken;
-@override final  String? userId;
+@override@JsonKey(readValue: _readUserId) final  String? userId;
 @override final  String? phone;
 @override final  String? name;
 @override final  ProfileStatus? profileStatus;
@@ -261,7 +261,7 @@ abstract mixin class _$AuthResponseCopyWith<$Res> implements $AuthResponseCopyWi
   factory _$AuthResponseCopyWith(_AuthResponse value, $Res Function(_AuthResponse) _then) = __$AuthResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String? accessToken, String? refreshToken, String? userId, String? phone, String? name, ProfileStatus? profileStatus, bool isNewUser, String? profileId
+ String? accessToken, String? refreshToken,@JsonKey(readValue: _readUserId) String? userId, String? phone, String? name, ProfileStatus? profileStatus, bool isNewUser, String? profileId
 });
 
 

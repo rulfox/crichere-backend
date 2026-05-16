@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import '../domain/entities/league.dart';
@@ -24,22 +23,25 @@ abstract class LeagueApi {
   @POST('/leagues')
   Future<League> createLeague(@Body() LeagueCreateRequest request);
 
-  @POST('/leagues/{id}/players/import')
-  @MultiPart()
+  // B3: was /import (MultiPart) → /bulk-import (JSON list of PlayerImportRequest)
+  @POST('/leagues/{id}/players/bulk-import')
   Future<void> importPlayers(
     @Path('id') String leagueId,
-    @Part() File file,
+    @Body() dynamic players,
   );
 
-  @GET('/leagues/{id}/franchises')
-  Future<List<Franchise>> getLeagueFranchises(@Path('id') String leagueId);
+  // B2: No /leagues/{id}/franchises endpoint in backend.
+  // Franchises are fetched individually via /franchises/{id}.
+  // This endpoint is intentionally removed — callers should use auction state.
+  // Kept as placeholder returning empty list via repository override.
 
-  @GET('/leagues/{id}/players')
-  Future<List<LeaguePlayer>> getLeaguePlayers(@Path('id') String leagueId);
+  // B1: was /leagues/{id}/players → /players/league/{leagueId}
+  @GET('/players/league/{leagueId}')
+  Future<List<LeaguePlayer>> getLeaguePlayers(@Path('leagueId') String leagueId);
 
-  // Fees
+  // Fees — B5: returns paginated FeeObligationListResponse, not flat list
   @GET('/leagues/{id}/fee-obligations')
-  Future<List<FeeObligation>> getFeeObligations(@Path('id') String leagueId);
+  Future<FeeObligationListResponse> getFeeObligations(@Path('id') String leagueId);
 
   @POST('/leagues/{id}/fee-obligations/{obligationId}/payments')
   Future<FeePayment> recordPayment(
@@ -55,9 +57,9 @@ abstract class LeagueApi {
     @Body() Map<String, dynamic> body,
   );
 
-  // Forfeits
+  // Forfeits — B7: returns paginated ForfeitRequestListResponse
   @GET('/leagues/{id}/forfeit-requests')
-  Future<List<ForfeitRequest>> getForfeitRequests(@Path('id') String leagueId);
+  Future<ForfeitRequestListResponse> getForfeitRequests(@Path('id') String leagueId);
 
   @POST('/leagues/{id}/forfeit')
   Future<ForfeitRequest> submitForfeit(
@@ -72,12 +74,15 @@ abstract class LeagueApi {
     @Body() Map<String, dynamic> body,
   );
 
-  // Waitlist
+  // Waitlist — GET returns paginated wrapper, POST requires type body
   @GET('/leagues/{id}/waiting-list')
-  Future<List<WaitlistEntry>> getWaitlist(@Path('id') String leagueId);
+  Future<WaitlistPagedResponse> getWaitlist(@Path('id') String leagueId);
 
   @POST('/leagues/{id}/waiting-list')
-  Future<WaitlistEntry> joinWaitlist(@Path('id') String leagueId);
+  Future<WaitlistEntry> joinWaitlist(
+    @Path('id') String leagueId,
+    @Body() Map<String, dynamic> body,
+  );
 
   @PATCH('/leagues/{id}/waiting-list/{entryId}/promote')
   Future<void> promoteFromWaitlist(

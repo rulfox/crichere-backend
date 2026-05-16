@@ -11,8 +11,9 @@ _Franchise _$FranchiseFromJson(Map<String, dynamic> json) => _Franchise(
   leagueId: json['leagueId'] as String,
   name: json['name'] as String,
   logoUrl: json['logoUrl'] as String?,
-  startingPurse: (json['startingPurse'] as num).toInt(),
-  currentPurse: (json['currentPurse'] as num).toInt(),
+  ownerId: json['ownerId'] as String?,
+  startingPurse: (json['totalPurse'] as num).toInt(),
+  currentPurse: (json['remainingPurse'] as num).toInt(),
 );
 
 Map<String, dynamic> _$FranchiseToJson(_Franchise instance) =>
@@ -21,6 +22,7 @@ Map<String, dynamic> _$FranchiseToJson(_Franchise instance) =>
       'leagueId': instance.leagueId,
       'name': instance.name,
       'logoUrl': instance.logoUrl,
-      'startingPurse': instance.startingPurse,
-      'currentPurse': instance.currentPurse,
+      'ownerId': instance.ownerId,
+      'totalPurse': instance.startingPurse,
+      'remainingPurse': instance.currentPurse,
     };

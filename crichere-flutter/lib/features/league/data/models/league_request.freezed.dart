@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LeagueCreateRequest {
 
- String get name; String get format;// T20, ODI, etc.
- int get basePrice; int get purseAmount; int get maxPlayersPerFranchise; String get waitingListMode;
+ String get name; String? get format; String? get rulesUrl; bool get mustSellAll; String get playerOrderMode; String get waitingListMode; String? get logoUrl; String? get bannerUrl; String? get auctionDate;
 /// Create a copy of LeagueCreateRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +28,16 @@ $LeagueCreateRequestCopyWith<LeagueCreateRequest> get copyWith => _$LeagueCreate
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LeagueCreateRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.format, format) || other.format == format)&&(identical(other.basePrice, basePrice) || other.basePrice == basePrice)&&(identical(other.purseAmount, purseAmount) || other.purseAmount == purseAmount)&&(identical(other.maxPlayersPerFranchise, maxPlayersPerFranchise) || other.maxPlayersPerFranchise == maxPlayersPerFranchise)&&(identical(other.waitingListMode, waitingListMode) || other.waitingListMode == waitingListMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LeagueCreateRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.format, format) || other.format == format)&&(identical(other.rulesUrl, rulesUrl) || other.rulesUrl == rulesUrl)&&(identical(other.mustSellAll, mustSellAll) || other.mustSellAll == mustSellAll)&&(identical(other.playerOrderMode, playerOrderMode) || other.playerOrderMode == playerOrderMode)&&(identical(other.waitingListMode, waitingListMode) || other.waitingListMode == waitingListMode)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.auctionDate, auctionDate) || other.auctionDate == auctionDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,format,basePrice,purseAmount,maxPlayersPerFranchise,waitingListMode);
+int get hashCode => Object.hash(runtimeType,name,format,rulesUrl,mustSellAll,playerOrderMode,waitingListMode,logoUrl,bannerUrl,auctionDate);
 
 @override
 String toString() {
-  return 'LeagueCreateRequest(name: $name, format: $format, basePrice: $basePrice, purseAmount: $purseAmount, maxPlayersPerFranchise: $maxPlayersPerFranchise, waitingListMode: $waitingListMode)';
+  return 'LeagueCreateRequest(name: $name, format: $format, rulesUrl: $rulesUrl, mustSellAll: $mustSellAll, playerOrderMode: $playerOrderMode, waitingListMode: $waitingListMode, logoUrl: $logoUrl, bannerUrl: $bannerUrl, auctionDate: $auctionDate)';
 }
 
 
@@ -49,7 +48,7 @@ abstract mixin class $LeagueCreateRequestCopyWith<$Res>  {
   factory $LeagueCreateRequestCopyWith(LeagueCreateRequest value, $Res Function(LeagueCreateRequest) _then) = _$LeagueCreateRequestCopyWithImpl;
 @useResult
 $Res call({
- String name, String format, int basePrice, int purseAmount, int maxPlayersPerFranchise, String waitingListMode
+ String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String? auctionDate
 });
 
 
@@ -66,15 +65,18 @@ class _$LeagueCreateRequestCopyWithImpl<$Res>
 
 /// Create a copy of LeagueCreateRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? format = null,Object? basePrice = null,Object? purseAmount = null,Object? maxPlayersPerFranchise = null,Object? waitingListMode = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? format = freezed,Object? rulesUrl = freezed,Object? mustSellAll = null,Object? playerOrderMode = null,Object? waitingListMode = null,Object? logoUrl = freezed,Object? bannerUrl = freezed,Object? auctionDate = freezed,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,format: null == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
-as String,basePrice: null == basePrice ? _self.basePrice : basePrice // ignore: cast_nullable_to_non_nullable
-as int,purseAmount: null == purseAmount ? _self.purseAmount : purseAmount // ignore: cast_nullable_to_non_nullable
-as int,maxPlayersPerFranchise: null == maxPlayersPerFranchise ? _self.maxPlayersPerFranchise : maxPlayersPerFranchise // ignore: cast_nullable_to_non_nullable
-as int,waitingListMode: null == waitingListMode ? _self.waitingListMode : waitingListMode // ignore: cast_nullable_to_non_nullable
-as String,
+as String,format: freezed == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
+as String?,rulesUrl: freezed == rulesUrl ? _self.rulesUrl : rulesUrl // ignore: cast_nullable_to_non_nullable
+as String?,mustSellAll: null == mustSellAll ? _self.mustSellAll : mustSellAll // ignore: cast_nullable_to_non_nullable
+as bool,playerOrderMode: null == playerOrderMode ? _self.playerOrderMode : playerOrderMode // ignore: cast_nullable_to_non_nullable
+as String,waitingListMode: null == waitingListMode ? _self.waitingListMode : waitingListMode // ignore: cast_nullable_to_non_nullable
+as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
+as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
+as String?,auctionDate: freezed == auctionDate ? _self.auctionDate : auctionDate // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -159,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String format,  int basePrice,  int purseAmount,  int maxPlayersPerFranchise,  String waitingListMode)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String? auctionDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LeagueCreateRequest() when $default != null:
-return $default(_that.name,_that.format,_that.basePrice,_that.purseAmount,_that.maxPlayersPerFranchise,_that.waitingListMode);case _:
+return $default(_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.auctionDate);case _:
   return orElse();
 
 }
@@ -180,10 +182,10 @@ return $default(_that.name,_that.format,_that.basePrice,_that.purseAmount,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String format,  int basePrice,  int purseAmount,  int maxPlayersPerFranchise,  String waitingListMode)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String? auctionDate)  $default,) {final _that = this;
 switch (_that) {
 case _LeagueCreateRequest():
-return $default(_that.name,_that.format,_that.basePrice,_that.purseAmount,_that.maxPlayersPerFranchise,_that.waitingListMode);case _:
+return $default(_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.auctionDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +202,10 @@ return $default(_that.name,_that.format,_that.basePrice,_that.purseAmount,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String format,  int basePrice,  int purseAmount,  int maxPlayersPerFranchise,  String waitingListMode)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String? auctionDate)?  $default,) {final _that = this;
 switch (_that) {
 case _LeagueCreateRequest() when $default != null:
-return $default(_that.name,_that.format,_that.basePrice,_that.purseAmount,_that.maxPlayersPerFranchise,_that.waitingListMode);case _:
+return $default(_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.auctionDate);case _:
   return null;
 
 }
@@ -215,16 +217,18 @@ return $default(_that.name,_that.format,_that.basePrice,_that.purseAmount,_that.
 @JsonSerializable()
 
 class _LeagueCreateRequest extends LeagueCreateRequest {
-  const _LeagueCreateRequest({required this.name, required this.format, required this.basePrice, required this.purseAmount, required this.maxPlayersPerFranchise, required this.waitingListMode}): super._();
+  const _LeagueCreateRequest({required this.name, this.format, this.rulesUrl, this.mustSellAll = false, this.playerOrderMode = 'RANDOM', this.waitingListMode = 'ADMIN_PICKS', this.logoUrl, this.bannerUrl, this.auctionDate}): super._();
   factory _LeagueCreateRequest.fromJson(Map<String, dynamic> json) => _$LeagueCreateRequestFromJson(json);
 
 @override final  String name;
-@override final  String format;
-// T20, ODI, etc.
-@override final  int basePrice;
-@override final  int purseAmount;
-@override final  int maxPlayersPerFranchise;
-@override final  String waitingListMode;
+@override final  String? format;
+@override final  String? rulesUrl;
+@override@JsonKey() final  bool mustSellAll;
+@override@JsonKey() final  String playerOrderMode;
+@override@JsonKey() final  String waitingListMode;
+@override final  String? logoUrl;
+@override final  String? bannerUrl;
+@override final  String? auctionDate;
 
 /// Create a copy of LeagueCreateRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -239,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LeagueCreateRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.format, format) || other.format == format)&&(identical(other.basePrice, basePrice) || other.basePrice == basePrice)&&(identical(other.purseAmount, purseAmount) || other.purseAmount == purseAmount)&&(identical(other.maxPlayersPerFranchise, maxPlayersPerFranchise) || other.maxPlayersPerFranchise == maxPlayersPerFranchise)&&(identical(other.waitingListMode, waitingListMode) || other.waitingListMode == waitingListMode));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LeagueCreateRequest&&(identical(other.name, name) || other.name == name)&&(identical(other.format, format) || other.format == format)&&(identical(other.rulesUrl, rulesUrl) || other.rulesUrl == rulesUrl)&&(identical(other.mustSellAll, mustSellAll) || other.mustSellAll == mustSellAll)&&(identical(other.playerOrderMode, playerOrderMode) || other.playerOrderMode == playerOrderMode)&&(identical(other.waitingListMode, waitingListMode) || other.waitingListMode == waitingListMode)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.bannerUrl, bannerUrl) || other.bannerUrl == bannerUrl)&&(identical(other.auctionDate, auctionDate) || other.auctionDate == auctionDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,name,format,basePrice,purseAmount,maxPlayersPerFranchise,waitingListMode);
+int get hashCode => Object.hash(runtimeType,name,format,rulesUrl,mustSellAll,playerOrderMode,waitingListMode,logoUrl,bannerUrl,auctionDate);
 
 @override
 String toString() {
-  return 'LeagueCreateRequest(name: $name, format: $format, basePrice: $basePrice, purseAmount: $purseAmount, maxPlayersPerFranchise: $maxPlayersPerFranchise, waitingListMode: $waitingListMode)';
+  return 'LeagueCreateRequest(name: $name, format: $format, rulesUrl: $rulesUrl, mustSellAll: $mustSellAll, playerOrderMode: $playerOrderMode, waitingListMode: $waitingListMode, logoUrl: $logoUrl, bannerUrl: $bannerUrl, auctionDate: $auctionDate)';
 }
 
 
@@ -259,7 +263,7 @@ abstract mixin class _$LeagueCreateRequestCopyWith<$Res> implements $LeagueCreat
   factory _$LeagueCreateRequestCopyWith(_LeagueCreateRequest value, $Res Function(_LeagueCreateRequest) _then) = __$LeagueCreateRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String format, int basePrice, int purseAmount, int maxPlayersPerFranchise, String waitingListMode
+ String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String? auctionDate
 });
 
 
@@ -276,15 +280,18 @@ class __$LeagueCreateRequestCopyWithImpl<$Res>
 
 /// Create a copy of LeagueCreateRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? format = null,Object? basePrice = null,Object? purseAmount = null,Object? maxPlayersPerFranchise = null,Object? waitingListMode = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? format = freezed,Object? rulesUrl = freezed,Object? mustSellAll = null,Object? playerOrderMode = null,Object? waitingListMode = null,Object? logoUrl = freezed,Object? bannerUrl = freezed,Object? auctionDate = freezed,}) {
   return _then(_LeagueCreateRequest(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String,format: null == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
-as String,basePrice: null == basePrice ? _self.basePrice : basePrice // ignore: cast_nullable_to_non_nullable
-as int,purseAmount: null == purseAmount ? _self.purseAmount : purseAmount // ignore: cast_nullable_to_non_nullable
-as int,maxPlayersPerFranchise: null == maxPlayersPerFranchise ? _self.maxPlayersPerFranchise : maxPlayersPerFranchise // ignore: cast_nullable_to_non_nullable
-as int,waitingListMode: null == waitingListMode ? _self.waitingListMode : waitingListMode // ignore: cast_nullable_to_non_nullable
-as String,
+as String,format: freezed == format ? _self.format : format // ignore: cast_nullable_to_non_nullable
+as String?,rulesUrl: freezed == rulesUrl ? _self.rulesUrl : rulesUrl // ignore: cast_nullable_to_non_nullable
+as String?,mustSellAll: null == mustSellAll ? _self.mustSellAll : mustSellAll // ignore: cast_nullable_to_non_nullable
+as bool,playerOrderMode: null == playerOrderMode ? _self.playerOrderMode : playerOrderMode // ignore: cast_nullable_to_non_nullable
+as String,waitingListMode: null == waitingListMode ? _self.waitingListMode : waitingListMode // ignore: cast_nullable_to_non_nullable
+as String,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
+as String?,bannerUrl: freezed == bannerUrl ? _self.bannerUrl : bannerUrl // ignore: cast_nullable_to_non_nullable
+as String?,auctionDate: freezed == auctionDate ? _self.auctionDate : auctionDate // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -31,7 +31,7 @@ class FeeManagementScreen extends ConsumerWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(obligation.entityName, style: CricTextStyle.body.copyWith(color: CricColor.gold)),
+              Text(obligation.userId, style: CricTextStyle.body.copyWith(color: CricColor.gold)),
               const SizedBox(height: 16),
               TextField(
                 controller: amountController,
@@ -135,7 +135,7 @@ class FeeManagementScreen extends ConsumerWidget {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(o.entityName, style: CricTextStyle.headingMd),
+                                      Text(o.userId, style: CricTextStyle.headingMd),
                                       Text('${o.feeType} · ₹${o.paidAmount}/₹${o.totalAmount}', style: CricTextStyle.caption),
                                     ],
                                   ),
@@ -148,7 +148,7 @@ class FeeManagementScreen extends ConsumerWidget {
                                       type: o.status == 'PAID' ? CricBadgeType.green : 
                                             (o.status == 'UNPAID' ? CricBadgeType.red : CricBadgeType.gold),
                                     ),
-                                    if (o.auctionEligible)
+                                    if (false)
                                       Padding(
                                         padding: const EdgeInsets.only(top: 4),
                                         child: Text('Auction Ready ✓', style: CricTextStyle.caption.copyWith(color: CricColor.green, fontSize: 10)),

@@ -77,7 +77,7 @@ class _AuctionApi implements AuctionApi {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/players/next',
+            '/auctions/${auctionId}/player/put',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -87,16 +87,20 @@ class _AuctionApi implements AuctionApi {
   }
 
   @override
-  Future<void> putSpecificPlayer(String auctionId, String playerId) async {
+  Future<void> putSpecificPlayer(
+    String auctionId,
+    Map<String, dynamic> body,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<void>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/players/${playerId}',
+            '/auctions/${auctionId}/player/put',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -126,16 +130,17 @@ class _AuctionApi implements AuctionApi {
   }
 
   @override
-  Future<void> markSold(String auctionId) async {
+  Future<void> markSold(String auctionId, Map<String, dynamic> body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<void>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/sold',
+            '/auctions/${auctionId}/player/sold',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -145,16 +150,17 @@ class _AuctionApi implements AuctionApi {
   }
 
   @override
-  Future<void> markUnsold(String auctionId) async {
+  Future<void> markUnsold(String auctionId, Map<String, dynamic> body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<void>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/unsold',
+            '/auctions/${auctionId}/player/unsold',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -164,16 +170,17 @@ class _AuctionApi implements AuctionApi {
   }
 
   @override
-  Future<void> undoBid(String auctionId) async {
+  Future<void> undoBid(String auctionId, Map<String, dynamic> body) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<void>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/undo-bid',
+            '/auctions/${auctionId}/bid/undo',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -190,10 +197,10 @@ class _AuctionApi implements AuctionApi {
     final _data = <String, dynamic>{};
     _data.addAll(body);
     final _options = _setStreamType<void>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/undo-sold',
+            '/auctions/${auctionId}/player/undo-sold',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -213,7 +220,7 @@ class _AuctionApi implements AuctionApi {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/force-assign',
+            '/auctions/${auctionId}/player/force-assign',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -233,7 +240,7 @@ class _AuctionApi implements AuctionApi {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/pre-assign',
+            '/auctions/${auctionId}/player/pre-assign',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -263,17 +270,16 @@ class _AuctionApi implements AuctionApi {
   }
 
   @override
-  Future<void> pauseTimer(String auctionId, Map<String, dynamic> body) async {
+  Future<void> stopTimer(String auctionId) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(body);
+    const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<void>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/timer/pause',
+            '/auctions/${auctionId}/timer/stop',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -283,23 +289,27 @@ class _AuctionApi implements AuctionApi {
   }
 
   @override
-  Future<void> resetTimer(String auctionId, Map<String, dynamic> body) async {
+  Future<dynamic> getFranchiseDetailedSummary(
+    String auctionId,
+    String franchiseId,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(body);
-    final _options = _setStreamType<void>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<dynamic>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auctions/${auctionId}/timer/reset',
+            '/auctions/${auctionId}/summary/franchises/${franchiseId}',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    await _dio.fetch<void>(_options);
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

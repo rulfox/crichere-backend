@@ -9,7 +9,6 @@ import '../../financials/domain/entities/fee_entities.dart';
 import '../../financials/domain/entities/forfeit_entities.dart';
 import '../domain/entities/waitlist_entities.dart';
 import 'package:drift/drift.dart';
-import 'dart:io';
 
 class LeagueRepositoryImpl implements LeagueRepository {
   final LeagueApi _api;
@@ -73,13 +72,15 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
-  Future<void> importPlayers(String leagueId, File file) async {
-    await _api.importPlayers(leagueId, file);
+  Future<void> importPlayers(String leagueId, List<Map<String, dynamic>> players) async {
+    await _api.importPlayers(leagueId, players);
   }
 
+  // B2: No list-franchises-by-league backend endpoint exists.
+  // Return empty list; franchise data available via auction summary.
   @override
   Future<List<Franchise>> getFranchises(String leagueId) async {
-    return await _api.getLeagueFranchises(leagueId);
+    return [];
   }
 
   @override
@@ -87,10 +88,11 @@ class LeagueRepositoryImpl implements LeagueRepository {
     return await _api.getLeaguePlayers(leagueId);
   }
 
-  // Fees
+  // Fees — unwrap paginated response, extract obligation from detail wrapper
   @override
   Future<List<FeeObligation>> getFeeObligations(String leagueId) async {
-    return await _api.getFeeObligations(leagueId);
+    final paged = await _api.getFeeObligations(leagueId);
+    return paged.obligations.map((detail) => detail.obligation).toList();
   }
 
   @override
@@ -110,10 +112,11 @@ class LeagueRepositoryImpl implements LeagueRepository {
     });
   }
 
-  // Forfeits
+  // Forfeits — unwrap paginated response
   @override
   Future<List<ForfeitRequest>> getForfeitRequests(String leagueId) async {
-    return await _api.getForfeitRequests(leagueId);
+    final paged = await _api.getForfeitRequests(leagueId);
+    return paged.requests;
   }
 
   @override
@@ -133,15 +136,17 @@ class LeagueRepositoryImpl implements LeagueRepository {
     });
   }
 
-  // Waitlist
+  // Waitlist — unwrap paginated response
   @override
   Future<List<WaitlistEntry>> getWaitlist(String leagueId) async {
-    return await _api.getWaitlist(leagueId);
+    final paged = await _api.getWaitlist(leagueId);
+    return paged.entries;
   }
 
   @override
   Future<WaitlistEntry> joinWaitlist(String leagueId) async {
-    return await _api.joinWaitlist(leagueId);
+    // Backend requires type field; default to PLAYER for player self-registration
+    return await _api.joinWaitlist(leagueId, {'type': 'PLAYER'});
   }
 
   @override

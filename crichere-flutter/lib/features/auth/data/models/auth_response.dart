@@ -4,6 +4,12 @@ import '../../domain/entities/auth_enums.dart';
 part 'auth_response.freezed.dart';
 part 'auth_response.g.dart';
 
+// D1: backend /auth/me returns 'id' but OTP verify returns 'userId'.
+// This helper reads whichever field is present.
+Object? _readUserId(Map<dynamic, dynamic> json, String key) {
+  return json['userId'] ?? json['id'];
+}
+
 @freezed
 abstract class AuthResponse with _$AuthResponse {
   const AuthResponse._();
@@ -11,7 +17,7 @@ abstract class AuthResponse with _$AuthResponse {
   const factory AuthResponse({
     String? accessToken,
     String? refreshToken,
-    String? userId,
+    @JsonKey(readValue: _readUserId) String? userId,
     String? phone,
     String? name,
     ProfileStatus? profileStatus,

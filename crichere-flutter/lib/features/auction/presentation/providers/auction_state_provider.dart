@@ -38,6 +38,7 @@ class AuctionStateNotifier extends _$AuctionStateNotifier {
         return state.copyWith(
           currentBid: e.amount,
           leadingFranchise: e.franchiseName,
+          leadingFranchiseId: e.franchiseId,
           bidHistory: [e, ...state.bidHistory.take(4)],
           remainingSeconds: nextSeconds,
         );
@@ -110,8 +111,9 @@ class AuctionState {
   final String? currentPlayerId;
   final String? currentPlayerName;
   final int currentBid;
-  final int bidIncrement; // Added
+  final int bidIncrement;
   final String? leadingFranchise;
+  final String? leadingFranchiseId;
   final List<BidPlaced> bidHistory;
   final String status;
   final int remainingSeconds;
@@ -121,8 +123,9 @@ class AuctionState {
     this.currentPlayerId,
     this.currentPlayerName,
     this.currentBid = 0,
-    this.bidIncrement = 500, // Default
+    this.bidIncrement = 500,
     this.leadingFranchise,
+    this.leadingFranchiseId,
     this.bidHistory = const [],
     this.status = 'WAITING',
     this.remainingSeconds = 0,
@@ -135,6 +138,7 @@ class AuctionState {
     int? currentBid,
     int? bidIncrement,
     String? leadingFranchise,
+    String? leadingFranchiseId,
     List<BidPlaced>? bidHistory,
     String? status,
     int? remainingSeconds,
@@ -146,6 +150,7 @@ class AuctionState {
       currentBid: currentBid ?? this.currentBid,
       bidIncrement: bidIncrement ?? this.bidIncrement,
       leadingFranchise: leadingFranchise ?? this.leadingFranchise,
+      leadingFranchiseId: leadingFranchiseId ?? this.leadingFranchiseId,
       bidHistory: bidHistory ?? this.bidHistory,
       status: status ?? this.status,
       remainingSeconds: remainingSeconds ?? this.remainingSeconds,

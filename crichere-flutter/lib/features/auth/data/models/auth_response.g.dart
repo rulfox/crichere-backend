@@ -10,7 +10,7 @@ _AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) =>
     _AuthResponse(
       accessToken: json['accessToken'] as String?,
       refreshToken: json['refreshToken'] as String?,
-      userId: json['userId'] as String?,
+      userId: _readUserId(json, 'userId') as String?,
       phone: json['phone'] as String?,
       name: json['name'] as String?,
       profileStatus: $enumDecodeNullable(

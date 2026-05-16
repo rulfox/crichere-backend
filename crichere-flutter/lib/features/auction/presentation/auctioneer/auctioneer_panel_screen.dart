@@ -138,7 +138,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
               style: CricButtonStyle.primary.copyWith(backgroundColor: const WidgetStatePropertyAll(CricColor.red)),
               onPressed: () async {
                 if (reasonController.text.isNotEmpty) {
-                  await auctionRepo.undoSold(auctionId, reasonController.text);
+                  await auctionRepo.undoSold(auctionId, auctionState.currentPlayerId ?? '', reasonController.text);
                   if (context.mounted) Navigator.pop(context);
                 }
               },
@@ -153,7 +153,9 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
       bindings: {
         const SingleActivator(LogicalKeyboardKey.keyZ, control: true): () => auctionRepo.undoBid(auctionId),
         const SingleActivator(LogicalKeyboardKey.enter): () {
-          if (auctionState.status == 'BIDDING') auctionRepo.markSold(auctionId);
+          if (auctionState.status == 'BIDDING' && auctionState.currentPlayerId != null && auctionState.leadingFranchiseId != null) {
+            auctionRepo.markSold(auctionId, leaguePlayerId: auctionState.currentPlayerId!, franchiseId: auctionState.leadingFranchiseId!, finalPrice: auctionState.currentBid);
+          }
         },
       },
       child: Focus(
@@ -201,18 +203,18 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                             return ListTile(
                               contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               leading: const AvatarCircle(name: '', radius: 14),
-                              title: Text(p.playerName, style: CricTextStyle.headingMd.copyWith(fontSize: 14)),
-                              subtitle: Text('Base: ₹${p.basePriceOverride ?? "1k"}', style: CricTextStyle.caption),
+                              title: Text(p.playerName ?? p.playerId, style: CricTextStyle.headingMd.copyWith(fontSize: 14)),
+                              subtitle: Text('Base: ₹${p.basePriceOverride ?? p.basePrice ?? "1k"}', style: CricTextStyle.caption),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.assignment_ind_outlined, size: 18, color: CricColor.textDim),
-                                    onPressed: () => showPreAssignDialog(p.playerId, p.playerName),
+                                    onPressed: () => showPreAssignDialog(p.playerId, p.playerName ?? p.playerId),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.bolt, size: 18, color: CricColor.textDim),
-                                    onPressed: () => showForceAssignDialog(p.playerId, p.playerName),
+                                    onPressed: () => showForceAssignDialog(p.playerId, p.playerName ?? p.playerId),
                                   ),
                                 ],
                               ),
@@ -268,7 +270,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                                       ),
                                       onPressed: () {
                                         if (auctionState.isTimerRunning) {
-                                          auctionRepo.pauseTimer(auctionId, auctionState.remainingSeconds);
+                                          auctionRepo.pauseTimer(auctionId, auctionState.remainingSeconds); // maps to timer/stop
                                         } else {
                                           auctionRepo.startTimer(auctionId, auctionState.remainingSeconds == 0 ? 60 : auctionState.remainingSeconds);
                                         }
@@ -276,7 +278,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.refresh, color: CricColor.textDim),
-                                      onPressed: () => auctionRepo.resetTimer(auctionId, 60),
+                                      onPressed: () => auctionRepo.resetTimer(auctionId, 60), // maps to timer/start with new duration
                                     ),
                                   ],
                                 ),
@@ -341,7 +343,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                               label: 'UNDO BID',
                               icon: Icons.undo,
                               color: CricColor.red,
-                              onPressed: () => auctionRepo.undoBid(auctionId),
+                              onPressed: () => auctionRepo.undoBid(auctionId, reason: ''),
                               isOutlined: true,
                             ),
                             const SizedBox(width: CricSpacing.lg),
@@ -349,14 +351,16 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                               label: 'UNSOLD',
                               icon: Icons.close,
                               color: CricColor.gold,
-                              onPressed: () => auctionRepo.markUnsold(auctionId),
+                              onPressed: () => auctionRepo.markUnsold(auctionId, leaguePlayerId: auctionState.currentPlayerId ?? ''),
                             ),
                             const SizedBox(width: CricSpacing.lg),
                             _AuctionButton(
                               label: 'SOLD',
                               icon: Icons.check,
                               color: CricColor.green,
-                              onPressed: () => auctionRepo.markSold(auctionId),
+                              onPressed: () => (auctionState.currentPlayerId != null && auctionState.leadingFranchiseId != null)
+                              ? auctionRepo.markSold(auctionId, leaguePlayerId: auctionState.currentPlayerId!, franchiseId: auctionState.leadingFranchiseId!, finalPrice: auctionState.currentBid)
+                              : null,
                             ),
                           ],
                         ),

@@ -31,7 +31,7 @@ class ForfeitManagementScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(request.entityName, style: CricTextStyle.body.copyWith(color: CricColor.gold)),
+              Text(request.userId, style: CricTextStyle.body.copyWith(color: CricColor.gold)),
               const SizedBox(height: 8),
               Text('Reason: ${request.reason}', style: CricTextStyle.caption),
               const SizedBox(height: 16),
@@ -121,7 +121,7 @@ class ForfeitManagementScreen extends ConsumerWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(r.entityName, style: CricTextStyle.headingMd),
+                                    Text(r.userId, style: CricTextStyle.headingMd),
                                     Text('Reason: ${r.reason}', style: CricTextStyle.caption),
                                   ],
                                 ),
