@@ -14,17 +14,17 @@ import '../../../league/presentation/providers/league_repository_provider.dart';
 @RoutePage()
 class AuctioneerPanelScreen extends HookConsumerWidget {
   final String auctionId;
+  final String leagueId;
 
-  const AuctioneerPanelScreen({super.key, required this.auctionId});
+  const AuctioneerPanelScreen({super.key, required this.auctionId, required this.leagueId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auctionState = ref.watch(auctionStateProvider);
     final auctionRepo = ref.watch(auctionRepositoryProvider);
-    final playersAsync = ref.watch(leaguePlayersProvider(auctionId));
-    final franchisesAsync = ref.watch(leagueFranchisesProvider(auctionId));
-    
-    // Listen to events and update local state
+    final playersAsync = ref.watch(leaguePlayersProvider(leagueId));
+    final franchisesAsync = ref.watch(leagueFranchisesProvider(leagueId));
+
     ref.listen(auctionEventsProvider(auctionId), (previous, next) {
       next.whenData((event) {
         ref.read(auctionStateProvider.notifier).handleEvent(event);
@@ -35,8 +35,10 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
     });
 
     final selectedFranchiseId = useState<String?>(null);
+    final preAssignType = useState<String>('CAPTAIN');
 
     void showForceAssignDialog(String playerId, String playerName) {
+      selectedFranchiseId.value = null;
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -59,6 +61,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
               onPressed: () async {
                 if (selectedFranchiseId.value != null) {
                   await auctionRepo.forceAssign(auctionId, playerId, selectedFranchiseId.value!, 0);
+                  selectedFranchiseId.value = null;
                   if (context.mounted) Navigator.pop(context);
                 }
               },
@@ -70,7 +73,8 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
     }
 
     void showPreAssignDialog(String playerId, String playerName) {
-      final type = useState('CAPTAIN');
+      selectedFranchiseId.value = null;
+      preAssignType.value = 'CAPTAIN';
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -81,13 +85,13 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
             children: [
               DropdownButtonFormField<String>(
                 dropdownColor: CricColor.slate2,
-                initialValue: type.value,
+                initialValue: preAssignType.value,
                 decoration: CricDecoration.textField(hint: 'Assignment Type'),
                 items: const [
                   DropdownMenuItem(value: 'CAPTAIN', child: Text('CAPTAIN (Deduct Purse)')),
                   DropdownMenuItem(value: 'ICON', child: Text('ICON (Free)')),
                 ],
-                onChanged: (val) => type.value = val!,
+                onChanged: (val) => preAssignType.value = val!,
               ),
               const SizedBox(height: 16),
               franchisesAsync.when(
@@ -108,7 +112,8 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
               style: CricButtonStyle.primary,
               onPressed: () async {
                 if (selectedFranchiseId.value != null) {
-                  await auctionRepo.preAssign(auctionId, playerId, selectedFranchiseId.value!, type.value, 0);
+                  await auctionRepo.preAssign(auctionId, playerId, selectedFranchiseId.value!, preAssignType.value, 0);
+                  selectedFranchiseId.value = null;
                   if (context.mounted) Navigator.pop(context);
                 }
               },

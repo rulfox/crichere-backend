@@ -386,7 +386,15 @@ class _AdminOverview extends StatelessWidget {
                     Row(
                       children: [
                         _AdminAction(icon: Icons.settings_outlined, label: 'MANAGE', onTap: () => context.router.push(LeagueDetailRoute(leagueId: league.id))),
-                        _AdminAction(icon: Icons.gavel_outlined, label: 'AUCTION', onTap: () => context.router.push(AuctioneerPanelRoute(auctionId: league.id))),
+                        _AdminAction(icon: Icons.gavel_outlined, label: 'AUCTION', onTap: () {
+                          if (league.auctionId != null) {
+                            context.router.push(AuctioneerPanelRoute(auctionId: league.auctionId!, leagueId: league.id));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Auction not initialized yet.')),
+                            );
+                          }
+                        }),
                         _AdminAction(icon: Icons.edit_outlined, label: 'EDIT', onTap: () => context.router.push(LeagueDetailRoute(leagueId: league.id))),
                       ],
                     ),

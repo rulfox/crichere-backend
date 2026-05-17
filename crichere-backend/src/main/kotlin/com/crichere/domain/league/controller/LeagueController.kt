@@ -4,6 +4,7 @@ import com.crichere.common.response.ApiResponse
 import com.crichere.common.response.ResponseHelper
 import com.crichere.domain.league.dto.*
 import com.crichere.domain.league.entity.League
+import com.crichere.domain.league.repository.AuctionRepository
 import com.crichere.domain.league.service.BulkImportService
 import com.crichere.domain.league.service.LeagueService
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -19,7 +20,8 @@ import java.util.*
 @Tag(name = "League Management")
 class LeagueController(
     private val leagueService: LeagueService,
-    private val bulkImportService: BulkImportService
+    private val bulkImportService: BulkImportService,
+    private val auctionRepository: AuctionRepository
 ) {
 
     @PostMapping
@@ -205,6 +207,7 @@ class LeagueController(
         bannerUrl = league.bannerUrl,
         status = league.status,
         auctionDate = league.auctionDate,
-        createdBy = league.createdBy
+        createdBy = league.createdBy,
+        auctionId = auctionRepository.findByLeagueId(league.id)?.id
     )
 }

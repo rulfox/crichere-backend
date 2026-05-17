@@ -21,7 +21,10 @@ class LeagueDetailScreen extends ConsumerWidget {
 
     return leaguesAsync.when(
       data: (leagues) {
-        final league = leagues.firstWhere((e) => e.id == leagueId);
+        final league = leagues.firstWhere(
+          (e) => e.id == leagueId,
+          orElse: () => throw StateError('League $leagueId not found'),
+        );
         return DefaultTabController(
           length: 5,
           child: Scaffold(
@@ -176,7 +179,15 @@ class _OverviewTab extends ConsumerWidget {
               ),
             ),
           ElevatedButton(
-            onPressed: () => context.router.push(LiveAuctionViewerRoute(auctionId: league.id)),
+            onPressed: () {
+              if (league.auctionId != null) {
+                context.router.push(LiveAuctionViewerRoute(auctionId: league.auctionId!));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Auction not initialized yet.')),
+                );
+              }
+            },
             style: CricButtonStyle.primary.copyWith(
               minimumSize: const WidgetStatePropertyAll(Size(double.infinity, 50)),
             ),
@@ -211,7 +222,15 @@ class _OverviewTab extends ConsumerWidget {
             children: [
               Expanded(
                 child: CricCard(
-                  onTap: () => context.router.push(AuctioneerPanelRoute(auctionId: league.id)),
+                  onTap: () {
+                    if (league.auctionId != null) {
+                      context.router.push(AuctioneerPanelRoute(auctionId: league.auctionId!, leagueId: league.id));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Auction not initialized yet.')),
+                      );
+                    }
+                  },
                   child: Column(
                     children: [
                       const Icon(Icons.gavel, color: CricColor.gold),

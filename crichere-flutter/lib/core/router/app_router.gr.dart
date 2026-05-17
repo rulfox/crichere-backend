@@ -57,10 +57,15 @@ class AuctioneerPanelRoute
   AuctioneerPanelRoute({
     _i21.Key? key,
     required String auctionId,
+    required String leagueId,
     List<_i20.PageRouteInfo>? children,
   }) : super(
          AuctioneerPanelRoute.name,
-         args: AuctioneerPanelRouteArgs(key: key, auctionId: auctionId),
+         args: AuctioneerPanelRouteArgs(
+           key: key,
+           auctionId: auctionId,
+           leagueId: leagueId,
+         ),
          initialChildren: children,
        );
 
@@ -73,32 +78,41 @@ class AuctioneerPanelRoute
       return _i1.AuctioneerPanelScreen(
         key: args.key,
         auctionId: args.auctionId,
+        leagueId: args.leagueId,
       );
     },
   );
 }
 
 class AuctioneerPanelRouteArgs {
-  const AuctioneerPanelRouteArgs({this.key, required this.auctionId});
+  const AuctioneerPanelRouteArgs({
+    this.key,
+    required this.auctionId,
+    required this.leagueId,
+  });
 
   final _i21.Key? key;
 
   final String auctionId;
 
+  final String leagueId;
+
   @override
   String toString() {
-    return 'AuctioneerPanelRouteArgs{key: $key, auctionId: $auctionId}';
+    return 'AuctioneerPanelRouteArgs{key: $key, auctionId: $auctionId, leagueId: $leagueId}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! AuctioneerPanelRouteArgs) return false;
-    return key == other.key && auctionId == other.auctionId;
+    return key == other.key &&
+        auctionId == other.auctionId &&
+        leagueId == other.leagueId;
   }
 
   @override
-  int get hashCode => key.hashCode ^ auctionId.hashCode;
+  int get hashCode => key.hashCode ^ auctionId.hashCode ^ leagueId.hashCode;
 }
 
 /// generated route for

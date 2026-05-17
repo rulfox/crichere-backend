@@ -38,7 +38,8 @@ data class LeagueResponse(
     val bannerUrl: String?,
     val status: LeagueStatus,
     val auctionDate: java.time.Instant?,
-    val createdBy: UUID
+    val createdBy: UUID,
+    val auctionId: UUID?
 )
 
 data class LeagueStatusUpdateRequest(

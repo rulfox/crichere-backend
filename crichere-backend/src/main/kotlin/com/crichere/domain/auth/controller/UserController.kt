@@ -57,7 +57,8 @@ class UserController(private val userService: UserService) {
                 bannerUrl = league.bannerUrl,
                 status = league.status,
                 auctionDate = league.auctionDate,
-                createdBy = league.createdBy
+                createdBy = league.createdBy,
+                auctionId = null
             )
         })
     }

@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/core/router/app_router.gr.dart';
@@ -9,18 +10,18 @@ import '../providers/auction_state_provider.dart';
 import '../../domain/entities/auction_event.dart';
 
 @RoutePage()
-class LiveAuctionViewerScreen extends ConsumerWidget {
+class LiveAuctionViewerScreen extends HookConsumerWidget {
   final String auctionId;
 
   const LiveAuctionViewerScreen({super.key, required this.auctionId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final eventsAsync = ref.watch(auctionEventsProvider(auctionId));
     final auctionState = ref.watch(auctionStateProvider);
+    final connectionState = useState<AsyncValue<AuctionEvent>>(const AsyncValue.loading());
 
-    // Listen to events and update local state
     ref.listen(auctionEventsProvider(auctionId), (previous, next) {
+      connectionState.value = next;
       next.whenData((event) {
         ref.read(auctionStateProvider.notifier).handleEvent(event);
         if (event is AuctionCompleted) {
@@ -28,6 +29,8 @@ class LiveAuctionViewerScreen extends ConsumerWidget {
         }
       });
     });
+
+    final eventsAsync = connectionState.value;
 
     return Scaffold(
       backgroundColor: CricColor.appBg,
@@ -52,8 +55,6 @@ class LiveAuctionViewerScreen extends ConsumerWidget {
               return _MobileAuctionLayout(auctionState: auctionState);
             },
           ),
-          
-          // Reconnection Overlay
           if (eventsAsync.isLoading || eventsAsync.hasError)
             _ReconnectionOverlay(
               isError: eventsAsync.hasError,

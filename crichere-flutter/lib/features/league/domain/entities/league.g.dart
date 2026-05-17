@@ -21,6 +21,7 @@ _League _$LeagueFromJson(Map<String, dynamic> json) => _League(
       ? null
       : DateTime.parse(json['auctionDate'] as String),
   createdBy: json['createdBy'] as String,
+  auctionId: json['auctionId'] as String?,
 );
 
 Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
@@ -36,4 +37,5 @@ Map<String, dynamic> _$LeagueToJson(_League instance) => <String, dynamic>{
   'status': instance.status,
   'auctionDate': instance.auctionDate?.toIso8601String(),
   'createdBy': instance.createdBy,
+  'auctionId': instance.auctionId,
 };

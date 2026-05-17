@@ -20,6 +20,7 @@ abstract class League with _$League {
     required String status,
     DateTime? auctionDate,
     required String createdBy,
+    String? auctionId,
   }) = _League;
 
   factory League.fromJson(Map<String, dynamic> json) => _$LeagueFromJson(json);

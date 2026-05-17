@@ -14,17 +14,13 @@ part 'auction_provider.g.dart';
 
 @riverpod
 Stream<AuctionEvent> auctionEvents(Ref ref, String auctionId) async* {
-  final api = ref.watch(auctionApiProvider);
-  final dio = ref.watch(dioClientProvider).dio;
+  final dio = ref.read(dioClientProvider).dio;
   int backoffSeconds = 2;
   const int maxBackoff = 30;
 
   while (true) {
     try {
-      // 1. Mandated Sync: Fetch current state first
-      await api.getAuctionState(auctionId);
-
-      // 2. Open SSE stream via dio (replaces eventsource package)
+      // Open SSE stream via dio
       final url = '${ApiEndpoints.baseUrl}/auctions/$auctionId/events';
       final response = await dio.get<ResponseBody>(
         url,
