@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:crichere_flutter/core/database/app_database.dart';
@@ -13,7 +14,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class NotificationService {
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  // Lazily resolved — avoids crashing when Firebase is not yet initialised
+  // (e.g. on web before firebase_options.dart is wired up).
+  FirebaseMessaging? _fcm;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   final AppDatabase _db;
   final Dio _dio;
@@ -21,8 +24,17 @@ class NotificationService {
   NotificationService(this._db, this._dio);
 
   Future<void> initialize() async {
+    // Guard: skip Firebase entirely if it hasn't been initialised.
+    // Firebase.apps is empty until Firebase.initializeApp() is called.
+    if (Firebase.apps.isEmpty) {
+      debugPrint('[NotificationService] Firebase not initialised — skipping push notifications.');
+      return;
+    }
+
+    _fcm = FirebaseMessaging.instance;
+
     // Request permission
-    NotificationSettings settings = await _fcm.requestPermission(
+    NotificationSettings settings = await _fcm!.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -32,13 +44,13 @@ class NotificationService {
       debugPrint('User granted permission');
 
       // Get token
-      String? token = await _fcm.getToken();
+      String? token = await _fcm!.getToken();
       if (token != null) {
         await _registerDeviceToken(token);
       }
 
       // Handle token refresh
-      _fcm.onTokenRefresh.listen(_registerDeviceToken);
+      _fcm!.onTokenRefresh.listen(_registerDeviceToken);
 
       if (!kIsWeb) {
         // Initialize local notifications for foreground (native only)

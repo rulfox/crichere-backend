@@ -92,9 +92,15 @@ class _WebDashboardLayout extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-          Padding(
-              padding: EdgeInsets.all(24),
-                child: Text('🏏 CRICHERE', style: CricTextStyle.logo),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    const Icon(Icons.sports_cricket, color: CricColor.gold, size: 22),
+                    const SizedBox(width: 8),
+                    Text('CRICHERE', style: CricTextStyle.logo),
+                  ],
+                ),
               ),
               const _SidebarSection(title: 'MAIN'),
               _SidebarItem(icon: Icons.home_outlined, label: 'Dashboard', isSelected: selectedIndex == 0, onTap: () => onIndexChanged(0)),
@@ -108,6 +114,10 @@ class _WebDashboardLayout extends HookConsumerWidget {
                   final leagues = leaguesAsync.asData?.value;
                   if (leagues != null && leagues.isNotEmpty) {
                     context.router.push(FeeManagementRoute(leagueId: leagues.first.id));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Leagues still loading. Please try again.')),
+                    );
                   }
                 },
               ),
@@ -358,6 +368,10 @@ class _AdminOverview extends StatelessWidget {
                   final leagues = leaguesAsync.asData?.value;
                   if (leagues != null && leagues.isNotEmpty) {
                     context.router.push(FeeManagementRoute(leagueId: leagues.first.id));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Leagues still loading. Please try again.')),
+                    );
                   }
                 },
                 child: Text('VIEW →', style: CricTextStyle.badge.copyWith(color: CricColor.red)),

@@ -9,8 +9,13 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.listener.PatternTopic
 import org.springframework.data.redis.listener.RedisMessageListenerContainer
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import java.util.*
 
+// Restrict Spring Data Redis repository scanning to a dedicated (currently empty) sub-package.
+// Without this, Redis auto-config scans all packages and emits a "Could not safely identify
+// store assignment for OtpRepository" warning because OtpRepository (a JPA repo) is picked up.
+@EnableRedisRepositories(basePackages = ["com.crichere.infrastructure.redis"])
 @Configuration
 class RedisConfig {
 

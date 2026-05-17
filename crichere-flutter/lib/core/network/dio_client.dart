@@ -25,8 +25,11 @@ class DioClient {
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        if (response.data is Map<String, dynamic>) {
-          final map = response.data as Map<String, dynamic>;
+        // Use `is Map` (not `is Map<String, dynamic>`) because in Flutter Web
+        // (dart2js), XHR JSON responses are JavaScript objects that satisfy
+        // `Map` but NOT the generic `Map<String, dynamic>` type check.
+        if (response.data is Map) {
+          final map = response.data as Map;
           if (map.containsKey('data')) {
             response.data = map['data'];
           }

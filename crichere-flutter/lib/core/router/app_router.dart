@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter/foundation.dart';
 import 'auth_guard.dart';
 import 'app_router.gr.dart';
 
@@ -8,26 +9,48 @@ class AppRouter extends RootStackRouter {
 
   AppRouter(this.authGuard);
 
+  // On web, route transitions cause a brief frame where both the old and new
+  // route are painted side-by-side (since there is no GPU animation layer).
+  // Use zero-duration / no-transition for web to avoid this visual glitch.
+  AutoRoute _route({
+    required PageInfo page,
+    String? path,
+    List<AutoRouteGuard> guards = const [],
+    bool initial = false,
+  }) {
+    if (kIsWeb) {
+      return CustomRoute(
+        page: page,
+        path: path,
+        guards: guards,
+        initial: initial,
+        transitionsBuilder: TransitionsBuilders.noTransition,
+        durationInMilliseconds: 0,
+      );
+    }
+    return AutoRoute(page: page, path: path, guards: guards, initial: initial);
+  }
+
   @override
   List<AutoRoute> get routes => [
-    AutoRoute(page: SplashRoute.page, initial: true), // no guard — reads token and routes
-    AutoRoute(page: PhoneEntryRoute.page, guards: [authGuard]),
-    AutoRoute(page: OtpRoute.page, guards: [authGuard]),
-    AutoRoute(page: ClaimProfileRoute.page, guards: [authGuard]),
-    AutoRoute(page: ProfileSetupRoute.page, guards: [authGuard]),
-    AutoRoute(page: ProfileEditRoute.page, guards: [authGuard]),
-    AutoRoute(page: HomeRoute.page, guards: [authGuard]),
-    AutoRoute(page: LeagueDetailRoute.page, guards: [authGuard]),
-    AutoRoute(page: LiveAuctionViewerRoute.page, guards: [authGuard]),
-    AutoRoute(page: AuctioneerPanelRoute.page, guards: [authGuard]),
-    AutoRoute(page: FeeManagementRoute.page, guards: [authGuard]),
-    AutoRoute(page: ForfeitManagementRoute.page, guards: [authGuard]),
-    AutoRoute(page: FranchiseSquadRoute.page, guards: [authGuard]),
-    AutoRoute(page: NotificationRoute.page, guards: [authGuard]),
-    AutoRoute(page: LeagueCreateRoute.page, guards: [authGuard]),
-    AutoRoute(page: PostAuctionRoute.page, guards: [authGuard]),
-    AutoRoute(page: FranchiseInviteRoute.page, path: '/invite/:token', guards: [authGuard]),
-    AutoRoute(page: PlatformAdminRoute.page, path: '/admin', guards: [authGuard]),
-    AutoRoute(page: PreAssignmentRoute.page, path: '/leagues/:leagueId/pre-assignment', guards: [authGuard]),
+    _route(page: SplashRoute.page, initial: true),
+    _route(page: PhoneEntryRoute.page, guards: [authGuard]),
+    _route(page: OtpRoute.page, guards: [authGuard]),
+    _route(page: ClaimProfileRoute.page, guards: [authGuard]),
+    _route(page: ProfileSetupRoute.page, guards: [authGuard]),
+    _route(page: ProfileEditRoute.page, guards: [authGuard]),
+    _route(page: HomeRoute.page, guards: [authGuard]),
+    _route(page: LeagueDetailRoute.page, guards: [authGuard]),
+    _route(page: LiveAuctionViewerRoute.page, guards: [authGuard]),
+    _route(page: AuctioneerPanelRoute.page, guards: [authGuard]),
+    _route(page: FeeManagementRoute.page, guards: [authGuard]),
+    _route(page: ForfeitManagementRoute.page, guards: [authGuard]),
+    _route(page: FranchiseSquadRoute.page, guards: [authGuard]),
+    _route(page: NotificationRoute.page, guards: [authGuard]),
+    _route(page: LeagueCreateRoute.page, guards: [authGuard]),
+    _route(page: PostAuctionRoute.page, guards: [authGuard]),
+    _route(page: FranchiseInviteRoute.page, path: '/invite/:token', guards: [authGuard]),
+    _route(page: PlatformAdminRoute.page, path: '/admin', guards: [authGuard]),
+    _route(page: PreAssignmentRoute.page, path: '/leagues/:leagueId/pre-assignment', guards: [authGuard]),
   ];
 }

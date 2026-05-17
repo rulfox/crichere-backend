@@ -13,8 +13,11 @@ spring:
       maximum-pool-size: 20
   data:
     redis:
-      host: ${REDISHOST:localhost}
-      port: ${REDISPORT:6379}
+      # Railway exposes REDIS_URL (preferred) as well as REDISHOST / REDISPORT / REDISPASSWORD.
+      # Use the full URL so authentication and any port overrides are handled automatically.
+      url: ${REDIS_URL:redis://${REDISHOST:localhost}:${REDISPORT:6379}}
+      # Explicit password fallback in case REDIS_URL is not set by the addon.
+      password: ${REDISPASSWORD:}
 
 springdoc:
   swagger-ui:
