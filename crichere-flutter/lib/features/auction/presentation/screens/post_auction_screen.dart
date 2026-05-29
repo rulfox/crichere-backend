@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +6,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
+import 'package:crichere_flutter/core/export/file_share.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../providers/auction_provider.dart';
 import '../../domain/entities/auction_summary.dart';
@@ -253,12 +253,30 @@ class _ExportsTab extends ConsumerWidget {
           ],
         ),
       );
-      final bytes = Uint8List.fromList(await doc.save());
-      final file = XFile.fromData(bytes, name: 'auction_report.pdf', mimeType: 'application/pdf');
-      await SharePlus.instance.share(ShareParams(files: [file]));
+      final bytes = await doc.save();
+      await FileShare.shareBytes(bytes, fileName: 'auction_report.pdf', mimeType: 'application/pdf');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('PDF error: $e')));
+      }
+    }
+  }
+
+  /// Fetches the canonical server-rendered summary PDF and shares it.
+  Future<void> _downloadServerPdf(BuildContext context, WidgetRef ref) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Preparing official report…')),
+    );
+    try {
+      final bytes = await ref.read(auctionRepositoryProvider).exportSummaryPdf(summary.auctionId);
+      await FileShare.shareBytes(
+        bytes,
+        fileName: 'auction_${summary.auctionId}_summary.pdf',
+        mimeType: 'application/pdf',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Export failed: $e')));
       }
     }
   }
@@ -313,11 +331,21 @@ class _ExportsTab extends ConsumerWidget {
         const SectionHeader(title: 'REPORTS & EXPORTS'),
         const SizedBox(height: 12),
         CricCard(
+          onTap: () => _downloadServerPdf(context, ref),
+          child: const ListTile(
+            leading: Icon(Icons.workspace_premium_outlined, color: CricColor.gold),
+            title: Text('Official Auction Report', style: TextStyle(color: Colors.white)),
+            subtitle: Text('PDF • Server-generated, full detail', style: TextStyle(color: CricColor.textFaint, fontSize: 12)),
+            trailing: Icon(Icons.download, color: CricColor.textDim),
+          ),
+        ),
+        const SizedBox(height: 12),
+        CricCard(
           onTap: () => _downloadPdf(context),
           child: const ListTile(
             leading: Icon(Icons.picture_as_pdf, color: CricColor.red),
-            title: Text('Full Auction Report', style: TextStyle(color: Colors.white)),
-            subtitle: Text('PDF • Summary & All Squads', style: TextStyle(color: CricColor.textFaint, fontSize: 12)),
+            title: Text('Quick Summary Report', style: TextStyle(color: Colors.white)),
+            subtitle: Text('PDF • Generated on device', style: TextStyle(color: CricColor.textFaint, fontSize: 12)),
             trailing: Icon(Icons.download, color: CricColor.textDim),
           ),
         ),
