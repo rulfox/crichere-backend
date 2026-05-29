@@ -25,7 +25,7 @@ class AppRouter extends RootStackRouter {
         guards: guards,
         initial: initial,
         transitionsBuilder: TransitionsBuilders.noTransition,
-        durationInMilliseconds: 0,
+        duration: Duration.zero,
       );
     }
     return AutoRoute(page: page, path: path, guards: guards, initial: initial);

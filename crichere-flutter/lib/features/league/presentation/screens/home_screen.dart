@@ -300,7 +300,7 @@ class _PlayerOverview extends StatelessWidget {
             );
           },
           loading: () => ShimmerLoading.rectangular(height: 80),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         ),
         const SizedBox(height: CricSpacing.lg),
         const SectionHeader(title: 'MY LEAGUES', actionLabel: 'See all'),

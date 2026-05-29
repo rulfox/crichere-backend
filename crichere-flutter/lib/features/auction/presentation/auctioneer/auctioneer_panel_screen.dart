@@ -336,7 +336,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                             )).toList(),
                           ),
                           loading: () => const CircularProgressIndicator(),
-                          error: (_, ___) => const SizedBox(),
+                          error: (_, _) => const SizedBox(),
                         ),
                         
                         const SizedBox(height: 24),
