@@ -144,12 +144,39 @@ class _SummaryTab extends StatelessWidget {
   }
 }
 
-class _SquadsTab extends StatelessWidget {
+class _SquadsTab extends ConsumerWidget {
   final AuctionSummary summary;
   const _SquadsTab({required this.summary});
 
+  Future<void> _exportFranchise(
+    BuildContext context,
+    WidgetRef ref,
+    String franchiseId,
+    String franchiseName,
+    bool asImage,
+  ) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Preparing ${asImage ? 'image' : 'PDF'} for $franchiseName…')),
+    );
+    try {
+      final repo = ref.read(auctionRepositoryProvider);
+      final bytes = asImage
+          ? await repo.exportFranchiseImage(summary.auctionId, franchiseId)
+          : await repo.exportFranchisePdf(summary.auctionId, franchiseId);
+      await FileShare.shareBytes(
+        bytes,
+        fileName: asImage ? '${franchiseName}_squad.png' : '${franchiseName}_squad.pdf',
+        mimeType: asImage ? 'image/png' : 'application/pdf',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Export failed: $e')));
+      }
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
       padding: const EdgeInsets.all(CricSpacing.page),
       itemCount: summary.franchiseSummaries.length,
@@ -158,17 +185,25 @@ class _SquadsTab extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: CricSpacing.md),
           child: CricCard(
-            onTap: () {
-              // Navigate to squad detail if needed
-            },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(res.franchiseName, style: CricTextStyle.headingMd),
+                    Expanded(child: Text(res.franchiseName, style: CricTextStyle.headingMd)),
                     CricBadge(label: '${res.squadCount} Players', type: CricBadgeType.gold),
+                    PopupMenuButton<String>(
+                      color: CricColor.slate2,
+                      icon: const Icon(Icons.ios_share, size: 18, color: CricColor.textDim),
+                      onSelected: (v) => _exportFranchise(
+                        context, ref, res.franchiseId, res.franchiseName, v == 'image',
+                      ),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(value: 'pdf', child: Text('Export PDF', style: CricTextStyle.body)),
+                        PopupMenuItem(value: 'image', child: Text('Export image', style: CricTextStyle.body)),
+                      ],
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
