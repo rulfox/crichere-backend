@@ -55,5 +55,6 @@ class AppRouter extends RootStackRouter {
     _route(page: PlatformAdminRoute.page, path: '/admin', guards: [authGuard]),
     _route(page: AdminUsersRoute.page, path: '/admin/users', guards: [authGuard]),
     _route(page: PreAssignmentRoute.page, path: '/leagues/:leagueId/pre-assignment', guards: [authGuard]),
+    _route(page: PricingRoute.page, path: '/leagues/:leagueId/pricing', guards: [authGuard]),
   ];
 }

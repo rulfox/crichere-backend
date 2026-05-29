@@ -282,6 +282,19 @@ class _OverviewTab extends ConsumerWidget {
               const SizedBox(width: CricSpacing.md),
               Expanded(
                 child: CricCard(
+                  onTap: () => context.router.push(PricingRoute(leagueId: league.id)),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.sell_outlined, color: CricColor.blue),
+                      const SizedBox(height: CricSpacing.sm),
+                      Text('PRICING', style: CricTextStyle.badge),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: CricSpacing.md),
+              Expanded(
+                child: CricCard(
                   onTap: () {
                     DefaultTabController.of(context).animateTo(3);
                   },
