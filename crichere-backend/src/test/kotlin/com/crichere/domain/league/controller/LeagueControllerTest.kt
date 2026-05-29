@@ -51,6 +51,8 @@ class LeagueControllerTest {
     private lateinit var smsProvider: com.crichere.common.provider.SmsProvider
     @MockBean
     private lateinit var stringRedisTemplate: org.springframework.data.redis.core.StringRedisTemplate
+    @MockBean
+    private lateinit var auctionRepository: com.crichere.domain.league.repository.AuctionRepository
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper

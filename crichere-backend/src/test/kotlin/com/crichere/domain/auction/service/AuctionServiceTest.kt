@@ -56,8 +56,10 @@ class AuctionServiceTest {
     @MockK lateinit var categoryIncrementRepository: AuctionRoundCategoryIncrementRepository
     @MockK lateinit var meterRegistry: io.micrometer.core.instrument.MeterRegistry
     @MockK lateinit var poolPlayerRepository: AuctionRoundPoolPlayerRepository
+    @MockK lateinit var entityManager: jakarta.persistence.EntityManager
 
     lateinit var auctionService: AuctionService
+    private var seqCounter: Long = 0L
 
     private val auctionId = UUID.randomUUID()
     private val roundId = UUID.randomUUID()
@@ -82,12 +84,20 @@ class AuctionServiceTest {
         every { slabRepository.findByRoundIdOrderByFromAmountAsc(any()) } returns emptyList()
         every { franchiseRepository.save(any()) } answers { firstArg() }
 
+        // Stub the atomic sequence-bump native query — returns a monotonically
+        // increasing value across calls so audit-log save() sees unique sequence numbers.
+        seqCounter = 0L
+        val nativeQuery = mockk<jakarta.persistence.Query>(relaxed = true)
+        every { entityManager.createNativeQuery(any<String>()) } returns nativeQuery
+        every { nativeQuery.setParameter(any<String>(), any()) } returns nativeQuery
+        every { nativeQuery.singleResult } answers { ++seqCounter }
+
         auctionService = AuctionService(
             auctionRepository, roundConfigRepository, slabRepository, categoryIncrementRepository,
             bidRepository, playerStateRepository, purseRepository, franchiseRepository,
             franchisePlayerRepository, auctionAuditLogRepository, leaguePlayerRepository,
             userRepository, leagueRepository, poolPlayerRepository, redisTemplate, objectMapper,
-            notificationService, leagueService, meterRegistry
+            notificationService, leagueService, meterRegistry, entityManager
         )
     }
     @DisplayName("placeBid - happy path")
@@ -198,6 +208,7 @@ class AuctionServiceTest {
         val leaguePlayer = LeaguePlayer(id = playerId, leagueId = UUID.randomUUID(), userId = UUID.randomUUID())
         val franchise = Franchise(id = franchiseId, name = "Team A", ownerId = UUID.randomUUID(), leagueId = UUID.randomUUID())
 
+        val playerUser = User(id = leaguePlayer.userId, phone = "+10000000000", name = "Bowler X")
         every { auctionRepository.findByIdWithLock(auctionId) } returns Optional.of(auction)
         every { playerStateRepository.findByAuctionIdAndLeaguePlayerId(auctionId, playerId) } returns Optional.of(playerState)
         every { purseRepository.findByFranchiseIdAndRoundId(franchiseId, roundId) } returns purse
@@ -207,7 +218,9 @@ class AuctionServiceTest {
         every { auctionRepository.save(any()) } answers { firstArg() }
         every { leaguePlayerRepository.findById(playerId) } returns Optional.of(leaguePlayer)
         every { franchiseRepository.findById(franchiseId) } returns Optional.of(franchise)
+        every { userRepository.findById(leaguePlayer.userId) } returns Optional.of(playerUser)
         every { notificationService.notifyPlayerSold(any(), any(), any()) } just runs
+        every { notificationService.notifyPlayerAcquired(any(), any(), any(), any()) } just runs
 
         val result = auctionService.sellPlayer(auctionId, playerId, franchiseId, finalPrice, actorId)
 
@@ -218,7 +231,8 @@ class AuctionServiceTest {
         assertNull(auction.currentLeaguePlayerId)
         verify { franchisePlayerRepository.save(any()) }
         verify { auctionAuditLogRepository.save(match { it.action == AuctionAction.PLAYER_SOLD }) }
-        verify(exactly = 2) { notificationService.notifyPlayerSold(any(), any(), any()) }
+        verify(exactly = 1) { notificationService.notifyPlayerSold(any(), any(), any()) }
+        verify(exactly = 1) { notificationService.notifyPlayerAcquired(any(), any(), any(), any()) }
     }
 
     @Test

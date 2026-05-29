@@ -119,6 +119,24 @@ class LeagueController(
         return ResponseHelper.success(data = prices.map { TagPriceResponse(it.id, it.tag, it.price) })
     }
 
+    @GetMapping("/{id}/auctions")
+    fun getAuctions(@PathVariable id: UUID): ApiResponse<List<Map<String, Any?>>> {
+        val auctions = auctionRepository.findAllByLeagueId(id)
+        return ResponseHelper.success(data = auctions.map { a ->
+            mapOf(
+                "id" to a.id,
+                "leagueId" to a.leagueId,
+                "auctioneerId" to a.auctioneerId,
+                "status" to a.status,
+                "currentRoundId" to a.currentRoundId,
+                "currentLeaguePlayerId" to a.currentLeaguePlayerId,
+                "startedAt" to a.startedAt,
+                "completedAt" to a.completedAt,
+                "publicViewToken" to a.publicViewToken
+            )
+        })
+    }
+
     @GetMapping("/{id}/franchises")
     fun getFranchises(@PathVariable id: UUID): ApiResponse<List<com.crichere.domain.franchise.dto.FranchiseResponse>> {
         val franchises = leagueService.getFranchises(id)
@@ -208,6 +226,6 @@ class LeagueController(
         status = league.status,
         auctionDate = league.auctionDate,
         createdBy = league.createdBy,
-        auctionId = auctionRepository.findByLeagueId(league.id)?.id
+        auctionIds = auctionRepository.findAllByLeagueId(league.id).map { it.id }
     )
 }

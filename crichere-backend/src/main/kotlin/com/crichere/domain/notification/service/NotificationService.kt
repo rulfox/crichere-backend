@@ -58,6 +58,10 @@ class NotificationService(
         )
     }
 
+    fun getUnreadCount(userId: UUID): Long {
+        return inAppNotificationRepository.countByUserIdAndReadAtIsNull(userId)
+    }
+
     @Transactional
     fun markAsRead(notificationId: UUID, userId: UUID): NotificationResponse {
         val notification = inAppNotificationRepository.findById(notificationId)
@@ -118,6 +122,17 @@ class NotificationService(
     @Transactional
     fun notifyPlayerSold(userId: UUID, franchiseName: String, finalPrice: Int) {
         createAndSend(userId, NotificationType.PLAYER_SOLD, "Sold!", "You have been sold to $franchiseName for $finalPrice.", emptyMap())
+    }
+
+    @Transactional
+    fun notifyPlayerAcquired(ownerUserId: UUID, playerName: String, franchiseName: String, finalPrice: Int) {
+        createAndSend(
+            ownerUserId,
+            NotificationType.PLAYER_SOLD,
+            "New signing for $franchiseName",
+            "$franchiseName acquired $playerName for $finalPrice.",
+            emptyMap()
+        )
     }
 
     @Transactional

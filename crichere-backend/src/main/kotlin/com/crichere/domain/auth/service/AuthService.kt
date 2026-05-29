@@ -10,6 +10,7 @@ import com.crichere.domain.auth.enums.ProfileStatus
 import com.crichere.domain.auth.repository.RefreshTokenRepository
 import com.crichere.domain.auth.repository.UserRepository
 import com.crichere.security.JwtTokenProvider
+import com.crichere.security.OtpRateLimiter
 import com.crichere.security.TokenBlacklistService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -25,15 +26,18 @@ class AuthService(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtTokenProvider: JwtTokenProvider,
     private val tokenBlacklistService: TokenBlacklistService,
+    private val otpRateLimiter: OtpRateLimiter,
     @Value("\${crichere.jwt.refresh-expiration-days}") private val refreshExpirationDays: Long
 ) {
 
-    fun sendOtp(phone: String) {
+    fun sendOtp(phone: String, ip: String?) {
+        otpRateLimiter.checkSend(phone, ip)
         otpService.generateAndSendOtp(phone)
     }
 
     @Transactional
-    fun verifyOtpAndLogin(phone: String, code: String): Map<String, Any> {
+    fun verifyOtpAndLogin(phone: String, code: String, ip: String?): Map<String, Any> {
+        otpRateLimiter.checkVerify(phone, ip)
         otpService.verifyOtp(phone, code)
 
         var user = userRepository.findByPhone(phone)

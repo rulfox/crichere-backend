@@ -36,6 +36,9 @@ class Auction(
     @Column(nullable = false, unique = true)
     var publicViewToken: String = generateSecureToken(),
 
+    @Column(name = "next_sequence_number", nullable = false)
+    var nextSequenceNumber: Long = 0,
+
     @Column(nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
 

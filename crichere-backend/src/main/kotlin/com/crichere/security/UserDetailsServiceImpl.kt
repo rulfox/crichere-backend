@@ -17,7 +17,8 @@ class UserDetailsServiceImpl(
     private val userRepository: UserRepository,
     private val userLeagueMembershipRepository: UserLeagueMembershipRepository,
     private val userPlatformMembershipRepository: UserPlatformMembershipRepository,
-    private val franchiseRepository: com.crichere.domain.franchise.repository.FranchiseRepository
+    private val franchiseRepository: com.crichere.domain.franchise.repository.FranchiseRepository,
+    private val auctionRepository: com.crichere.domain.league.repository.AuctionRepository
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
@@ -51,6 +52,17 @@ class UserDetailsServiceImpl(
         val platformMembership = userPlatformMembershipRepository.findByUserId(userId)
         if (platformMembership != null) {
             authorities.add(SimpleGrantedAuthority("ROLE_PLATFORM_ADMIN"))
+        }
+
+        // Scoped auctioneer authority — emit one role per auction this user is auctioneer of.
+        // Single batched query (findAllByLeagueIdIn) instead of N+1 per league.
+        val auctioneeredLeagues = leagueMemberships
+            .filter { it.role == com.crichere.domain.auth.enums.LeagueRole.AUCTIONEER }
+            .map { it.leagueId }
+        if (auctioneeredLeagues.isNotEmpty()) {
+            auctionRepository.findAllByLeagueIdIn(auctioneeredLeagues).forEach { a ->
+                authorities.add(SimpleGrantedAuthority("ROLE_AUCTIONEER_${a.id}"))
+            }
         }
 
         return User.builder()

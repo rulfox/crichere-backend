@@ -107,7 +107,9 @@ data class FranchisePurseStateResponse(
     val currencyType: CurrencyType?,
     val startingAmount: Int?,
     val currentAmount: Int,
-    val reservedAmount: Int
+    val reservedAmount: Int,
+    val franchiseName: String? = null,
+    val franchiseLogoUrl: String? = null
 )
 
 data class BidRequest(
@@ -119,6 +121,48 @@ data class BidRequest(
 
 data class TimerStartRequest(
     val durationSeconds: Int? = null
+)
+
+data class TimerExtendRequest(
+    @field:Positive
+    val additionalSeconds: Int
+)
+
+data class PauseAuctionRequest(
+    @field:Size(max = 500)
+    val reason: String? = null
+)
+
+data class CancelAuctionRequest(
+    @field:Size(max = 500)
+    val reason: String? = null
+)
+
+data class PutPlayerRequest(
+    val leaguePlayerId: UUID? = null
+)
+
+data class UndoBidRequest(
+    @field:NotBlank
+    @field:Size(max = 500)
+    val reason: String
+)
+
+data class UnsoldPlayerRequest(
+    val leaguePlayerId: UUID
+)
+
+data class WithdrawPlayerRequest(
+    val leaguePlayerId: UUID,
+
+    @field:NotBlank
+    @field:Size(max = 500)
+    val reason: String
+)
+
+data class UpdatePlayerPoolRequest(
+    @field:NotEmpty
+    val playerIds: List<UUID>
 )
 
 data class TimerStateResponse(

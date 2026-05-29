@@ -5,7 +5,7 @@ enum class LeagueStatus {
 }
 
 enum class AuctionStatus {
-    DRAFT, LIVE, PAUSED, COMPLETED
+    DRAFT, LIVE, PAUSED, COMPLETED, CANCELLED
 }
 
 enum class PlayerOrderMode {

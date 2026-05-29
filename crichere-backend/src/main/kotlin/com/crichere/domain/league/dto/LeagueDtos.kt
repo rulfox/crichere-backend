@@ -39,7 +39,7 @@ data class LeagueResponse(
     val status: LeagueStatus,
     val auctionDate: java.time.Instant?,
     val createdBy: UUID,
-    val auctionId: UUID?
+    val auctionIds: List<UUID> = emptyList()
 )
 
 data class LeagueStatusUpdateRequest(

@@ -31,7 +31,7 @@ class WaitingListController(private val waitingListService: WaitingListService) 
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun getWaitingList(
         @PathVariable leagueId: UUID,
         @RequestParam(required = false) type: WaitingListType?,
@@ -68,7 +68,7 @@ class WaitingListController(private val waitingListService: WaitingListService) 
     }
 
     @PatchMapping("/{entryId}/promote")
-    @PreAuthorize("hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #leagueId)")
     fun promoteEntry(
         @PathVariable leagueId: UUID,
         @PathVariable entryId: UUID

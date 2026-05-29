@@ -23,15 +23,29 @@ class AuthController(
 ) {
 
     @PostMapping("/otp/send")
-    fun sendOtp(@Valid @RequestBody request: OtpSendRequest): ApiResponse<Nothing> {
-        authService.sendOtp(request.phone)
+    fun sendOtp(
+        @Valid @RequestBody request: OtpSendRequest,
+        httpRequest: HttpServletRequest
+    ): ApiResponse<Nothing> {
+        authService.sendOtp(request.phone, clientIp(httpRequest))
         return ResponseHelper.success(message = "OTP sent successfully", messageKey = "success.otp_sent")
     }
 
     @PostMapping("/otp/verify")
-    fun verifyOtp(@Valid @RequestBody request: OtpVerifyRequest): ApiResponse<Map<String, Any>> {
-        val result = authService.verifyOtpAndLogin(request.phone, request.code)
+    fun verifyOtp(
+        @Valid @RequestBody request: OtpVerifyRequest,
+        httpRequest: HttpServletRequest
+    ): ApiResponse<Map<String, Any>> {
+        val result = authService.verifyOtpAndLogin(request.phone, request.code, clientIp(httpRequest))
         return ResponseHelper.success(data = result, message = "Login successful", messageKey = "success.login")
+    }
+
+    private fun clientIp(req: HttpServletRequest): String? {
+        // Prefer the first entry in X-Forwarded-For (set by trusted proxies); fall back
+        // to the socket remote address. Operators should ensure their LB strips spoofed
+        // headers before the request reaches this app.
+        val xff = req.getHeader("X-Forwarded-For")?.split(",")?.firstOrNull()?.trim()
+        return xff?.takeIf { it.isNotBlank() } ?: req.remoteAddr
     }
 
     @PostMapping("/claim-profile")

@@ -96,7 +96,7 @@ class PlatformAdminController(
                     status = league.status,
                     auctionDate = league.auctionDate,
                     createdBy = league.createdBy,
-                    auctionId = auctionRepository.findByLeagueId(league.id)?.id
+                    auctionIds = auctionRepository.findAllByLeagueId(league.id).map { it.id }
                 )
             },
             totalElements = result.totalElements,

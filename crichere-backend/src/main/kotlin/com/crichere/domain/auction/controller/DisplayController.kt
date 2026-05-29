@@ -8,10 +8,12 @@ import com.crichere.domain.auction.sse.SseBroadcaster
 import com.crichere.domain.league.enums.AuctionStatus
 import com.crichere.common.exception.BusinessLogicException
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import org.springframework.web.util.HtmlUtils
 import java.util.*
 
 /**
@@ -52,38 +54,63 @@ class DisplayController(
     }
 
     /**
-     * Public access to SSE event stream. Only allowed if the auction is LIVE.
+     * Public access to SSE event stream by auction id. LIVE-only.
+     * Used by the embedded projector display page; consumers must already know the
+     * 128-bit auction UUID (equivalent in entropy to the public view token).
      */
     @GetMapping("/{id}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun streamPublicEvents(
         @PathVariable id: UUID,
-        @RequestHeader(name = "Last-Event-ID", required = false) lastEventId: Long?
-    ): SseEmitter {
-        val auction = auctionService.getAuction(id)
+        @RequestHeader(name = "Last-Event-ID", required = false) headerLastId: Long?,
+        @RequestParam(name = "lastEventId", required = false) queryLastId: Long?
+    ): ResponseEntity<SseEmitter> {
+        return buildPublicStream(id, headerLastId ?: queryLastId)
+    }
+
+    /**
+     * Internal helper: build a public SSE stream for a LIVE auction with proper
+     * snapshot-first ordering and reconnect support.
+     */
+    private fun buildPublicStream(
+        auctionId: UUID,
+        lastEventId: Long?
+    ): ResponseEntity<SseEmitter> {
+        val auction = auctionService.getAuction(auctionId)
         if (auction.status != AuctionStatus.LIVE) {
             throw BusinessLogicException("Public access allowed only when auction is LIVE", "error.auction_not_live")
         }
 
-        val emitter = SseEmitter(1800000L) // 30 minutes
-        sseBroadcaster.addEmitter(id, emitter)
+        val emitter = SseEmitter(0L)
+        emitter.send(SseEmitter.event().reconnectTime(3000L).comment("connected"))
 
-        if (lastEventId != null) {
-            val logs = auctionService.getAuditLogs(id, lastEventId)
-            logs.forEach { log ->
-                val event = mapOf(
-                    "id" to log.sequenceNumber,
-                    "event" to log.action.name,
-                    "data" to log.payload
-                )
-                emitter.send(SseEmitter.event().id(log.sequenceNumber.toString()).data(objectMapper.writeValueAsString(event)))
-            }
-        } else {
-            val snapshot = auctionService.getStateSnapshot(id)
-            val event = mapOf("event" to "SNAPSHOT", "data" to snapshot)
-            emitter.send(SseEmitter.event().data(objectMapper.writeValueAsString(event)))
+        val snapshot = auctionService.getStateSnapshot(auctionId)
+        val baseSeq = snapshot.lastSequenceNumber
+        val snapshotEvent = mapOf("event" to "SNAPSHOT", "data" to snapshot)
+        emitter.send(
+            SseEmitter.event()
+                .id(baseSeq.toString())
+                .name("SNAPSHOT")
+                .data(objectMapper.writeValueAsString(snapshotEvent))
+        )
+
+        val replayFrom = lastEventId ?: baseSeq
+        auctionService.getAuditLogs(auctionId, replayFrom).forEach { log ->
+            val payload = mapOf("id" to log.sequenceNumber, "event" to log.action.name, "data" to log.payload)
+            emitter.send(
+                SseEmitter.event()
+                    .id(log.sequenceNumber.toString())
+                    .name(log.action.name)
+                    .data(objectMapper.writeValueAsString(payload))
+            )
         }
 
-        return emitter
+        sseBroadcaster.addEmitter(auctionId, emitter)
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-transform")
+            .header("X-Accel-Buffering", "no")
+            .header(HttpHeaders.CONNECTION, "keep-alive")
+            .body(emitter)
     }
 
     /**
@@ -104,19 +131,34 @@ class DisplayController(
     @GetMapping("/view/{token}/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun streamPublicViewEvents(
         @PathVariable token: String,
-        @RequestHeader(name = "Last-Event-ID", required = false) lastEventId: Long?
-    ): SseEmitter {
+        @RequestHeader(name = "Last-Event-ID", required = false) headerLastId: Long?,
+        @RequestParam(name = "lastEventId", required = false) queryLastId: Long?
+    ): ResponseEntity<SseEmitter> {
         val auction = auctionService.getAuctionByToken(token)
-        if (auction.status != AuctionStatus.LIVE) {
-            throw BusinessLogicException("Auction is not LIVE", "error.auction_not_live")
-        }
-        return streamPublicEvents(auction.id, lastEventId)
+        return buildPublicStream(auction.id, headerLastId ?: queryLastId)
+    }
+
+    /**
+     * Token-based status check — used by clients to distinguish "expired" vs "not yet live"
+     * without exposing the full snapshot.
+     */
+    @GetMapping("/view/{token}/status")
+    fun getViewStatus(@PathVariable token: String): ApiResponse<Map<String, Any?>> {
+        val auction = auctionService.getAuctionByToken(token)
+        return ResponseHelper.success(data = mapOf(
+            "auctionId" to auction.id,
+            "leagueId" to auction.leagueId,
+            "status" to auction.status,
+            "startedAt" to auction.startedAt,
+            "completedAt" to auction.completedAt
+        ))
     }
 
     /**
      * Generates a self-contained HTML display page with embedded CSS and JavaScript.
      */
     private fun buildDisplayPageHtml(auctionId: UUID, leagueId: UUID): String {
+        val safeAuctionId = HtmlUtils.htmlEscape(auctionId.toString())
         return """
             <!DOCTYPE html>
             <html lang="en">
@@ -172,7 +214,7 @@ class DisplayController(
                 <div id="overlay" class="overlay"><div class="overlay-content" id="overlay-text"></div></div>
 
                 <script>
-                    const auctionId = '${auctionId}';
+                    const auctionId = '$safeAuctionId';
                     let currentSnapshot = null;
 
                     async function fetchState() {

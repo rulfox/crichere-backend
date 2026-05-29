@@ -38,6 +38,12 @@ class NotificationController(private val notificationService: NotificationServic
         return ResponseHelper.success(message = "Device token removed", messageKey = "success.device_token_removed")
     }
 
+    @GetMapping("/unread-count")
+    fun getUnreadCount(@AuthenticationPrincipal user: UserDetails): ApiResponse<Map<String, Long>> {
+        val count = notificationService.getUnreadCount(UUID.fromString(user.username))
+        return ResponseHelper.success(data = mapOf("unreadCount" to count))
+    }
+
     @GetMapping
     fun getNotifications(
         @RequestParam(defaultValue = "false") unreadOnly: Boolean,

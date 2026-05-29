@@ -37,10 +37,14 @@ class RedisConfig {
         }
         container.setConnectionFactory(connectionFactory)
         container.addMessageListener({ message, _ ->
-            val channel = String(message.channel)
-            val body = String(message.body)
-            val auctionId = UUID.fromString(channel.substringAfter("auction:"))
-            sseBroadcaster.broadcastRaw(auctionId, body)
+            try {
+                val channel = String(message.channel)
+                val body = String(message.body)
+                val auctionId = UUID.fromString(channel.substringAfter("auction:"))
+                sseBroadcaster.broadcastRaw(auctionId, body)
+            } catch (t: Throwable) {
+                logger.warn("Failed to handle Redis pub/sub message: ${t.message}")
+            }
         }, PatternTopic("auction:*"))
         return container
     }

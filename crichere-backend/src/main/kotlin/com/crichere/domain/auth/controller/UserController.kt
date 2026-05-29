@@ -4,6 +4,8 @@ import com.crichere.common.response.ApiResponse
 import com.crichere.common.response.ResponseHelper
 import com.crichere.domain.auth.dto.*
 import com.crichere.domain.auth.service.UserService
+import com.crichere.domain.franchise.repository.FranchiseRepository
+import com.crichere.domain.auth.repository.UserFranchiseMembershipRepository
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -15,7 +17,11 @@ import java.util.*
 @RestController
 @RequestMapping("/users")
 @Tag(name = "User Management")
-class UserController(private val userService: UserService) {
+class UserController(
+    private val userService: UserService,
+    private val franchiseRepository: FranchiseRepository,
+    private val franchiseMembershipRepository: UserFranchiseMembershipRepository
+) {
 
     @GetMapping("/{id}")
     fun getUser(@PathVariable id: UUID): ApiResponse<UserResponse> {
@@ -41,6 +47,25 @@ class UserController(private val userService: UserService) {
         return ResponseHelper.success(data = response)
     }
 
+    @GetMapping("/{id}/franchises")
+    fun getUserFranchises(@PathVariable id: UUID): ApiResponse<List<com.crichere.domain.franchise.dto.FranchiseResponse>> {
+        val owned = franchiseRepository.findByOwnerId(id)
+        val memberOf = franchiseMembershipRepository.findAllByUserId(id).map { it.franchiseId }
+        val membershipFranchises = if (memberOf.isNotEmpty()) franchiseRepository.findAllById(memberOf) else emptyList()
+        val combined = (owned + membershipFranchises).distinctBy { it.id }
+        return ResponseHelper.success(data = combined.map { f ->
+            com.crichere.domain.franchise.dto.FranchiseResponse(
+                id = f.id,
+                leagueId = f.leagueId,
+                name = f.name,
+                logoUrl = f.logoUrl,
+                ownerId = f.ownerId,
+                totalPurse = f.totalPurse,
+                remainingPurse = f.remainingPurse
+            )
+        })
+    }
+
     @GetMapping("/{id}/leagues")
     fun getUserLeagues(@PathVariable id: UUID): ApiResponse<List<com.crichere.domain.league.dto.LeagueResponse>> {
         val leagues = userService.getUserLeagues(id)
@@ -58,7 +83,7 @@ class UserController(private val userService: UserService) {
                 status = league.status,
                 auctionDate = league.auctionDate,
                 createdBy = league.createdBy,
-                auctionId = null
+                auctionIds = emptyList()
             )
         })
     }

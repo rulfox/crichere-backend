@@ -36,6 +36,7 @@ class FranchiseServiceTest {
     @MockK lateinit var membershipRepository: UserFranchiseMembershipRepository
     @MockK lateinit var franchisePlayerRepository: com.crichere.domain.auction.repository.FranchisePlayerRepository
     @MockK lateinit var leaguePlayerRepository: com.crichere.domain.player.repository.LeaguePlayerRepository
+    @MockK lateinit var roundConfigRepository: com.crichere.domain.auction.repository.AuctionRoundConfigRepository
 
     private lateinit var franchiseService: FranchiseService
 
@@ -54,6 +55,7 @@ class FranchiseServiceTest {
             membershipRepository,
             franchisePlayerRepository,
             leaguePlayerRepository,
+            roundConfigRepository,
             "http://localhost:8080"
         )
     }
@@ -125,7 +127,7 @@ class FranchiseServiceTest {
     }
 
     @Test
-    @DisplayName("acceptInvite - success with ownership transfer")
+    @DisplayName("acceptInvite - adds membership without overwriting owner")
     fun acceptInviteSuccess() {
         val invite = FranchiseInvite(
             franchiseId = franchiseId,
@@ -140,7 +142,7 @@ class FranchiseServiceTest {
 
         every { franchiseInviteRepository.findByToken(token) } returns invite
         every { franchiseRepository.findById(franchiseId) } returns Optional.of(franchise)
-        every { franchiseRepository.save(any()) } answers { firstArg() }
+        every { membershipRepository.findByUserIdAndFranchiseId(newUserId, franchiseId) } returns null
         every { membershipRepository.save(any()) } answers { firstArg() }
         every { franchiseInviteRepository.save(any()) } answers { firstArg() }
 
@@ -149,8 +151,8 @@ class FranchiseServiceTest {
         assertEquals(1, invite.useCount)
         assertEquals(newUserId, invite.acceptedByUserId)
         assertEquals(FranchiseInviteStatus.ACCEPTED, invite.status)
-        assertEquals(newUserId, franchise.ownerId) // Ownership transferred
-        verify { franchiseRepository.save(match { it.ownerId == newUserId }) }
+        assertEquals(ownerId, franchise.ownerId) // Ownership preserved
+        verify { membershipRepository.save(match { it.userId == newUserId && it.franchiseId == franchiseId }) }
     }
 
     @Test
@@ -168,6 +170,7 @@ class FranchiseServiceTest {
         every { leaguePlayerRepository.findById(player1Id) } returns Optional.of(leaguePlayer)
         every { userRepository.findById(user1Id) } returns Optional.of(user)
         every { leagueRepository.findById(leagueId) } returns Optional.of(League(id = leagueId, name = "CPL", createdBy = UUID.randomUUID()))
+        every { roundConfigRepository.findAllById(any<Iterable<UUID>>()) } returns emptyList()
 
         val result = franchiseService.getSquad(franchiseId)
 

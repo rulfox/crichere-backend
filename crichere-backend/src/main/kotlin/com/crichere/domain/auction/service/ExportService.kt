@@ -80,6 +80,73 @@ class ExportService(
         }
     }
 
+    fun exportFranchiseSquadPdf(auctionId: UUID, franchiseId: UUID): ByteArray {
+        val franchise = franchiseRepository.findById(franchiseId).orElseThrow { ResourceNotFoundException("Franchise not found") }
+        val league = leagueRepository.findById(franchise.leagueId).get()
+        val auction = auctionRepository.findById(auctionId).orElseThrow { ResourceNotFoundException("Auction not found") }
+        if (auction.leagueId != league.id) throw ResourceNotFoundException("Franchise does not belong to this auction's league")
+
+        val fPlayers = franchisePlayerRepository.findByFranchiseId(franchiseId)
+        val totalSpent = fPlayers.sumOf { it.boughtPrice.toLong() }
+
+        PDDocument().use { document ->
+            val page = PDPage()
+            document.addPage(page)
+            PDPageContentStream(document, page).use { cs ->
+                cs.beginText()
+                cs.setFont(PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 22f)
+                cs.newLineAtOffset(50f, 760f)
+                cs.showText("${franchise.name} — ${league.name}")
+                cs.endText()
+
+                cs.beginText()
+                cs.setFont(PDType1Font(Standard14Fonts.FontName.HELVETICA), 13f)
+                cs.newLineAtOffset(50f, 730f)
+                cs.showText("Squad size: ${fPlayers.size}    Spent: $totalSpent    Remaining: ${franchise.remainingPurse}")
+                cs.endText()
+
+                cs.beginText()
+                cs.setFont(PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 12f)
+                cs.newLineAtOffset(50f, 695f)
+                cs.showText("Player")
+                cs.newLineAtOffset(220f, 0f)
+                cs.showText("Category")
+                cs.newLineAtOffset(120f, 0f)
+                cs.showText("Round")
+                cs.newLineAtOffset(80f, 0f)
+                cs.showText("Price")
+                cs.endText()
+
+                var y = 675f
+                fPlayers.forEach { fp ->
+                    val lp = leaguePlayerRepository.findById(fp.leaguePlayerId).get()
+                    val user = userRepository.findById(lp.userId).get()
+                    cs.beginText()
+                    cs.setFont(PDType1Font(Standard14Fonts.FontName.HELVETICA), 11f)
+                    cs.newLineAtOffset(50f, y)
+                    cs.showText(user.name ?: "Unknown")
+                    cs.newLineAtOffset(220f, 0f)
+                    cs.showText(lp.category ?: "-")
+                    cs.newLineAtOffset(120f, 0f)
+                    cs.showText("-") // Round not tracked per FranchisePlayer in current schema
+                    cs.newLineAtOffset(80f, 0f)
+                    cs.showText(fp.boughtPrice.toString())
+                    cs.endText()
+                    y -= 18f
+                    if (y < 50f) {
+                        val newPage = PDPage()
+                        document.addPage(newPage)
+                        y = 760f
+                    }
+                }
+            }
+
+            val baos = ByteArrayOutputStream()
+            document.save(baos)
+            return baos.toByteArray()
+        }
+    }
+
     fun exportFranchiseSquadImage(auctionId: UUID, franchiseId: UUID): ByteArray {
         val franchise = franchiseRepository.findById(franchiseId).orElseThrow { ResourceNotFoundException("Franchise not found") }
         val league = leagueRepository.findById(franchise.leagueId).get()

@@ -45,8 +45,10 @@ class NewFeaturesTest {
     private val notificationService = mockk<NotificationService>()
     private val leagueService = mockk<LeagueService>()
     private val meterRegistry = mockk<io.micrometer.core.instrument.MeterRegistry>(relaxed = true)
+    private val entityManager = mockk<jakarta.persistence.EntityManager>()
 
     private lateinit var auctionService: AuctionService
+    private var seqCounter: Long = 0L
 
     private val auctionId = UUID.randomUUID()
     private val roundId = UUID.randomUUID()
@@ -58,12 +60,18 @@ class NewFeaturesTest {
         every { meterRegistry.counter(any()) } returns counter
         every { franchiseRepository.save(any()) } answers { firstArg() }
 
+        seqCounter = 0L
+        val nativeQuery = mockk<jakarta.persistence.Query>(relaxed = true)
+        every { entityManager.createNativeQuery(any<String>()) } returns nativeQuery
+        every { nativeQuery.setParameter(any<String>(), any()) } returns nativeQuery
+        every { nativeQuery.singleResult } answers { ++seqCounter }
+
         auctionService = AuctionService(
             auctionRepository, roundConfigRepository, slabRepository, categoryIncrementRepository,
             bidRepository, playerStateRepository, purseRepository, franchiseRepository,
             franchisePlayerRepository, auctionAuditLogRepository, leaguePlayerRepository,
             userRepository, leagueRepository, poolPlayerRepository, redisTemplate, objectMapper,
-            notificationService, leagueService, meterRegistry
+            notificationService, leagueService, meterRegistry, entityManager
         )
     }
 

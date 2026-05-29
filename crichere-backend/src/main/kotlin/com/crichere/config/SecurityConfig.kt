@@ -4,6 +4,7 @@ import com.crichere.security.JwtAuthenticationEntryPoint
 import com.crichere.security.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -30,7 +31,7 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/public/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/public/**").permitAll()
                     .requestMatchers("/auth/otp/send", "/auth/otp/verify", "/auth/token/refresh").permitAll()
                     .requestMatchers("/actuator/health").permitAll()
                     .requestMatchers("/actuator/**").hasRole("PLATFORM_ADMIN")

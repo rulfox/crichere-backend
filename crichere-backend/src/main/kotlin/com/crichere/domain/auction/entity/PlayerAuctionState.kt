@@ -17,6 +17,9 @@ class PlayerAuctionState(
     @Column(nullable = false)
     val leaguePlayerId: UUID,
 
+    @Column(name = "round_id")
+    var roundId: UUID? = null,
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var state: PlayerAuctionStateValue = PlayerAuctionStateValue.AVAILABLE,

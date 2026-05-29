@@ -2,6 +2,8 @@ package com.crichere.common.exception
 
 import com.crichere.common.response.ApiResponse
 import com.crichere.common.response.ResponseHelper
+import org.slf4j.LoggerFactory
+import org.slf4j.MDC
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
@@ -14,8 +16,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
+    private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
     @ExceptionHandler(CrichereException::class)
     fun handleCrichereException(ex: CrichereException): ResponseEntity<ApiResponse<Nothing>> {
+        // Business exceptions are caller-visible: keep their message.
         val response = ResponseHelper.error(
             code = ex.javaClass.simpleName,
             message = ex.message,
@@ -41,9 +46,12 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(Exception::class)
     fun handleAllExceptions(ex: Exception): ResponseEntity<ApiResponse<Nothing>> {
+        val requestId = MDC.get("requestId")
+        // Internal errors: log the full stack but never leak internals to the client.
+        log.error("Unhandled exception (requestId=$requestId)", ex)
         val response = ResponseHelper.error(
             code = "InternalServerError",
-            message = ex.message ?: "An unexpected error occurred",
+            message = if (requestId != null) "Internal server error. Request id: $requestId" else "Internal server error",
             messageKey = "error.internal_server_error"
         )
         return ResponseEntity.internalServerError().body(response)

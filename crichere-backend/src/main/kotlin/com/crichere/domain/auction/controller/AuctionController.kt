@@ -46,7 +46,7 @@ class AuctionController(
     }
 
     @PatchMapping("/{id}/start")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun startAuction(
         @PathVariable id: UUID,
         @AuthenticationPrincipal user: UserDetails
@@ -56,18 +56,18 @@ class AuctionController(
     }
 
     @PatchMapping("/{id}/pause")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun pauseAuction(
         @PathVariable id: UUID,
-        @RequestBody(required = false) request: Map<String, String>?,
+        @RequestBody(required = false) request: PauseAuctionRequest?,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<AuctionResponse> {
-        val auction = auctionService.pauseAuction(id, request?.get("reason"), UUID.fromString(user.username))
+        val auction = auctionService.pauseAuction(id, request?.reason, UUID.fromString(user.username))
         return ResponseHelper.success(data = mapToResponse(auction))
     }
 
     @PatchMapping("/{id}/resume")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun resumeAuction(
         @PathVariable id: UUID,
         @AuthenticationPrincipal user: UserDetails
@@ -77,7 +77,7 @@ class AuctionController(
     }
 
     @PatchMapping("/{id}/complete")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun completeAuction(
         @PathVariable id: UUID,
         @AuthenticationPrincipal user: UserDetails
@@ -86,8 +86,29 @@ class AuctionController(
         return ResponseHelper.success(data = mapToResponse(auction))
     }
 
+    @PatchMapping("/{id}/cancel")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
+    fun cancelAuction(
+        @PathVariable id: UUID,
+        @RequestBody(required = false) request: CancelAuctionRequest?,
+        @AuthenticationPrincipal user: UserDetails
+    ): ApiResponse<AuctionResponse> {
+        val auction = auctionService.cancelAuction(id, request?.reason, UUID.fromString(user.username))
+        return ResponseHelper.success(data = mapToResponse(auction))
+    }
+
+    @PatchMapping("/{id}/timer/extend")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
+    fun extendTimer(
+        @PathVariable id: UUID,
+        @Valid @RequestBody request: TimerExtendRequest,
+        @AuthenticationPrincipal user: UserDetails
+    ): ApiResponse<TimerStateResponse> {
+        return ResponseHelper.success(data = auctionService.extendTimer(id, request.additionalSeconds, UUID.fromString(user.username)))
+    }
+
     @PatchMapping("/{id}/rounds/{roundId}/start")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun startRound(
         @PathVariable id: UUID,
         @PathVariable roundId: UUID,
@@ -98,18 +119,18 @@ class AuctionController(
     }
 
     @PostMapping("/{id}/player/put")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun putPlayer(
         @PathVariable id: UUID,
-        @RequestBody(required = false) request: Map<String, UUID>?,
+        @RequestBody(required = false) request: PutPlayerRequest?,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
-        val state = auctionService.putPlayer(id, request?.get("leaguePlayerId"), UUID.fromString(user.username))
+        val state = auctionService.putPlayer(id, request?.leaguePlayerId, UUID.fromString(user.username))
         return ResponseHelper.success(data = auctionService.mapToStateResponse(state))
     }
 
     @PostMapping("/{id}/bid")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun placeBid(
         @PathVariable id: UUID,
         @Valid @RequestBody request: BidRequest,
@@ -122,18 +143,18 @@ class AuctionController(
     }
 
     @PatchMapping("/{id}/bid/undo")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun undoBid(
         @PathVariable id: UUID,
-        @RequestBody request: Map<String, String>,
+        @Valid @RequestBody request: UndoBidRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
-        val state = auctionService.undoBid(id, request["reason"]!!, UUID.fromString(user.username))
+        val state = auctionService.undoBid(id, request.reason, UUID.fromString(user.username))
         return ResponseHelper.success(data = auctionService.mapToStateResponse(state))
     }
 
     @PostMapping("/{id}/player/sold")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun sellPlayer(
         @PathVariable id: UUID,
         @Valid @RequestBody request: PlayerSoldRequest,
@@ -144,7 +165,7 @@ class AuctionController(
     }
 
     @PatchMapping("/{id}/player/undo-sold")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun undoSold(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UndoSoldRequest,
@@ -155,7 +176,7 @@ class AuctionController(
     }
 
     @PostMapping("/{id}/player/pre-assign")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun preAssign(
         @PathVariable id: UUID,
         @Valid @RequestBody request: PreAssignRequest,
@@ -169,18 +190,18 @@ class AuctionController(
     }
 
     @PostMapping("/{id}/player/unsold")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun unsoldPlayer(
         @PathVariable id: UUID,
-        @RequestBody request: Map<String, UUID>,
+        @Valid @RequestBody request: UnsoldPlayerRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
-        val state = auctionService.unsoldPlayer(id, request["leaguePlayerId"]!!, UUID.fromString(user.username))
+        val state = auctionService.unsoldPlayer(id, request.leaguePlayerId, UUID.fromString(user.username))
         return ResponseHelper.success(data = auctionService.mapToStateResponse(state))
     }
 
     @PostMapping("/{id}/player/force-assign")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun forceAssign(
         @PathVariable id: UUID,
         @Valid @RequestBody request: ForceAssignRequest,
@@ -191,7 +212,7 @@ class AuctionController(
     }
 
     @PostMapping("/{id}/timer/start")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun startTimer(
         @PathVariable id: UUID,
         @RequestBody(required = false) request: TimerStartRequest?,
@@ -202,7 +223,7 @@ class AuctionController(
     }
 
     @PostMapping("/{id}/timer/stop")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun stopTimer(
         @PathVariable id: UUID,
         @AuthenticationPrincipal user: UserDetails
@@ -217,7 +238,7 @@ class AuctionController(
     }
 
     @PostMapping("/{id}/rounds/{roundId}/category-increments")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun updateCategoryIncrements(
         @PathVariable id: UUID,
         @PathVariable roundId: UUID,
@@ -253,7 +274,7 @@ class AuctionController(
 
     @PostMapping("/{id}/rounds")
     @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun addRound(
         @PathVariable id: UUID,
         @Valid @RequestBody request: RoundConfigDto
@@ -278,7 +299,7 @@ class AuctionController(
                 completionTrigger = r.completionTrigger,
                 countdownSeconds = r.countdownSeconds,
                 antiSnipeSeconds = r.antiSnipeSeconds,
-                bidIncrementSlabs = emptyList() // Slabs should be fetched separately or included
+                bidIncrementSlabs = auctionService.getRoundSlabs(r.id)
             )
         })
     }
@@ -298,12 +319,12 @@ class AuctionController(
             completionTrigger = r.completionTrigger,
             countdownSeconds = r.countdownSeconds,
             antiSnipeSeconds = r.antiSnipeSeconds,
-            bidIncrementSlabs = emptyList()
+            bidIncrementSlabs = auctionService.getRoundSlabs(roundId)
         ))
     }
 
     @PutMapping("/{id}/rounds/{roundId}")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun updateRound(
         @PathVariable id: UUID,
         @PathVariable roundId: UUID,
@@ -314,14 +335,14 @@ class AuctionController(
     }
 
     @DeleteMapping("/{id}/rounds/{roundId}")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun deleteRound(@PathVariable id: UUID, @PathVariable roundId: UUID): ApiResponse<Nothing> {
         auctionService.deleteRound(roundId)
         return ResponseHelper.success(message = "Round deleted")
     }
 
     @PatchMapping("/{id}/rounds/{roundId}/complete")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun completeRound(
         @PathVariable id: UUID,
         @PathVariable roundId: UUID,
@@ -332,7 +353,7 @@ class AuctionController(
     }
 
     @GetMapping("/{id}/rounds/{roundId}/player-pool")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun getPlayerPool(
         @PathVariable id: UUID,
         @PathVariable roundId: UUID
@@ -342,28 +363,27 @@ class AuctionController(
     }
 
     @PatchMapping("/{id}/rounds/{roundId}/player-pool")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun updatePlayerPool(
         @PathVariable id: UUID,
         @PathVariable roundId: UUID,
-        @RequestBody request: Map<String, List<UUID>>
+        @Valid @RequestBody request: UpdatePlayerPoolRequest
     ): ApiResponse<Nothing> {
-        val playerIds = request["playerIds"] ?: throw com.crichere.common.exception.BusinessLogicException("playerIds field is required", "error.player_ids_required")
-        auctionService.updatePlayerPool(roundId, playerIds)
+        auctionService.updatePlayerPool(roundId, request.playerIds)
         return ResponseHelper.success(message = "Player pool updated")
     }
 
     @PostMapping("/{id}/player/withdraw")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun withdrawPlayer(
         @PathVariable id: UUID,
-        @RequestBody request: Map<String, Any>,
+        @Valid @RequestBody request: WithdrawPlayerRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<PlayerAuctionStateResponse> {
         val state = auctionService.withdrawPlayer(
-            id, 
-            UUID.fromString(request["leaguePlayerId"].toString()), 
-            request["reason"].toString(), 
+            id,
+            request.leaguePlayerId,
+            request.reason,
             UUID.fromString(user.username)
         )
         return ResponseHelper.success(data = auctionService.mapToStateResponse(state))
@@ -403,7 +423,7 @@ class AuctionController(
     }
 
     @GetMapping("/{id}/summary/export/pdf", produces = ["application/pdf"])
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('AUCTIONEER')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun exportSummaryPdf(
         @PathVariable id: UUID,
         @AuthenticationPrincipal user: UserDetails
@@ -420,8 +440,7 @@ class AuctionController(
         @PathVariable id: UUID,
         @PathVariable franchiseId: UUID
     ): org.springframework.http.ResponseEntity<ByteArray> {
-        // Dummy implementation for now, using the same export logic or similar
-        val pdf = exportService.exportAuctionSummaryPdf(id) 
+        val pdf = exportService.exportFranchiseSquadPdf(id, franchiseId)
         return org.springframework.http.ResponseEntity.ok()
             .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"franchise-squad.pdf\"")
             .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
@@ -441,14 +460,14 @@ class AuctionController(
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun deleteAuction(@PathVariable id: UUID): ApiResponse<Nothing> {
         auctionService.deleteAuction(id)
         return ResponseHelper.success(message = "Auction deleted")
     }
 
     @PostMapping("/{id}/regenerate-view-token")
-    @PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN')")
+    @PreAuthorize("@auctionAuth.canManage(#id, authentication)")
     fun regenerateViewToken(@PathVariable id: UUID): ApiResponse<AuctionResponse> {
         val auction = auctionService.regeneratePublicViewToken(id)
         return ResponseHelper.success(data = mapToResponse(auction))

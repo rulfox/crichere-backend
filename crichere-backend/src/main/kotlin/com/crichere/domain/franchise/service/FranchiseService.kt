@@ -26,6 +26,7 @@ class FranchiseService(
     private val membershipRepository: UserFranchiseMembershipRepository,
     private val franchisePlayerRepository: FranchisePlayerRepository,
     private val leaguePlayerRepository: LeaguePlayerRepository,
+    private val roundConfigRepository: com.crichere.domain.auction.repository.AuctionRoundConfigRepository,
     @org.springframework.beans.factory.annotation.Value("\${app.base-url:http://localhost:8080}")
     private val baseUrl: String
 ) {
@@ -60,6 +61,9 @@ class FranchiseService(
 
     fun getSquad(franchiseId: UUID): List<com.crichere.domain.auction.dto.AuctionPlayerSummary> {
         val players = franchisePlayerRepository.findByFranchiseId(franchiseId)
+        val roundIds = players.map { it.roundId }.distinct()
+        val roundsById = if (roundIds.isEmpty()) emptyMap()
+            else roundConfigRepository.findAllById(roundIds).associate { it.id to it.roundNumber }
         return players.map { fp ->
             val lp = leaguePlayerRepository.findById(fp.leaguePlayerId).get()
             val user = userRepository.findById(lp.userId).get()
@@ -68,7 +72,7 @@ class FranchiseService(
                 playerCategory = lp.category,
                 finalPrice = fp.boughtPrice,
                 assignmentType = "SOLD",
-                roundNumber = 1
+                roundNumber = roundsById[fp.roundId] ?: 1
             )
         }
     }
@@ -131,15 +135,16 @@ class FranchiseService(
         }
 
         val franchise = getFranchise(invite.franchiseId)
-        
-        // Update ownership and membership
-        franchise.ownerId = userId
-        franchiseRepository.save(franchise)
-        
-        membershipRepository.save(com.crichere.domain.auth.entity.UserFranchiseMembership(
-            userId = userId,
-            franchiseId = franchise.id
-        ))
+
+        // Idempotent membership add. Do NOT silently demote the existing owner — the
+        // invite grants membership; explicit ownership transfer is a separate flow.
+        val existingMembership = membershipRepository.findByUserIdAndFranchiseId(userId, franchise.id)
+        if (existingMembership == null) {
+            membershipRepository.save(com.crichere.domain.auth.entity.UserFranchiseMembership(
+                userId = userId,
+                franchiseId = franchise.id
+            ))
+        }
 
         invite.useCount++
         invite.acceptedByUserId = userId
