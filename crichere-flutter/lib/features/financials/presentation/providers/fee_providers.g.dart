@@ -85,3 +85,86 @@ final class FeeObligationsFamily extends $Family
   @override
   String toString() => r'feeObligationsProvider';
 }
+
+/// Authoritative fee totals from the backend (`GET /leagues/{id}/fees/summary`).
+
+@ProviderFor(feeSummary)
+final feeSummaryProvider = FeeSummaryFamily._();
+
+/// Authoritative fee totals from the backend (`GET /leagues/{id}/fees/summary`).
+
+final class FeeSummaryProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<FeeSummary>,
+          FeeSummary,
+          FutureOr<FeeSummary>
+        >
+    with $FutureModifier<FeeSummary>, $FutureProvider<FeeSummary> {
+  /// Authoritative fee totals from the backend (`GET /leagues/{id}/fees/summary`).
+  FeeSummaryProvider._({
+    required FeeSummaryFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'feeSummaryProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$feeSummaryHash();
+
+  @override
+  String toString() {
+    return r'feeSummaryProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<FeeSummary> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<FeeSummary> create(Ref ref) {
+    final argument = this.argument as String;
+    return feeSummary(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FeeSummaryProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$feeSummaryHash() => r'd552fb9f709302ecf32f408aeaa2870299d29973';
+
+/// Authoritative fee totals from the backend (`GET /leagues/{id}/fees/summary`).
+
+final class FeeSummaryFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<FeeSummary>, String> {
+  FeeSummaryFamily._()
+    : super(
+        retry: null,
+        name: r'feeSummaryProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Authoritative fee totals from the backend (`GET /leagues/{id}/fees/summary`).
+
+  FeeSummaryProvider call(String leagueId) =>
+      FeeSummaryProvider._(argument: leagueId, from: this);
+
+  @override
+  String toString() => r'feeSummaryProvider';
+}

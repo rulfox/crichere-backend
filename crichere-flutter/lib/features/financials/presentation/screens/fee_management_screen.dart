@@ -73,6 +73,7 @@ class FeeManagementScreen extends ConsumerWidget {
                 if (amount != null && amount > 0) {
                   await leagueRepo.recordPayment(leagueId, obligation.id, amount, mode.value, notesController.text);
                   ref.invalidate(feeObligationsProvider(leagueId));
+                  ref.invalidate(feeSummaryProvider(leagueId));
                   if (context.mounted) Navigator.pop(context);
                 }
               },
@@ -95,8 +96,17 @@ class FeeManagementScreen extends ConsumerWidget {
       ),
       body: obligationsAsync.when(
         data: (obligations) {
-          final collected = obligations.fold(0, (sum, e) => sum + e.paidAmount);
-          final pending = obligations.fold(0, (sum, e) => sum + (e.totalAmount - e.paidAmount));
+          // Prefer the authoritative server summary; fall back to a client tally
+          // while it loads (or if it errors).
+          final summaryAsync = ref.watch(feeSummaryProvider(leagueId));
+          final collected = summaryAsync.maybeWhen(
+            data: (s) => s.totalCollected,
+            orElse: () => obligations.fold(0, (sum, e) => sum + e.paidAmount),
+          );
+          final pending = summaryAsync.maybeWhen(
+            data: (s) => s.balanceDue,
+            orElse: () => obligations.fold(0, (sum, e) => sum + (e.totalAmount - e.paidAmount)),
+          );
 
           return Column(
             children: [
@@ -106,9 +116,9 @@ class FeeManagementScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _StatItem(label: 'COLLECTED', value: '₹${collected}', color: CricColor.green),
+                      _StatItem(label: 'COLLECTED', value: '₹$collected', color: CricColor.green),
                       Container(width: 1, height: 40, color: CricColor.borderLight),
-                      _StatItem(label: 'PENDING', value: '₹${pending}', color: CricColor.red),
+                      _StatItem(label: 'PENDING', value: '₹$pending', color: CricColor.red),
                     ],
                   ),
                 ),
@@ -145,14 +155,9 @@ class FeeManagementScreen extends ConsumerWidget {
                                   children: [
                                     CricBadge(
                                       label: o.status,
-                                      type: o.status == 'PAID' ? CricBadgeType.green : 
+                                      type: o.status == 'PAID' ? CricBadgeType.green :
                                             (o.status == 'UNPAID' ? CricBadgeType.red : CricBadgeType.gold),
                                     ),
-                                    if (false)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 4),
-                                        child: Text('Auction Ready ✓', style: CricTextStyle.caption.copyWith(color: CricColor.green, fontSize: 10)),
-                                      ),
                                   ],
                                 ),
                               ],
