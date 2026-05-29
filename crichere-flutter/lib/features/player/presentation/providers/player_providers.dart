@@ -1,5 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:crichere_flutter/core/providers/auth_provider.dart';
+import 'package:crichere_flutter/core/network/storage_api.dart';
+import 'package:crichere_flutter/core/network/photo_upload_service.dart';
+import 'package:crichere_flutter/features/auth/presentation/providers/auth_repository_provider.dart';
 import '../../data/player_api.dart';
 import '../../../league/domain/entities/league_player.dart';
 
@@ -9,6 +12,20 @@ part 'player_providers.g.dart';
 PlayerApi playerApi(Ref ref) {
   final dio = ref.watch(dioClientProvider).dio;
   return PlayerApi(dio);
+}
+
+@riverpod
+StorageApi storageApi(Ref ref) {
+  final dio = ref.watch(dioClientProvider).dio;
+  return StorageApi(dio);
+}
+
+@riverpod
+PhotoUploadService photoUploadService(Ref ref) {
+  return PhotoUploadService(
+    ref.watch(storageApiProvider),
+    ref.watch(authApiProvider),
+  );
 }
 
 /// Registers a user into a league as a player.

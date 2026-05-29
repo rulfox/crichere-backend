@@ -7,6 +7,7 @@ import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../providers/league_repository_provider.dart';
 import '../../../auth/presentation/providers/auth_repository_provider.dart';
 import '../../../auth/domain/entities/user_profile.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../domain/entities/league.dart' as domain;
 import '../../../../core/router/app_router.gr.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
@@ -634,6 +635,9 @@ class _ProfileTab extends ConsumerWidget {
                     leading: const Icon(Icons.logout, color: CricColor.red),
                     title: const Text('Logout', style: TextStyle(color: Colors.white)),
                     onTap: () async {
+                      // Unregister the FCM token while the access token is still
+                      // valid (the DELETE endpoint is authenticated), then log out.
+                      await ref.read(notificationServiceProvider).unregisterDeviceToken();
                       await ref.read(authRepositoryProvider).logout();
                       if (context.mounted) {
                         context.router.replaceAll([const PhoneEntryRoute()]);

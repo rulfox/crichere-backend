@@ -50,6 +50,95 @@ final class PlayerApiProvider
 
 String _$playerApiHash() => r'332416536356cc16df564a9afcd3ee3919e3ed2a';
 
+@ProviderFor(storageApi)
+final storageApiProvider = StorageApiProvider._();
+
+final class StorageApiProvider
+    extends $FunctionalProvider<StorageApi, StorageApi, StorageApi>
+    with $Provider<StorageApi> {
+  StorageApiProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'storageApiProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$storageApiHash();
+
+  @$internal
+  @override
+  $ProviderElement<StorageApi> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  StorageApi create(Ref ref) {
+    return storageApi(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(StorageApi value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<StorageApi>(value),
+    );
+  }
+}
+
+String _$storageApiHash() => r'064650036011dd920024a47892ce6585450901af';
+
+@ProviderFor(photoUploadService)
+final photoUploadServiceProvider = PhotoUploadServiceProvider._();
+
+final class PhotoUploadServiceProvider
+    extends
+        $FunctionalProvider<
+          PhotoUploadService,
+          PhotoUploadService,
+          PhotoUploadService
+        >
+    with $Provider<PhotoUploadService> {
+  PhotoUploadServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'photoUploadServiceProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$photoUploadServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<PhotoUploadService> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  PhotoUploadService create(Ref ref) {
+    return photoUploadService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PhotoUploadService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PhotoUploadService>(value),
+    );
+  }
+}
+
+String _$photoUploadServiceHash() =>
+    r'00acc57ce33003b717228893c41f5ab1c0db96a9';
+
 /// Registers a user into a league as a player.
 
 @ProviderFor(registerPlayer)
