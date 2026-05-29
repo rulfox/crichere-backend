@@ -19,7 +19,6 @@ class LeagueCreateScreen extends HookConsumerWidget {
     final format = useState('T20');
     final basePrice = useTextEditingController(text: '1000');
     final purse = useTextEditingController(text: '40000');
-    final maxPlayers = useTextEditingController(text: '15');
     final waitingListMode = useState('AUTO_PROMOTE');
     final selectedFile = useState<File?>(null);
     final isLoading = useState(false);

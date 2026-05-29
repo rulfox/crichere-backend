@@ -8,6 +8,9 @@ import '../providers/league_repository_provider.dart';
 import '../providers/waitlist_providers.dart';
 import '../../../../core/router/app_router.gr.dart';
 import 'package:crichere_flutter/features/league/domain/entities/league.dart' as domain;
+import 'package:crichere_flutter/features/franchise/presentation/providers/franchise_providers.dart';
+import 'package:crichere_flutter/features/auth/presentation/providers/auth_repository_provider.dart';
+import 'package:crichere_flutter/shared/widgets/user_picker.dart';
 
 @RoutePage()
 class LeagueDetailScreen extends ConsumerWidget {
@@ -441,6 +444,106 @@ class _FranchisesTab extends ConsumerWidget {
   final String leagueId;
   const _FranchisesTab({required this.leagueId});
 
+  Future<void> _showCreateDialog(BuildContext context, WidgetRef ref) async {
+    final nameController = TextEditingController();
+    final purseController = TextEditingController(text: '40000');
+    final owner = ValueNotifier<({String id, String label})?>(null);
+    final saving = ValueNotifier(false);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: CricColor.slate2,
+        title: Text('Create Franchise', style: CricTextStyle.headingMd),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              style: CricTextStyle.body,
+              decoration: CricDecoration.textField(hint: 'Franchise name'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: purseController,
+              keyboardType: TextInputType.number,
+              style: CricTextStyle.body,
+              decoration: CricDecoration.textField(hint: 'Total purse (₹)'),
+            ),
+            const SizedBox(height: 12),
+            ValueListenableBuilder(
+              valueListenable: owner,
+              builder: (context, value, _) => OutlinedButton.icon(
+                icon: const Icon(Icons.person_outline, size: 18, color: CricColor.gold),
+                label: Text(
+                  value?.label ?? 'Choose owner',
+                  style: CricTextStyle.body.copyWith(
+                    color: value == null ? CricColor.textDim : CricColor.textPrimary,
+                  ),
+                ),
+                onPressed: () async {
+                  final picked = await showUserPicker(
+                    context,
+                    ref.read(authRepositoryProvider),
+                    title: 'Select franchise owner',
+                  );
+                  if (picked?.userId != null) {
+                    owner.value = (id: picked!.userId!, label: picked.name ?? picked.phone ?? picked.userId!);
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('CANCEL', style: CricTextStyle.badge.copyWith(color: CricColor.textDim)),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: saving,
+            builder: (context, isSaving, _) => ElevatedButton(
+              style: CricButtonStyle.primary,
+              onPressed: isSaving
+                  ? null
+                  : () async {
+                      final name = nameController.text.trim();
+                      final purse = int.tryParse(purseController.text.trim());
+                      final ownerId = owner.value?.id;
+                      if (name.isEmpty || purse == null || ownerId == null) {
+                        ScaffoldMessenger.of(dialogContext).showSnackBar(
+                          const SnackBar(content: Text('Name, purse and owner are required.')),
+                        );
+                        return;
+                      }
+                      saving.value = true;
+                      try {
+                        await ref.read(franchiseRepositoryProvider).createFranchise(
+                              leagueId: leagueId,
+                              name: name,
+                              ownerId: ownerId,
+                              totalPurse: purse,
+                            );
+                        ref.invalidate(leagueFranchisesProvider(leagueId));
+                        if (dialogContext.mounted) Navigator.pop(dialogContext);
+                      } catch (e) {
+                        saving.value = false;
+                        if (dialogContext.mounted) {
+                          ScaffoldMessenger.of(dialogContext)
+                              .showSnackBar(SnackBar(content: Text('Create failed: $e')));
+                        }
+                      }
+                    },
+              child: isSaving
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Text('CREATE'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final franchisesAsync = ref.watch(leagueFranchisesProvider(leagueId));
@@ -448,12 +551,24 @@ class _FranchisesTab extends ConsumerWidget {
     return franchisesAsync.when(
       data: (franchises) => ListView.builder(
         padding: const EdgeInsets.all(CricSpacing.page),
-        itemCount: franchises.length,
+        itemCount: franchises.length + 1,
         itemBuilder: (context, index) {
-          final franchise = franchises[index];
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: CricSpacing.md),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.add, color: CricColor.gold),
+                label: const Text('CREATE FRANCHISE'),
+                style: CricButtonStyle.ghost,
+                onPressed: () => _showCreateDialog(context, ref),
+              ),
+            );
+          }
+          final franchise = franchises[index - 1];
           return Padding(
             padding: const EdgeInsets.only(bottom: CricSpacing.md),
             child: CricCard(
+              onTap: () => context.router.push(FranchiseSquadRoute(franchiseId: franchise.id)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -470,18 +585,13 @@ class _FranchisesTab extends ConsumerWidget {
                       ),
                       const SizedBox(width: CricSpacing.md),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(franchise.name, style: CricTextStyle.headingMd),
-                            Text('11 Players · Owner: Amit G.', style: CricTextStyle.caption),
-                          ],
-                        ),
+                        child: Text(franchise.name, style: CricTextStyle.headingMd),
                       ),
+                      const Icon(Icons.chevron_right, color: CricColor.textDim),
                     ],
                   ),
                   const SizedBox(height: CricSpacing.lg),
-                  const PurseBar(spent: 18000, total: 40000),
+                  PurseBar(spent: franchise.startingPurse - franchise.currentPurse, total: franchise.startingPurse),
                 ],
               ),
             ),
