@@ -53,6 +53,7 @@ class AppRouter extends RootStackRouter {
     // Public spectator share link — no auth guard.
     _route(page: SpectatorRoute.page, path: '/spectate/:token'),
     _route(page: PlatformAdminRoute.page, path: '/admin', guards: [authGuard]),
+    _route(page: AdminUsersRoute.page, path: '/admin/users', guards: [authGuard]),
     _route(page: PreAssignmentRoute.page, path: '/leagues/:leagueId/pre-assignment', guards: [authGuard]),
   ];
 }

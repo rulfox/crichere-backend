@@ -10,24 +10,24 @@ Last updated: 2026-05-29
 
 ---
 
-## 1. CORS — production configuration (🔴 production blocker for Web)
+## 1. CORS — production configuration (✅ RESOLVED 2026-05-29)
 
 **File:** `crichere-backend/.../config/CorsConfig.kt`
 
-**Problem:** When `allowCredentials = true`, the CORS spec forbids a wildcard origin
-(`*` or `addAllowedOriginPattern("*")`). Browsers reject the response and the Flutter Web
-client cannot read any authenticated response or open the SSE stream. A wildcard pattern
-works in dev only because credentials are often not enforced there.
+**Problem (was):** With `allowCredentials = true`, an `addAllowedOriginPattern("*")` reflects
+*any* request origin back as allowed — i.e. any website could make credentialed calls. The
+config warned but did not prevent this in production.
 
-**Client workaround:** None possible — this is purely a server/browser contract. Web build
-will not function against a misconfigured deployment.
+**Resolution:** `CorsConfig` now injects `Environment` and **fails fast** if the
+`allowed-origins` list contains `*` while the `prod` profile is active — forcing operators to
+set `CORS_ALLOWED_ORIGINS` to the explicit deployed web origin(s) (e.g.
+`https://app.crichere.live`). Dev (`application-dev.yml` → `*`) is unchanged for ergonomics.
+`allowedHeaders`/`allowedMethods` remain `*` (so `Authorization`, `Last-Event-ID`,
+`Cache-Control` and the SSE `GET` are permitted), and a 1h preflight `maxAge` was added.
 
-**Recommended backend fix:**
-- Drive allowed origins from an env var `CORS_ALLOWED_ORIGINS` (comma-separated) that
-  **enumerates the exact deployed web origin(s)** (e.g. `https://app.crichere.live`).
-- Keep `allowCredentials = true` only alongside the explicit origin list.
-- Ensure `Authorization`, `Last-Event-ID`, `Cache-Control` are in `allowedHeaders` and that
-  `GET` on the SSE endpoints is permitted for the web origin.
+**Remaining operational step:** ensure `CORS_ALLOWED_ORIGINS` is set in the prod environment
+to the real web origin(s). With the new guard, a prod deploy with `*` (or unset) will refuse
+to start rather than silently shipping an open credentialed policy.
 
 ---
 
