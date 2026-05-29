@@ -1,9 +1,23 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/auction_event.dart';
+import '../../domain/entities/auction_state_snapshot.dart';
 
 part 'auction_state_provider.g.dart';
 
+/// A single entry in the live bid feed.
+class BidEntry {
+  final String franchiseId;
+  final String franchiseName;
+  final int amount;
+  const BidEntry({
+    required this.franchiseId,
+    required this.franchiseName,
+    required this.amount,
+  });
+}
+
+/// Reduces the SSE [AuctionEvent] stream into a flat, render-friendly state.
 @riverpod
 class AuctionStateNotifier extends _$AuctionStateNotifier {
   Timer? _timer;
@@ -15,82 +29,126 @@ class AuctionStateNotifier extends _$AuctionStateNotifier {
   }
 
   void handleEvent(AuctionEvent event) {
-    state = event.map(
-      playerUp: (e) {
-        _timer?.cancel();
-        return state.copyWith(
-          currentPlayerId: e.playerId,
-          currentPlayerName: e.playerName,
-          currentBid: e.basePrice,
-          bidIncrement: e.bidIncrement ?? 500, // Use from event if available
-          leadingFranchise: null,
-          status: 'BIDDING',
-          remainingSeconds: 60,
-          isTimerRunning: false,
-        );
-      },
-      bidPlaced: (e) {
-        int nextSeconds = state.remainingSeconds;
-        // SC-004: Anti-snipe: If bid lands within <= 10s, reset to 10s
-        if (state.isTimerRunning && state.remainingSeconds <= 10 && state.remainingSeconds > 0) {
-          nextSeconds = 10;
-        }
-        return state.copyWith(
-          currentBid: e.amount,
-          leadingFranchise: e.franchiseName,
-          leadingFranchiseId: e.franchiseId,
-          bidHistory: [e, ...state.bidHistory.take(4)],
-          remainingSeconds: nextSeconds,
-        );
-      },
-      playerSold: (e) {
-        _timer?.cancel();
-        return state.copyWith(
-          status: 'SOLD',
-          bidHistory: [],
-          isTimerRunning: false,
-        );
-      },
-      playerUnsold: (e) {
-        _timer?.cancel();
-        return state.copyWith(
-          status: 'UNSOLD',
-          bidHistory: [],
-          isTimerRunning: false,
-        );
-      },
-      playerForceAssigned: (e) {
-        _timer?.cancel();
-        return state.copyWith(
-          status: 'FORCE_ASSIGNED',
-          bidHistory: [],
-          isTimerRunning: false,
-        );
-      },
-      timerStarted: (e) {
-        _startTimer();
-        return state.copyWith(
-          isTimerRunning: true,
-          remainingSeconds: e.remainingSeconds,
-        );
-      },
-      timerPaused: (e) {
-        _timer?.cancel();
-        return state.copyWith(
-          isTimerRunning: false,
-          remainingSeconds: e.remainingSeconds,
-        );
-      },
-      timerReset: (e) {
-        return state.copyWith(
-          remainingSeconds: e.remainingSeconds,
-        );
-      },
-      bidUndone: (_) => state, 
-      soldReverted: (_) => state,
-      roundStarted: (e) => state.copyWith(status: 'ROUND_${e.roundNumber}'),
-      auctionStarted: (_) => state.copyWith(status: 'STARTED'),
-      auctionCompleted: (_) => state.copyWith(status: 'COMPLETED'),
+    state = switch (event) {
+      AuctionSnapshotEvent(:final snapshot) => _applySnapshot(snapshot),
+      PlayerUpEvent(:final leaguePlayerId, :final playerName, :final basePrice) => () {
+          _timer?.cancel();
+          return state.copyWith(
+            currentPlayerId: leaguePlayerId,
+            currentPlayerName: playerName,
+            currentBid: basePrice ?? 0,
+            leadingFranchise: null,
+            leadingFranchiseId: null,
+            bidHistory: const [],
+            status: 'BIDDING',
+            isTimerRunning: false,
+          );
+        }(),
+      BidPlacedEvent(:final franchiseId, :final bidAmount) => () {
+          final name = state.franchiseNames[franchiseId] ?? 'Franchise';
+          var nextSeconds = state.remainingSeconds;
+          // Anti-snipe: a bid inside the anti-snipe window tops the timer back up.
+          if (state.isTimerRunning &&
+              state.antiSnipeSeconds > 0 &&
+              state.remainingSeconds <= state.antiSnipeSeconds &&
+              state.remainingSeconds > 0) {
+            nextSeconds = state.antiSnipeSeconds;
+          }
+          return state.copyWith(
+            currentBid: bidAmount,
+            leadingFranchise: name,
+            leadingFranchiseId: franchiseId,
+            remainingSeconds: nextSeconds,
+            bidHistory: [
+              BidEntry(franchiseId: franchiseId, franchiseName: name, amount: bidAmount),
+              ...state.bidHistory.take(9),
+            ],
+          );
+        }(),
+      BidUndoneEvent(:final newHighestBid, :final newHighestBidder) => state.copyWith(
+          currentBid: newHighestBid ?? 0,
+          leadingFranchiseId: newHighestBidder,
+          leadingFranchise:
+              newHighestBidder == null ? null : state.franchiseNames[newHighestBidder],
+        ),
+      PlayerSoldEvent() => _settle('SOLD'),
+      PlayerUnsoldEvent() => _settle('UNSOLD'),
+      PlayerWithdrawnEvent() => _settle('WITHDRAWN'),
+      PlayerForceAssignedEvent() => _settle('FORCE_ASSIGNED'),
+      PlayerPreAssignedEvent() => _settle('PRE_ASSIGNED'),
+      SoldRevertedEvent() => state.copyWith(status: 'BIDDING'),
+      TimerStartedEvent(:final durationSeconds, :final antiSnipeSeconds) => () {
+          _startTimer();
+          return state.copyWith(
+            isTimerRunning: true,
+            remainingSeconds: durationSeconds ?? state.remainingSeconds,
+            antiSnipeSeconds: antiSnipeSeconds ?? state.antiSnipeSeconds,
+          );
+        }(),
+      TimerStoppedEvent() => () {
+          _timer?.cancel();
+          return state.copyWith(isTimerRunning: false);
+        }(),
+      TimerResetEvent(:final newDurationSeconds) => state.copyWith(
+          remainingSeconds: newDurationSeconds ?? state.remainingSeconds,
+        ),
+      TimerExtendedEvent(:final newDurationSeconds, :final addedSeconds) => state.copyWith(
+          remainingSeconds:
+              newDurationSeconds ?? (state.remainingSeconds + (addedSeconds ?? 0)),
+        ),
+      RoundStartedEvent(:final roundNumber) =>
+        state.copyWith(status: 'ROUND_${roundNumber ?? ''}'),
+      RoundCompletedEvent() => state.copyWith(status: 'ROUND_COMPLETED'),
+      AuctionStartedEvent() => state.copyWith(status: 'STARTED'),
+      AuctionPausedEvent() => () {
+          _timer?.cancel();
+          return state.copyWith(status: 'PAUSED', isTimerRunning: false);
+        }(),
+      AuctionResumedEvent() => state.copyWith(status: 'LIVE'),
+      AuctionCompletedEvent() => () {
+          _timer?.cancel();
+          return state.copyWith(status: 'COMPLETED', isTimerRunning: false);
+        }(),
+      AuctionCancelledEvent() => () {
+          _timer?.cancel();
+          return state.copyWith(status: 'CANCELLED', isTimerRunning: false);
+        }(),
+      UnknownAuctionEvent() => state,
+    };
+  }
+
+  AuctionState _settle(String status) {
+    _timer?.cancel();
+    return state.copyWith(
+      status: status,
+      bidHistory: const [],
+      isTimerRunning: false,
+    );
+  }
+
+  AuctionState _applySnapshot(AuctionStateSnapshot s) {
+    _timer?.cancel();
+    final names = <String, String>{
+      for (final p in s.franchisePurseStates)
+        if (p.franchiseName != null) p.franchiseId: p.franchiseName!,
+    };
+    final timer = s.timer;
+    final running = timer?.isRunning ?? false;
+    if (running) _startTimer();
+    return state.copyWith(
+      franchises: s.franchisePurseStates,
+      franchiseNames: names,
+      currentPlayerId: s.currentPlayer?.leaguePlayerId,
+      currentPlayerName: s.currentPlayer?.playerName,
+      currentBid: s.currentHighestBid ?? s.currentPlayer?.basePrice ?? 0,
+      leadingFranchiseId: s.currentHighestBidderId,
+      leadingFranchise: s.currentHighestBidderId == null
+          ? null
+          : names[s.currentHighestBidderId],
+      status: s.auctionStatus.name.toUpperCase(),
+      remainingSeconds: timer?.remainingSeconds ?? 0,
+      antiSnipeSeconds: timer?.antiSnipeSeconds ?? 0,
+      isTimerRunning: running,
     );
   }
 
@@ -114,10 +172,13 @@ class AuctionState {
   final int bidIncrement;
   final String? leadingFranchise;
   final String? leadingFranchiseId;
-  final List<BidPlaced> bidHistory;
+  final List<BidEntry> bidHistory;
   final String status;
   final int remainingSeconds;
   final bool isTimerRunning;
+  final int antiSnipeSeconds;
+  final List<FranchisePurseState> franchises;
+  final Map<String, String> franchiseNames;
 
   const AuctionState({
     this.currentPlayerId,
@@ -130,6 +191,9 @@ class AuctionState {
     this.status = 'WAITING',
     this.remainingSeconds = 0,
     this.isTimerRunning = false,
+    this.antiSnipeSeconds = 0,
+    this.franchises = const [],
+    this.franchiseNames = const {},
   });
 
   AuctionState copyWith({
@@ -139,10 +203,13 @@ class AuctionState {
     int? bidIncrement,
     String? leadingFranchise,
     String? leadingFranchiseId,
-    List<BidPlaced>? bidHistory,
+    List<BidEntry>? bidHistory,
     String? status,
     int? remainingSeconds,
     bool? isTimerRunning,
+    int? antiSnipeSeconds,
+    List<FranchisePurseState>? franchises,
+    Map<String, String>? franchiseNames,
   }) {
     return AuctionState(
       currentPlayerId: currentPlayerId ?? this.currentPlayerId,
@@ -155,6 +222,9 @@ class AuctionState {
       status: status ?? this.status,
       remainingSeconds: remainingSeconds ?? this.remainingSeconds,
       isTimerRunning: isTimerRunning ?? this.isTimerRunning,
+      antiSnipeSeconds: antiSnipeSeconds ?? this.antiSnipeSeconds,
+      franchises: franchises ?? this.franchises,
+      franchiseNames: franchiseNames ?? this.franchiseNames,
     );
   }
 }

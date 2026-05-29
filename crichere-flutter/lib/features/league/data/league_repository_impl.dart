@@ -8,6 +8,7 @@ import 'models/league_request.dart';
 import '../../financials/domain/entities/fee_entities.dart';
 import '../../financials/domain/entities/forfeit_entities.dart';
 import '../domain/entities/waitlist_entities.dart';
+import '../domain/entities/league_prices.dart';
 import 'package:drift/drift.dart';
 
 class LeagueRepositoryImpl implements LeagueRepository {
@@ -105,6 +106,26 @@ class LeagueRepositoryImpl implements LeagueRepository {
     await _api.removePlayer(leagueId, playerId);
   }
 
+  // Category / tag prices
+  @override
+  Future<List<CategoryPrice>> getCategoryPrices(String leagueId) =>
+      _api.getCategoryPrices(leagueId);
+
+  @override
+  Future<CategoryPrice> updateCategoryPrice(String leagueId, String category, int price) =>
+      _api.updateCategoryPrice(leagueId, {'category': category, 'price': price});
+
+  @override
+  Future<List<TagPrice>> getTagPrices(String leagueId) => _api.getTagPrices(leagueId);
+
+  @override
+  Future<TagPrice> updateTagPrice(String leagueId, String tag, int price) =>
+      _api.updateTagPrice(leagueId, {'tag': tag, 'price': price});
+
+  @override
+  Future<dynamic> getLeagueAuctions(String leagueId) =>
+      _api.getLeagueAuctions(leagueId);
+
   // Fees
   @override
   Future<List<FeeObligation>> getFeeObligations(String leagueId) async {
@@ -113,20 +134,28 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
-  Future<FeePayment> recordPayment(String leagueId, String obligationId, int amount, String paymentMode, String? notes) async {
+  Future<FeeObligation> createFeeObligation(String leagueId, Map<String, dynamic> body) =>
+      _api.createFeeObligation(leagueId, body);
+
+  @override
+  Future<FeeObligationDetail> getFeeObligationForUser(String leagueId, String userId) =>
+      _api.getFeeObligationForUser(leagueId, userId);
+
+  @override
+  Future<FeeSummary> getFeeSummary(String leagueId) => _api.getFeeSummary(leagueId);
+
+  @override
+  Future<FeeObligation> recordPayment(String leagueId, String obligationId, int amount, String paymentMode, String? notes) async {
     return await _api.recordPayment(leagueId, obligationId, {
       'amount': amount,
       'paymentMode': paymentMode,
-      'notes': notes,
+      if (notes != null) 'notes': notes,
     });
   }
 
   @override
-  Future<void> waiveFee(String leagueId, String obligationId, int refundAmount, String? notes) async {
-    await _api.waiveFee(leagueId, obligationId, {
-      'refundAmount': refundAmount,
-      'notes': notes,
-    });
+  Future<FeeObligation> waiveFee(String leagueId, String obligationId, String reason) async {
+    return await _api.waiveFee(leagueId, obligationId, {'reason': reason});
   }
 
   // Forfeits
@@ -137,21 +166,31 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
-  Future<ForfeitRequest> submitForfeit(String leagueId, String entityId, String type, String reason) async {
+  Future<ForfeitRequest> submitForfeit(String leagueId, String type, String reason, {String? franchiseId}) async {
     return await _api.submitForfeit(leagueId, {
-      'entityId': entityId,
       'type': type,
+      if (franchiseId != null) 'franchiseId': franchiseId,
       'reason': reason,
     });
   }
 
   @override
-  Future<void> approveForfeit(String leagueId, String requestId, int refundAmount, bool promoteNext) async {
-    await _api.approveForfeit(leagueId, requestId, {
-      'refundAmount': refundAmount,
-      'promoteNext': promoteNext,
+  Future<ForfeitRequest> approveForfeit(String leagueId, String requestId, String feeRefundDecision, {int? feeRefundAmount, String? adminNotes}) async {
+    return await _api.approveForfeit(leagueId, requestId, {
+      'feeRefundDecision': feeRefundDecision,
+      if (feeRefundAmount != null) 'feeRefundAmount': feeRefundAmount,
+      if (adminNotes != null) 'adminNotes': adminNotes,
     });
   }
+
+  @override
+  Future<ForfeitRequest> rejectForfeit(String leagueId, String requestId, String adminNotes) async {
+    return await _api.rejectForfeit(leagueId, requestId, {'adminNotes': adminNotes});
+  }
+
+  @override
+  Future<ForfeitRequest> cancelForfeit(String leagueId, String requestId) =>
+      _api.cancelForfeit(leagueId, requestId);
 
   // Waitlist
   @override
@@ -161,8 +200,15 @@ class LeagueRepositoryImpl implements LeagueRepository {
   }
 
   @override
-  Future<WaitlistEntry> joinWaitlist(String leagueId) async {
-    return await _api.joinWaitlist(leagueId, {'type': 'PLAYER'});
+  Future<WaitlistEntry> getMyWaitlistPosition(String leagueId) =>
+      _api.getMyWaitlistPosition(leagueId);
+
+  @override
+  Future<WaitlistEntry> joinWaitlist(String leagueId, {String type = 'PLAYER', String? franchiseId}) async {
+    return await _api.joinWaitlist(leagueId, {
+      'type': type,
+      if (franchiseId != null) 'franchiseId': franchiseId,
+    });
   }
 
   @override

@@ -4,6 +4,7 @@ import '../../../core/network/page_response.dart';
 import '../../league/domain/entities/league.dart';
 import 'models/auth_request.dart';
 import 'models/auth_response.dart';
+import '../domain/entities/user_profile.dart';
 
 part 'auth_api.g.dart';
 
@@ -24,14 +25,14 @@ abstract class AuthApi {
   Future<void> claimProfile(@Body() ClaimRequest request);
 
   @GET('/auth/me')
-  Future<AuthResponse> getCurrentUser();
+  Future<UserProfile> getCurrentUser();
 
   @POST('/auth/logout')
   Future<void> logout();
 
   // User Management
   @GET('/users/{id}')
-  Future<AuthResponse> getUser(@Path('id') String id);
+  Future<UserProfile> getUser(@Path('id') String id);
 
   @GET('/users/{id}/leagues')
   Future<List<League>> getUserLeagues(@Path('id') String id);

@@ -96,7 +96,7 @@ class _SummaryTab extends StatelessWidget {
                     children: [
                       Text('SOLD', style: CricTextStyle.overline),
                       const SizedBox(height: 4),
-                      Text('${summary.totalPlayersSold}', style: CricTextStyle.displayLg.copyWith(fontSize: 24, color: CricColor.green)),
+                      Text('${summary.totalSold}', style: CricTextStyle.displayLg.copyWith(fontSize: 24, color: CricColor.green)),
                     ],
                   ),
                 ),
@@ -108,7 +108,7 @@ class _SummaryTab extends StatelessWidget {
                     children: [
                       Text('TOTAL SPENT', style: CricTextStyle.overline),
                       const SizedBox(height: 4),
-                      Text('₹${(summary.totalAmountSpent / 1000).toStringAsFixed(1)}k', style: CricTextStyle.displayLg.copyWith(fontSize: 24, color: CricColor.gold)),
+                      Text('₹${(summary.totalSpent / 1000).toStringAsFixed(1)}k', style: CricTextStyle.displayLg.copyWith(fontSize: 24, color: CricColor.gold)),
                     ],
                   ),
                 ),
@@ -117,7 +117,7 @@ class _SummaryTab extends StatelessWidget {
           ),
           const SizedBox(height: CricSpacing.xl),
           const SectionHeader(title: ' TOP BUY'),
-          if (summary.topBuy != null) Padding(
+          if (summary.highestSale != null) Padding(
             padding: const EdgeInsets.only(bottom: CricSpacing.sm),
             child: CricCard(
               child: Row(
@@ -128,12 +128,12 @@ class _SummaryTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(summary.topBuy!.playerName, style: CricTextStyle.headingMd),
-                        Text(summary.topBuy!.franchiseName, style: CricTextStyle.caption),
+                        Text(summary.highestSale!.playerName, style: CricTextStyle.headingMd),
+                        Text(summary.highestSale!.franchiseName, style: CricTextStyle.caption),
                       ],
                     ),
                   ),
-                  Text('₹${summary.topBuy!.amount}', style: CricTextStyle.headingMd.copyWith(color: CricColor.gold)),
+                  Text('₹${summary.highestSale!.amount}', style: CricTextStyle.headingMd.copyWith(color: CricColor.gold)),
                 ],
               ),
             ),
@@ -152,9 +152,9 @@ class _SquadsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.all(CricSpacing.page),
-      itemCount: summary.franchiseResults.length,
+      itemCount: summary.franchiseSummaries.length,
       itemBuilder: (context, index) {
-        final res = summary.franchiseResults[index];
+        final res = summary.franchiseSummaries[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: CricSpacing.md),
           child: CricCard(
@@ -168,7 +168,7 @@ class _SquadsTab extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(res.franchiseName, style: CricTextStyle.headingMd),
-                    CricBadge(label: '${res.playersCount} Players', type: CricBadgeType.gold),
+                    CricBadge(label: '${res.squadCount} Players', type: CricBadgeType.gold),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -240,15 +240,15 @@ class _ExportsTab extends ConsumerWidget {
           build: (ctx) => [
             pw.Header(level: 0, child: pw.Text('Auction Report', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold))),
             pw.SizedBox(height: 16),
-            pw.Text('Total Players Sold: ${summary.totalPlayersSold}'),
-            pw.Text('Total Amount Spent: ₹${summary.totalAmountSpent}'),
+            pw.Text('Total Players Sold: ${summary.totalSold}'),
+            pw.Text('Total Amount Spent: ₹${summary.totalSpent}'),
             pw.SizedBox(height: 24),
             pw.Header(level: 1, child: pw.Text('Top Buy', style: pw.TextStyle(fontSize: 16))),
-            if (summary.topBuy != null) pw.Text('${summary.topBuy!.playerName} → ${summary.topBuy!.franchiseName}: ₹${summary.topBuy!.amount}'),
+            if (summary.highestSale != null) pw.Text('${summary.highestSale!.playerName} → ${summary.highestSale!.franchiseName}: ₹${summary.highestSale!.amount}'),
             pw.SizedBox(height: 24),
             pw.Header(level: 1, child: pw.Text('Franchise Results', style: pw.TextStyle(fontSize: 16))),
-            ...summary.franchiseResults.map((f) => pw.Text(
-              '${f.franchiseName}: ${f.playersCount} players, ₹${f.totalSpent} spent, ₹${f.remainingPurse} remaining',
+            ...summary.franchiseSummaries.map((f) => pw.Text(
+              '${f.franchiseName}: ${f.squadCount} players, ₹${f.totalSpent} spent, ₹${f.remainingPurse} remaining',
             )),
           ],
         ),

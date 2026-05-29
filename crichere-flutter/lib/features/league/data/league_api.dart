@@ -7,6 +7,7 @@ import '../../franchise/domain/entities/franchise.dart';
 import '../../financials/domain/entities/fee_entities.dart';
 import '../../financials/domain/entities/forfeit_entities.dart';
 import '../domain/entities/waitlist_entities.dart';
+import '../domain/entities/league_prices.dart';
 import 'models/league_request.dart';
 
 part 'league_api.g.dart';
@@ -62,19 +63,58 @@ abstract class LeagueApi {
     @Path('playerId') String playerId,
   );
 
+  // Category / tag prices
+  @GET('/leagues/{id}/category-prices')
+  Future<List<CategoryPrice>> getCategoryPrices(@Path('id') String leagueId);
+
+  @POST('/leagues/{id}/category-prices')
+  Future<CategoryPrice> updateCategoryPrice(
+    @Path('id') String leagueId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET('/leagues/{id}/tag-prices')
+  Future<List<TagPrice>> getTagPrices(@Path('id') String leagueId);
+
+  @POST('/leagues/{id}/tag-prices')
+  Future<TagPrice> updateTagPrice(
+    @Path('id') String leagueId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET('/leagues/{id}/auctions')
+  Future<dynamic> getLeagueAuctions(@Path('id') String leagueId);
+
   // Fees
   @GET('/leagues/{id}/fee-obligations')
   Future<FeeObligationListResponse> getFeeObligations(@Path('id') String leagueId);
 
+  @POST('/leagues/{id}/fee-obligations')
+  Future<FeeObligation> createFeeObligation(
+    @Path('id') String leagueId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET('/leagues/{id}/fee-obligations/{userId}')
+  Future<FeeObligationDetail> getFeeObligationForUser(
+    @Path('id') String leagueId,
+    @Path('userId') String userId,
+  );
+
+  @GET('/leagues/{id}/fees/summary')
+  Future<FeeSummary> getFeeSummary(@Path('id') String leagueId);
+
+  // FIX: recordPayment returns FeeObligationResponse (was FeePayment).
   @POST('/leagues/{id}/fee-obligations/{obligationId}/payments')
-  Future<FeePayment> recordPayment(
+  Future<FeeObligation> recordPayment(
     @Path('id') String leagueId,
     @Path('obligationId') String obligationId,
     @Body() Map<String, dynamic> body,
   );
 
+  // FIX: waive body is `{reason}` (was `{refundAmount, notes}`).
   @PATCH('/leagues/{id}/fee-obligations/{obligationId}/waive')
-  Future<void> waiveFee(
+  Future<FeeObligation> waiveFee(
     @Path('id') String leagueId,
     @Path('obligationId') String obligationId,
     @Body() Map<String, dynamic> body,
@@ -84,22 +124,40 @@ abstract class LeagueApi {
   @GET('/leagues/{id}/forfeit-requests')
   Future<ForfeitRequestListResponse> getForfeitRequests(@Path('id') String leagueId);
 
+  // FIX: create body is `{type, franchiseId?, reason}` (was `{entityId, type, reason}`).
   @POST('/leagues/{id}/forfeit')
   Future<ForfeitRequest> submitForfeit(
     @Path('id') String leagueId,
     @Body() Map<String, dynamic> body,
   );
 
+  // FIX: approve body is `{feeRefundDecision, feeRefundAmount?, adminNotes?}`.
   @PATCH('/leagues/{id}/forfeit-requests/{requestId}/approve')
-  Future<void> approveForfeit(
+  Future<ForfeitRequest> approveForfeit(
     @Path('id') String leagueId,
     @Path('requestId') String requestId,
     @Body() Map<String, dynamic> body,
   );
 
+  @PATCH('/leagues/{id}/forfeit-requests/{requestId}/reject')
+  Future<ForfeitRequest> rejectForfeit(
+    @Path('id') String leagueId,
+    @Path('requestId') String requestId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @PATCH('/leagues/{id}/forfeit-requests/{requestId}/cancel')
+  Future<ForfeitRequest> cancelForfeit(
+    @Path('id') String leagueId,
+    @Path('requestId') String requestId,
+  );
+
   // Waitlist
   @GET('/leagues/{id}/waiting-list')
   Future<WaitlistPagedResponse> getWaitlist(@Path('id') String leagueId);
+
+  @GET('/leagues/{id}/waiting-list/my-position')
+  Future<WaitlistEntry> getMyWaitlistPosition(@Path('id') String leagueId);
 
   @POST('/leagues/{id}/waiting-list')
   Future<WaitlistEntry> joinWaitlist(

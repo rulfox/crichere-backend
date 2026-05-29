@@ -180,8 +180,8 @@ class _OverviewTab extends ConsumerWidget {
             ),
           ElevatedButton(
             onPressed: () {
-              if (league.auctionId != null) {
-                context.router.push(LiveAuctionViewerRoute(auctionId: league.auctionId!));
+              if (league.currentAuctionId != null) {
+                context.router.push(LiveAuctionViewerRoute(auctionId: league.currentAuctionId!));
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Auction not initialized yet.')),
@@ -223,8 +223,8 @@ class _OverviewTab extends ConsumerWidget {
               Expanded(
                 child: CricCard(
                   onTap: () {
-                    if (league.auctionId != null) {
-                      context.router.push(AuctioneerPanelRoute(auctionId: league.auctionId!, leagueId: league.id));
+                    if (league.currentAuctionId != null) {
+                      context.router.push(AuctioneerPanelRoute(auctionId: league.currentAuctionId!, leagueId: league.id));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Auction not initialized yet.')),

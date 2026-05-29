@@ -7,7 +7,7 @@ import 'package:crichere_flutter/features/auth/domain/usecases/send_otp_usecase.
 import 'package:crichere_flutter/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:crichere_flutter/features/auth/domain/usecases/claim_profile_usecase.dart';
 import 'package:crichere_flutter/features/auth/domain/usecases/logout_usecase.dart';
-import 'package:crichere_flutter/features/auth/data/models/auth_response.dart';
+import 'package:crichere_flutter/features/auth/domain/entities/user_profile.dart';
 
 part 'auth_repository_provider.g.dart';
 
@@ -25,7 +25,7 @@ AuthRepository authRepository(Ref ref) {
 }
 
 @riverpod
-Future<AuthResponse> currentUser(Ref ref) {
+Future<UserProfile> currentUser(Ref ref) {
   return ref.watch(authRepositoryProvider).getCurrentUser();
 }
 

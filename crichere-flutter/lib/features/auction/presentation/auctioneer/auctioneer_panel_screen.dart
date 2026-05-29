@@ -28,7 +28,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
     ref.listen(auctionEventsProvider(auctionId), (previous, next) {
       next.whenData((event) {
         ref.read(auctionStateProvider.notifier).handleEvent(event);
-        if (event is AuctionCompleted) {
+        if (event is AuctionCompletedEvent) {
           context.router.replace(PostAuctionRoute(auctionId: auctionId));
         }
       });

@@ -132,7 +132,7 @@ class ProfileSetupScreen extends HookConsumerWidget {
                       try {
                         final user = await ref.read(currentUserProvider.future);
                         await ref.read(authRepositoryProvider).updateCricketProfile(
-                          user.userId ?? '',
+                          user.id,
                           role.value!,
                           battingStyle.value?.name ?? '',
                           bowlingStyle.value?.name ?? '',

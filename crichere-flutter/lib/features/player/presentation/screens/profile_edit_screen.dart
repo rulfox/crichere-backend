@@ -90,7 +90,7 @@ class ProfileEditScreen extends HookConsumerWidget {
                     isLoading.value = true;
                     try {
                       await ref.read(authRepositoryProvider).updateCricketProfile(
-                        user.userId ?? '',
+                        user.id,
                         selectedRole.value,
                         battingStyle.text,
                         bowlingStyle.text,

@@ -8,9 +8,129 @@ part of 'auction_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Tracks the SSE connection lifecycle for an auction so the UI can show
+/// connecting / live / reconnecting states. Updated by [auctionEvents].
+
+@ProviderFor(AuctionConnection)
+final auctionConnectionProvider = AuctionConnectionFamily._();
+
+/// Tracks the SSE connection lifecycle for an auction so the UI can show
+/// connecting / live / reconnecting states. Updated by [auctionEvents].
+final class AuctionConnectionProvider
+    extends $NotifierProvider<AuctionConnection, SseConnectionStatus> {
+  /// Tracks the SSE connection lifecycle for an auction so the UI can show
+  /// connecting / live / reconnecting states. Updated by [auctionEvents].
+  AuctionConnectionProvider._({
+    required AuctionConnectionFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'auctionConnectionProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$auctionConnectionHash();
+
+  @override
+  String toString() {
+    return r'auctionConnectionProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  AuctionConnection create() => AuctionConnection();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SseConnectionStatus value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SseConnectionStatus>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AuctionConnectionProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$auctionConnectionHash() => r'fdc26483c28cd6afe53707cbb89f961be1352f75';
+
+/// Tracks the SSE connection lifecycle for an auction so the UI can show
+/// connecting / live / reconnecting states. Updated by [auctionEvents].
+
+final class AuctionConnectionFamily extends $Family
+    with
+        $ClassFamilyOverride<
+          AuctionConnection,
+          SseConnectionStatus,
+          SseConnectionStatus,
+          SseConnectionStatus,
+          String
+        > {
+  AuctionConnectionFamily._()
+    : super(
+        retry: null,
+        name: r'auctionConnectionProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Tracks the SSE connection lifecycle for an auction so the UI can show
+  /// connecting / live / reconnecting states. Updated by [auctionEvents].
+
+  AuctionConnectionProvider call(String auctionId) =>
+      AuctionConnectionProvider._(argument: auctionId, from: this);
+
+  @override
+  String toString() => r'auctionConnectionProvider';
+}
+
+/// Tracks the SSE connection lifecycle for an auction so the UI can show
+/// connecting / live / reconnecting states. Updated by [auctionEvents].
+
+abstract class _$AuctionConnection extends $Notifier<SseConnectionStatus> {
+  late final _$args = ref.$arg as String;
+  String get auctionId => _$args;
+
+  SseConnectionStatus build(String auctionId);
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<SseConnectionStatus, SseConnectionStatus>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<SseConnectionStatus, SseConnectionStatus>,
+              SseConnectionStatus,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, () => build(_$args));
+  }
+}
+
+/// Live auction event stream. Auto-reconnects with `Last-Event-ID` replay; the
+/// first event is always a [AuctionEvent.snapshot]. The bearer token is attached
+/// by the shared Dio interceptor.
 
 @ProviderFor(auctionEvents)
 final auctionEventsProvider = AuctionEventsFamily._();
+
+/// Live auction event stream. Auto-reconnects with `Last-Event-ID` replay; the
+/// first event is always a [AuctionEvent.snapshot]. The bearer token is attached
+/// by the shared Dio interceptor.
 
 final class AuctionEventsProvider
     extends
@@ -20,6 +140,9 @@ final class AuctionEventsProvider
           Stream<AuctionEvent>
         >
     with $FutureModifier<AuctionEvent>, $StreamProvider<AuctionEvent> {
+  /// Live auction event stream. Auto-reconnects with `Last-Event-ID` replay; the
+  /// first event is always a [AuctionEvent.snapshot]. The bearer token is attached
+  /// by the shared Dio interceptor.
   AuctionEventsProvider._({
     required AuctionEventsFamily super.from,
     required String super.argument,
@@ -64,7 +187,11 @@ final class AuctionEventsProvider
   }
 }
 
-String _$auctionEventsHash() => r'34d73bc7e1f110b1c62e09bc057e01b49032ea99';
+String _$auctionEventsHash() => r'b702abac256dfec88e0b142c4eba1f17814f6707';
+
+/// Live auction event stream. Auto-reconnects with `Last-Event-ID` replay; the
+/// first event is always a [AuctionEvent.snapshot]. The bearer token is attached
+/// by the shared Dio interceptor.
 
 final class AuctionEventsFamily extends $Family
     with $FunctionalFamilyOverride<Stream<AuctionEvent>, String> {
@@ -76,6 +203,10 @@ final class AuctionEventsFamily extends $Family
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
+
+  /// Live auction event stream. Auto-reconnects with `Last-Event-ID` replay; the
+  /// first event is always a [AuctionEvent.snapshot]. The bearer token is attached
+  /// by the shared Dio interceptor.
 
   AuctionEventsProvider call(String auctionId) =>
       AuctionEventsProvider._(argument: auctionId, from: this);

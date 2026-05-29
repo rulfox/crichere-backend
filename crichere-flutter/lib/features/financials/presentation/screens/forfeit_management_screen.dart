@@ -20,7 +20,9 @@ class ForfeitManagementScreen extends ConsumerWidget {
 
     void showApproveDialog(ForfeitRequest request) {
       final refundController = TextEditingController(text: '0');
-      final promoteNext = ValueNotifier(true);
+      final notesController = TextEditingController();
+      // Backend ForfeitApproveRequest: feeRefundDecision + optional feeRefundAmount + adminNotes.
+      final decision = ValueNotifier<String>('NO_REFUND');
 
       showDialog(
         context: context,
@@ -35,22 +37,40 @@ class ForfeitManagementScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               Text('Reason: ${request.reason}', style: CricTextStyle.caption),
               const SizedBox(height: 16),
-              TextField(
-                controller: refundController,
-                keyboardType: TextInputType.number,
-                style: CricTextStyle.body,
-                decoration: CricDecoration.textField(hint: 'Refund Amount (₹)'),
+              ValueListenableBuilder<String>(
+                valueListenable: decision,
+                builder: (context, value, _) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DropdownButton<String>(
+                      value: value,
+                      isExpanded: true,
+                      dropdownColor: CricColor.slate2,
+                      style: CricTextStyle.body,
+                      items: const [
+                        DropdownMenuItem(value: 'NO_REFUND', child: Text('No refund')),
+                        DropdownMenuItem(value: 'PARTIAL_REFUND', child: Text('Partial refund')),
+                        DropdownMenuItem(value: 'FULL_REFUND', child: Text('Full refund')),
+                      ],
+                      onChanged: (v) => decision.value = v ?? 'NO_REFUND',
+                    ),
+                    if (value == 'PARTIAL_REFUND') ...[
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: refundController,
+                        keyboardType: TextInputType.number,
+                        style: CricTextStyle.body,
+                        decoration: CricDecoration.textField(hint: 'Refund Amount (₹)'),
+                      ),
+                    ],
+                  ],
+                ),
               ),
               const SizedBox(height: 12),
-              ValueListenableBuilder(
-                valueListenable: promoteNext,
-                builder: (context, value, _) => CheckboxListTile(
-                  title: Text('Promote from waitlist', style: CricTextStyle.body),
-                  value: value,
-                  activeColor: CricColor.gold,
-                  onChanged: (v) => promoteNext.value = v!,
-                  contentPadding: EdgeInsets.zero,
-                ),
+              TextField(
+                controller: notesController,
+                style: CricTextStyle.body,
+                decoration: CricDecoration.textField(hint: 'Admin notes (optional)'),
               ),
             ],
           ),
@@ -62,8 +82,16 @@ class ForfeitManagementScreen extends ConsumerWidget {
             ElevatedButton(
               style: CricButtonStyle.primary,
               onPressed: () async {
-                final refund = int.tryParse(refundController.text) ?? 0;
-                await leagueRepo.approveForfeit(leagueId, request.id, refund, promoteNext.value);
+                final dec = decision.value;
+                final refund = dec == 'PARTIAL_REFUND' ? (int.tryParse(refundController.text) ?? 0) : null;
+                final notes = notesController.text.trim();
+                await leagueRepo.approveForfeit(
+                  leagueId,
+                  request.id,
+                  dec,
+                  feeRefundAmount: refund,
+                  adminNotes: notes.isEmpty ? null : notes,
+                );
                 ref.invalidate(forfeitRequestsProvider(leagueId));
                 if (context.mounted) Navigator.pop(context);
               },

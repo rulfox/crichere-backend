@@ -112,12 +112,12 @@ class _AuthApi implements AuthApi {
   }
 
   @override
-  Future<AuthResponse> getCurrentUser() async {
+  Future<UserProfile> getCurrentUser() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<AuthResponse>(
+    final _options = _setStreamType<UserProfile>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -128,9 +128,9 @@ class _AuthApi implements AuthApi {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late AuthResponse _value;
+    late UserProfile _value;
     try {
-      _value = AuthResponse.fromJson(_result.data!);
+      _value = UserProfile.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
@@ -158,12 +158,12 @@ class _AuthApi implements AuthApi {
   }
 
   @override
-  Future<AuthResponse> getUser(String id) async {
+  Future<UserProfile> getUser(String id) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<AuthResponse>(
+    final _options = _setStreamType<UserProfile>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -174,9 +174,9 @@ class _AuthApi implements AuthApi {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late AuthResponse _value;
+    late UserProfile _value;
     try {
-      _value = AuthResponse.fromJson(_result.data!);
+      _value = UserProfile.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

@@ -71,11 +71,43 @@ class NotificationService {
     }
   }
 
+  /// Backend `DeviceTokenRequest` requires a non-null `platform` enum — omitting
+  /// it returns 400. Resolve it from the running platform.
+  String _platform() {
+    if (kIsWeb) return 'WEB';
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 'IOS';
+      case TargetPlatform.android:
+        return 'ANDROID';
+      default:
+        return 'ANDROID';
+    }
+  }
+
   Future<void> _registerDeviceToken(String token) async {
     try {
-      await _dio.post('${ApiEndpoints.notifications}/device-token', data: {'token': token});
+      await _dio.post(
+        '${ApiEndpoints.notifications}/device-token',
+        data: {'token': token, 'platform': _platform()},
+      );
     } catch (e) {
       debugPrint('Error registering device token: $e');
+    }
+  }
+
+  /// Unregisters the current FCM token (call on logout).
+  Future<void> unregisterDeviceToken() async {
+    try {
+      final token = await _fcm?.getToken();
+      if (token != null) {
+        await _dio.delete(
+          '${ApiEndpoints.notifications}/device-token',
+          data: {'token': token},
+        );
+      }
+    } catch (e) {
+      debugPrint('Error removing device token: $e');
     }
   }
 
