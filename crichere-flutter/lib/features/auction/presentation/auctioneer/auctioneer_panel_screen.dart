@@ -28,7 +28,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
     ref.listen(auctionEventsProvider(auctionId), (previous, next) {
       next.whenData((event) {
         ref.read(auctionStateProvider.notifier).handleEvent(event);
-        if (event is AuctionCompleted) {
+        if (event is AuctionCompletedEvent) {
           context.router.replace(PostAuctionRoute(auctionId: auctionId));
         }
       });
@@ -336,7 +336,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                             )).toList(),
                           ),
                           loading: () => const CircularProgressIndicator(),
-                          error: (_, ___) => const SizedBox(),
+                          error: (_, _) => const SizedBox(),
                         ),
                         
                         const SizedBox(height: 24),

@@ -9,56 +9,78 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i20;
-import 'package:crichere_flutter/features/admin/presentation/screens/platform_admin_screen.dart'
-    as _i14;
-import 'package:crichere_flutter/features/auction/presentation/auctioneer/auctioneer_panel_screen.dart'
+import 'package:auto_route/auto_route.dart' as _i23;
+import 'package:crichere_flutter/features/admin/presentation/screens/admin_users_screen.dart'
     as _i1;
-import 'package:crichere_flutter/features/auction/presentation/screens/live_auction_viewer_screen.dart'
-    as _i10;
-import 'package:crichere_flutter/features/auction/presentation/screens/post_auction_screen.dart'
+import 'package:crichere_flutter/features/admin/presentation/screens/platform_admin_screen.dart'
     as _i15;
-import 'package:crichere_flutter/features/auth/presentation/screens/claim_profile_screen.dart'
+import 'package:crichere_flutter/features/auction/presentation/auctioneer/auctioneer_panel_screen.dart'
     as _i2;
-import 'package:crichere_flutter/features/auth/presentation/screens/otp_screen.dart'
-    as _i12;
-import 'package:crichere_flutter/features/auth/presentation/screens/phone_entry_screen.dart'
-    as _i13;
-import 'package:crichere_flutter/features/auth/presentation/screens/profile_setup_screen.dart'
-    as _i18;
-import 'package:crichere_flutter/features/auth/presentation/screens/splash_screen.dart'
-    as _i19;
-import 'package:crichere_flutter/features/financials/presentation/screens/fee_management_screen.dart'
-    as _i3;
-import 'package:crichere_flutter/features/financials/presentation/screens/forfeit_management_screen.dart'
-    as _i4;
-import 'package:crichere_flutter/features/franchise/presentation/screens/franchise_invite_screen.dart'
-    as _i5;
-import 'package:crichere_flutter/features/franchise/presentation/screens/franchise_squad_screen.dart'
-    as _i6;
-import 'package:crichere_flutter/features/league/presentation/screens/home_screen.dart'
-    as _i7;
-import 'package:crichere_flutter/features/league/presentation/screens/league_create_screen.dart'
-    as _i8;
-import 'package:crichere_flutter/features/league/presentation/screens/league_detail_screen.dart'
-    as _i9;
-import 'package:crichere_flutter/features/league/presentation/screens/pre_assignment_screen.dart'
-    as _i16;
-import 'package:crichere_flutter/features/notification/presentation/screens/notification_screen.dart'
+import 'package:crichere_flutter/features/auction/presentation/screens/live_auction_viewer_screen.dart'
     as _i11;
-import 'package:crichere_flutter/features/player/presentation/screens/profile_edit_screen.dart'
+import 'package:crichere_flutter/features/auction/presentation/screens/post_auction_screen.dart'
+    as _i16;
+import 'package:crichere_flutter/features/auth/presentation/screens/claim_profile_screen.dart'
+    as _i3;
+import 'package:crichere_flutter/features/auth/presentation/screens/otp_screen.dart'
+    as _i13;
+import 'package:crichere_flutter/features/auth/presentation/screens/phone_entry_screen.dart'
+    as _i14;
+import 'package:crichere_flutter/features/auth/presentation/screens/profile_setup_screen.dart'
+    as _i20;
+import 'package:crichere_flutter/features/auth/presentation/screens/splash_screen.dart'
+    as _i22;
+import 'package:crichere_flutter/features/financials/presentation/screens/fee_management_screen.dart'
+    as _i4;
+import 'package:crichere_flutter/features/financials/presentation/screens/forfeit_management_screen.dart'
+    as _i5;
+import 'package:crichere_flutter/features/franchise/presentation/screens/franchise_invite_screen.dart'
+    as _i6;
+import 'package:crichere_flutter/features/franchise/presentation/screens/franchise_squad_screen.dart'
+    as _i7;
+import 'package:crichere_flutter/features/league/presentation/screens/home_screen.dart'
+    as _i8;
+import 'package:crichere_flutter/features/league/presentation/screens/league_create_screen.dart'
+    as _i9;
+import 'package:crichere_flutter/features/league/presentation/screens/league_detail_screen.dart'
+    as _i10;
+import 'package:crichere_flutter/features/league/presentation/screens/pre_assignment_screen.dart'
     as _i17;
-import 'package:flutter/material.dart' as _i21;
+import 'package:crichere_flutter/features/league/presentation/screens/pricing_screen.dart'
+    as _i18;
+import 'package:crichere_flutter/features/notification/presentation/screens/notification_screen.dart'
+    as _i12;
+import 'package:crichere_flutter/features/player/presentation/screens/profile_edit_screen.dart'
+    as _i19;
+import 'package:crichere_flutter/features/spectator/presentation/screens/spectator_screen.dart'
+    as _i21;
+import 'package:flutter/material.dart' as _i24;
 
 /// generated route for
-/// [_i1.AuctioneerPanelScreen]
+/// [_i1.AdminUsersScreen]
+class AdminUsersRoute extends _i23.PageRouteInfo<void> {
+  const AdminUsersRoute({List<_i23.PageRouteInfo>? children})
+    : super(AdminUsersRoute.name, initialChildren: children);
+
+  static const String name = 'AdminUsersRoute';
+
+  static _i23.PageInfo page = _i23.PageInfo(
+    name,
+    builder: (data) {
+      return const _i1.AdminUsersScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [_i2.AuctioneerPanelScreen]
 class AuctioneerPanelRoute
-    extends _i20.PageRouteInfo<AuctioneerPanelRouteArgs> {
+    extends _i23.PageRouteInfo<AuctioneerPanelRouteArgs> {
   AuctioneerPanelRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String auctionId,
     required String leagueId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          AuctioneerPanelRoute.name,
          args: AuctioneerPanelRouteArgs(
@@ -71,11 +93,11 @@ class AuctioneerPanelRoute
 
   static const String name = 'AuctioneerPanelRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<AuctioneerPanelRouteArgs>();
-      return _i1.AuctioneerPanelScreen(
+      return _i2.AuctioneerPanelScreen(
         key: args.key,
         auctionId: args.auctionId,
         leagueId: args.leagueId,
@@ -91,7 +113,7 @@ class AuctioneerPanelRouteArgs {
     required this.leagueId,
   });
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String auctionId;
 
@@ -116,13 +138,13 @@ class AuctioneerPanelRouteArgs {
 }
 
 /// generated route for
-/// [_i2.ClaimProfileScreen]
-class ClaimProfileRoute extends _i20.PageRouteInfo<ClaimProfileRouteArgs> {
+/// [_i3.ClaimProfileScreen]
+class ClaimProfileRoute extends _i23.PageRouteInfo<ClaimProfileRouteArgs> {
   ClaimProfileRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String profileId,
     required String suggestedName,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          ClaimProfileRoute.name,
          args: ClaimProfileRouteArgs(
@@ -135,11 +157,11 @@ class ClaimProfileRoute extends _i20.PageRouteInfo<ClaimProfileRouteArgs> {
 
   static const String name = 'ClaimProfileRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ClaimProfileRouteArgs>();
-      return _i2.ClaimProfileScreen(
+      return _i3.ClaimProfileScreen(
         key: args.key,
         profileId: args.profileId,
         suggestedName: args.suggestedName,
@@ -155,7 +177,7 @@ class ClaimProfileRouteArgs {
     required this.suggestedName,
   });
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String profileId;
 
@@ -181,12 +203,12 @@ class ClaimProfileRouteArgs {
 }
 
 /// generated route for
-/// [_i3.FeeManagementScreen]
-class FeeManagementRoute extends _i20.PageRouteInfo<FeeManagementRouteArgs> {
+/// [_i4.FeeManagementScreen]
+class FeeManagementRoute extends _i23.PageRouteInfo<FeeManagementRouteArgs> {
   FeeManagementRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String leagueId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          FeeManagementRoute.name,
          args: FeeManagementRouteArgs(key: key, leagueId: leagueId),
@@ -195,11 +217,11 @@ class FeeManagementRoute extends _i20.PageRouteInfo<FeeManagementRouteArgs> {
 
   static const String name = 'FeeManagementRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<FeeManagementRouteArgs>();
-      return _i3.FeeManagementScreen(key: args.key, leagueId: args.leagueId);
+      return _i4.FeeManagementScreen(key: args.key, leagueId: args.leagueId);
     },
   );
 }
@@ -207,7 +229,7 @@ class FeeManagementRoute extends _i20.PageRouteInfo<FeeManagementRouteArgs> {
 class FeeManagementRouteArgs {
   const FeeManagementRouteArgs({this.key, required this.leagueId});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String leagueId;
 
@@ -228,13 +250,13 @@ class FeeManagementRouteArgs {
 }
 
 /// generated route for
-/// [_i4.ForfeitManagementScreen]
+/// [_i5.ForfeitManagementScreen]
 class ForfeitManagementRoute
-    extends _i20.PageRouteInfo<ForfeitManagementRouteArgs> {
+    extends _i23.PageRouteInfo<ForfeitManagementRouteArgs> {
   ForfeitManagementRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String leagueId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          ForfeitManagementRoute.name,
          args: ForfeitManagementRouteArgs(key: key, leagueId: leagueId),
@@ -243,11 +265,11 @@ class ForfeitManagementRoute
 
   static const String name = 'ForfeitManagementRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ForfeitManagementRouteArgs>();
-      return _i4.ForfeitManagementScreen(
+      return _i5.ForfeitManagementScreen(
         key: args.key,
         leagueId: args.leagueId,
       );
@@ -258,7 +280,7 @@ class ForfeitManagementRoute
 class ForfeitManagementRouteArgs {
   const ForfeitManagementRouteArgs({this.key, required this.leagueId});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String leagueId;
 
@@ -279,13 +301,13 @@ class ForfeitManagementRouteArgs {
 }
 
 /// generated route for
-/// [_i5.FranchiseInviteScreen]
+/// [_i6.FranchiseInviteScreen]
 class FranchiseInviteRoute
-    extends _i20.PageRouteInfo<FranchiseInviteRouteArgs> {
+    extends _i23.PageRouteInfo<FranchiseInviteRouteArgs> {
   FranchiseInviteRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String token,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          FranchiseInviteRoute.name,
          args: FranchiseInviteRouteArgs(key: key, token: token),
@@ -295,7 +317,7 @@ class FranchiseInviteRoute
 
   static const String name = 'FranchiseInviteRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -303,7 +325,7 @@ class FranchiseInviteRoute
         orElse: () =>
             FranchiseInviteRouteArgs(token: pathParams.getString('token')),
       );
-      return _i5.FranchiseInviteScreen(key: args.key, token: args.token);
+      return _i6.FranchiseInviteScreen(key: args.key, token: args.token);
     },
   );
 }
@@ -311,7 +333,7 @@ class FranchiseInviteRoute
 class FranchiseInviteRouteArgs {
   const FranchiseInviteRouteArgs({this.key, required this.token});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String token;
 
@@ -332,12 +354,12 @@ class FranchiseInviteRouteArgs {
 }
 
 /// generated route for
-/// [_i6.FranchiseSquadScreen]
-class FranchiseSquadRoute extends _i20.PageRouteInfo<FranchiseSquadRouteArgs> {
+/// [_i7.FranchiseSquadScreen]
+class FranchiseSquadRoute extends _i23.PageRouteInfo<FranchiseSquadRouteArgs> {
   FranchiseSquadRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String franchiseId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          FranchiseSquadRoute.name,
          args: FranchiseSquadRouteArgs(key: key, franchiseId: franchiseId),
@@ -346,11 +368,11 @@ class FranchiseSquadRoute extends _i20.PageRouteInfo<FranchiseSquadRouteArgs> {
 
   static const String name = 'FranchiseSquadRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<FranchiseSquadRouteArgs>();
-      return _i6.FranchiseSquadScreen(
+      return _i7.FranchiseSquadScreen(
         key: args.key,
         franchiseId: args.franchiseId,
       );
@@ -361,7 +383,7 @@ class FranchiseSquadRoute extends _i20.PageRouteInfo<FranchiseSquadRouteArgs> {
 class FranchiseSquadRouteArgs {
   const FranchiseSquadRouteArgs({this.key, required this.franchiseId});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String franchiseId;
 
@@ -382,44 +404,44 @@ class FranchiseSquadRouteArgs {
 }
 
 /// generated route for
-/// [_i7.HomeScreen]
-class HomeRoute extends _i20.PageRouteInfo<void> {
-  const HomeRoute({List<_i20.PageRouteInfo>? children})
+/// [_i8.HomeScreen]
+class HomeRoute extends _i23.PageRouteInfo<void> {
+  const HomeRoute({List<_i23.PageRouteInfo>? children})
     : super(HomeRoute.name, initialChildren: children);
 
   static const String name = 'HomeRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i7.HomeScreen();
+      return const _i8.HomeScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i8.LeagueCreateScreen]
-class LeagueCreateRoute extends _i20.PageRouteInfo<void> {
-  const LeagueCreateRoute({List<_i20.PageRouteInfo>? children})
+/// [_i9.LeagueCreateScreen]
+class LeagueCreateRoute extends _i23.PageRouteInfo<void> {
+  const LeagueCreateRoute({List<_i23.PageRouteInfo>? children})
     : super(LeagueCreateRoute.name, initialChildren: children);
 
   static const String name = 'LeagueCreateRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i8.LeagueCreateScreen();
+      return const _i9.LeagueCreateScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i9.LeagueDetailScreen]
-class LeagueDetailRoute extends _i20.PageRouteInfo<LeagueDetailRouteArgs> {
+/// [_i10.LeagueDetailScreen]
+class LeagueDetailRoute extends _i23.PageRouteInfo<LeagueDetailRouteArgs> {
   LeagueDetailRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String leagueId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          LeagueDetailRoute.name,
          args: LeagueDetailRouteArgs(key: key, leagueId: leagueId),
@@ -428,11 +450,11 @@ class LeagueDetailRoute extends _i20.PageRouteInfo<LeagueDetailRouteArgs> {
 
   static const String name = 'LeagueDetailRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<LeagueDetailRouteArgs>();
-      return _i9.LeagueDetailScreen(key: args.key, leagueId: args.leagueId);
+      return _i10.LeagueDetailScreen(key: args.key, leagueId: args.leagueId);
     },
   );
 }
@@ -440,7 +462,7 @@ class LeagueDetailRoute extends _i20.PageRouteInfo<LeagueDetailRouteArgs> {
 class LeagueDetailRouteArgs {
   const LeagueDetailRouteArgs({this.key, required this.leagueId});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String leagueId;
 
@@ -461,13 +483,13 @@ class LeagueDetailRouteArgs {
 }
 
 /// generated route for
-/// [_i10.LiveAuctionViewerScreen]
+/// [_i11.LiveAuctionViewerScreen]
 class LiveAuctionViewerRoute
-    extends _i20.PageRouteInfo<LiveAuctionViewerRouteArgs> {
+    extends _i23.PageRouteInfo<LiveAuctionViewerRouteArgs> {
   LiveAuctionViewerRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String auctionId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          LiveAuctionViewerRoute.name,
          args: LiveAuctionViewerRouteArgs(key: key, auctionId: auctionId),
@@ -476,11 +498,11 @@ class LiveAuctionViewerRoute
 
   static const String name = 'LiveAuctionViewerRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<LiveAuctionViewerRouteArgs>();
-      return _i10.LiveAuctionViewerScreen(
+      return _i11.LiveAuctionViewerScreen(
         key: args.key,
         auctionId: args.auctionId,
       );
@@ -491,7 +513,7 @@ class LiveAuctionViewerRoute
 class LiveAuctionViewerRouteArgs {
   const LiveAuctionViewerRouteArgs({this.key, required this.auctionId});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String auctionId;
 
@@ -512,28 +534,28 @@ class LiveAuctionViewerRouteArgs {
 }
 
 /// generated route for
-/// [_i11.NotificationScreen]
-class NotificationRoute extends _i20.PageRouteInfo<void> {
-  const NotificationRoute({List<_i20.PageRouteInfo>? children})
+/// [_i12.NotificationScreen]
+class NotificationRoute extends _i23.PageRouteInfo<void> {
+  const NotificationRoute({List<_i23.PageRouteInfo>? children})
     : super(NotificationRoute.name, initialChildren: children);
 
   static const String name = 'NotificationRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i11.NotificationScreen();
+      return const _i12.NotificationScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i12.OtpScreen]
-class OtpRoute extends _i20.PageRouteInfo<OtpRouteArgs> {
+/// [_i13.OtpScreen]
+class OtpRoute extends _i23.PageRouteInfo<OtpRouteArgs> {
   OtpRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String phone,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          OtpRoute.name,
          args: OtpRouteArgs(key: key, phone: phone),
@@ -542,11 +564,11 @@ class OtpRoute extends _i20.PageRouteInfo<OtpRouteArgs> {
 
   static const String name = 'OtpRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<OtpRouteArgs>();
-      return _i12.OtpScreen(key: args.key, phone: args.phone);
+      return _i13.OtpScreen(key: args.key, phone: args.phone);
     },
   );
 }
@@ -554,7 +576,7 @@ class OtpRoute extends _i20.PageRouteInfo<OtpRouteArgs> {
 class OtpRouteArgs {
   const OtpRouteArgs({this.key, required this.phone});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String phone;
 
@@ -575,44 +597,44 @@ class OtpRouteArgs {
 }
 
 /// generated route for
-/// [_i13.PhoneEntryScreen]
-class PhoneEntryRoute extends _i20.PageRouteInfo<void> {
-  const PhoneEntryRoute({List<_i20.PageRouteInfo>? children})
+/// [_i14.PhoneEntryScreen]
+class PhoneEntryRoute extends _i23.PageRouteInfo<void> {
+  const PhoneEntryRoute({List<_i23.PageRouteInfo>? children})
     : super(PhoneEntryRoute.name, initialChildren: children);
 
   static const String name = 'PhoneEntryRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i13.PhoneEntryScreen();
+      return const _i14.PhoneEntryScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i14.PlatformAdminScreen]
-class PlatformAdminRoute extends _i20.PageRouteInfo<void> {
-  const PlatformAdminRoute({List<_i20.PageRouteInfo>? children})
+/// [_i15.PlatformAdminScreen]
+class PlatformAdminRoute extends _i23.PageRouteInfo<void> {
+  const PlatformAdminRoute({List<_i23.PageRouteInfo>? children})
     : super(PlatformAdminRoute.name, initialChildren: children);
 
   static const String name = 'PlatformAdminRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i14.PlatformAdminScreen();
+      return const _i15.PlatformAdminScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i15.PostAuctionScreen]
-class PostAuctionRoute extends _i20.PageRouteInfo<PostAuctionRouteArgs> {
+/// [_i16.PostAuctionScreen]
+class PostAuctionRoute extends _i23.PageRouteInfo<PostAuctionRouteArgs> {
   PostAuctionRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String auctionId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          PostAuctionRoute.name,
          args: PostAuctionRouteArgs(key: key, auctionId: auctionId),
@@ -621,11 +643,11 @@ class PostAuctionRoute extends _i20.PageRouteInfo<PostAuctionRouteArgs> {
 
   static const String name = 'PostAuctionRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<PostAuctionRouteArgs>();
-      return _i15.PostAuctionScreen(key: args.key, auctionId: args.auctionId);
+      return _i16.PostAuctionScreen(key: args.key, auctionId: args.auctionId);
     },
   );
 }
@@ -633,7 +655,7 @@ class PostAuctionRoute extends _i20.PageRouteInfo<PostAuctionRouteArgs> {
 class PostAuctionRouteArgs {
   const PostAuctionRouteArgs({this.key, required this.auctionId});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String auctionId;
 
@@ -654,12 +676,12 @@ class PostAuctionRouteArgs {
 }
 
 /// generated route for
-/// [_i16.PreAssignmentScreen]
-class PreAssignmentRoute extends _i20.PageRouteInfo<PreAssignmentRouteArgs> {
+/// [_i17.PreAssignmentScreen]
+class PreAssignmentRoute extends _i23.PageRouteInfo<PreAssignmentRouteArgs> {
   PreAssignmentRoute({
-    _i21.Key? key,
+    _i24.Key? key,
     required String leagueId,
-    List<_i20.PageRouteInfo>? children,
+    List<_i23.PageRouteInfo>? children,
   }) : super(
          PreAssignmentRoute.name,
          args: PreAssignmentRouteArgs(key: key, leagueId: leagueId),
@@ -668,11 +690,11 @@ class PreAssignmentRoute extends _i20.PageRouteInfo<PreAssignmentRouteArgs> {
 
   static const String name = 'PreAssignmentRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<PreAssignmentRouteArgs>();
-      return _i16.PreAssignmentScreen(key: args.key, leagueId: args.leagueId);
+      return _i17.PreAssignmentScreen(key: args.key, leagueId: args.leagueId);
     },
   );
 }
@@ -680,7 +702,7 @@ class PreAssignmentRoute extends _i20.PageRouteInfo<PreAssignmentRouteArgs> {
 class PreAssignmentRouteArgs {
   const PreAssignmentRouteArgs({this.key, required this.leagueId});
 
-  final _i21.Key? key;
+  final _i24.Key? key;
 
   final String leagueId;
 
@@ -701,49 +723,143 @@ class PreAssignmentRouteArgs {
 }
 
 /// generated route for
-/// [_i17.ProfileEditScreen]
-class ProfileEditRoute extends _i20.PageRouteInfo<void> {
-  const ProfileEditRoute({List<_i20.PageRouteInfo>? children})
+/// [_i18.PricingScreen]
+class PricingRoute extends _i23.PageRouteInfo<PricingRouteArgs> {
+  PricingRoute({
+    _i24.Key? key,
+    required String leagueId,
+    List<_i23.PageRouteInfo>? children,
+  }) : super(
+         PricingRoute.name,
+         args: PricingRouteArgs(key: key, leagueId: leagueId),
+         initialChildren: children,
+       );
+
+  static const String name = 'PricingRoute';
+
+  static _i23.PageInfo page = _i23.PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<PricingRouteArgs>();
+      return _i18.PricingScreen(key: args.key, leagueId: args.leagueId);
+    },
+  );
+}
+
+class PricingRouteArgs {
+  const PricingRouteArgs({this.key, required this.leagueId});
+
+  final _i24.Key? key;
+
+  final String leagueId;
+
+  @override
+  String toString() {
+    return 'PricingRouteArgs{key: $key, leagueId: $leagueId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PricingRouteArgs) return false;
+    return key == other.key && leagueId == other.leagueId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ leagueId.hashCode;
+}
+
+/// generated route for
+/// [_i19.ProfileEditScreen]
+class ProfileEditRoute extends _i23.PageRouteInfo<void> {
+  const ProfileEditRoute({List<_i23.PageRouteInfo>? children})
     : super(ProfileEditRoute.name, initialChildren: children);
 
   static const String name = 'ProfileEditRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i17.ProfileEditScreen();
+      return const _i19.ProfileEditScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i18.ProfileSetupScreen]
-class ProfileSetupRoute extends _i20.PageRouteInfo<void> {
-  const ProfileSetupRoute({List<_i20.PageRouteInfo>? children})
+/// [_i20.ProfileSetupScreen]
+class ProfileSetupRoute extends _i23.PageRouteInfo<void> {
+  const ProfileSetupRoute({List<_i23.PageRouteInfo>? children})
     : super(ProfileSetupRoute.name, initialChildren: children);
 
   static const String name = 'ProfileSetupRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i18.ProfileSetupScreen();
+      return const _i20.ProfileSetupScreen();
     },
   );
 }
 
 /// generated route for
-/// [_i19.SplashScreen]
-class SplashRoute extends _i20.PageRouteInfo<void> {
-  const SplashRoute({List<_i20.PageRouteInfo>? children})
+/// [_i21.SpectatorScreen]
+class SpectatorRoute extends _i23.PageRouteInfo<SpectatorRouteArgs> {
+  SpectatorRoute({
+    _i24.Key? key,
+    required String token,
+    List<_i23.PageRouteInfo>? children,
+  }) : super(
+         SpectatorRoute.name,
+         args: SpectatorRouteArgs(key: key, token: token),
+         initialChildren: children,
+       );
+
+  static const String name = 'SpectatorRoute';
+
+  static _i23.PageInfo page = _i23.PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<SpectatorRouteArgs>();
+      return _i21.SpectatorScreen(key: args.key, token: args.token);
+    },
+  );
+}
+
+class SpectatorRouteArgs {
+  const SpectatorRouteArgs({this.key, required this.token});
+
+  final _i24.Key? key;
+
+  final String token;
+
+  @override
+  String toString() {
+    return 'SpectatorRouteArgs{key: $key, token: $token}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! SpectatorRouteArgs) return false;
+    return key == other.key && token == other.token;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ token.hashCode;
+}
+
+/// generated route for
+/// [_i22.SplashScreen]
+class SplashRoute extends _i23.PageRouteInfo<void> {
+  const SplashRoute({List<_i23.PageRouteInfo>? children})
     : super(SplashRoute.name, initialChildren: children);
 
   static const String name = 'SplashRoute';
 
-  static _i20.PageInfo page = _i20.PageInfo(
+  static _i23.PageInfo page = _i23.PageInfo(
     name,
     builder: (data) {
-      return const _i19.SplashScreen();
+      return const _i22.SplashScreen();
     },
   );
 }

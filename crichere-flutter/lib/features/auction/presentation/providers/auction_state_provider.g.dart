@@ -8,12 +8,15 @@ part of 'auction_state_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Reduces the SSE [AuctionEvent] stream into a flat, render-friendly state.
 
 @ProviderFor(AuctionStateNotifier)
 final auctionStateProvider = AuctionStateNotifierProvider._();
 
+/// Reduces the SSE [AuctionEvent] stream into a flat, render-friendly state.
 final class AuctionStateNotifierProvider
     extends $NotifierProvider<AuctionStateNotifier, AuctionState> {
+  /// Reduces the SSE [AuctionEvent] stream into a flat, render-friendly state.
   AuctionStateNotifierProvider._()
     : super(
         from: null,
@@ -42,7 +45,9 @@ final class AuctionStateNotifierProvider
 }
 
 String _$auctionStateNotifierHash() =>
-    r'e1da1dcb66f3230c6de8f28d3c2b8becf13874a9';
+    r'd2ffe364b02e4123da27d9e3b95d0dba99bbb2af';
+
+/// Reduces the SSE [AuctionEvent] stream into a flat, render-friendly state.
 
 abstract class _$AuctionStateNotifier extends $Notifier<AuctionState> {
   AuctionState build();

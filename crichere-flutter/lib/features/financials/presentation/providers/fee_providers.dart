@@ -8,3 +8,9 @@ part 'fee_providers.g.dart';
 Future<List<FeeObligation>> feeObligations(Ref ref, String leagueId) {
   return ref.watch(leagueRepositoryProvider).getFeeObligations(leagueId);
 }
+
+/// Authoritative fee totals from the backend (`GET /leagues/{id}/fees/summary`).
+@riverpod
+Future<FeeSummary> feeSummary(Ref ref, String leagueId) {
+  return ref.watch(leagueRepositoryProvider).getFeeSummary(leagueId);
+}

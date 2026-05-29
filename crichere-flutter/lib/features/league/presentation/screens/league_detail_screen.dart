@@ -8,6 +8,10 @@ import '../providers/league_repository_provider.dart';
 import '../providers/waitlist_providers.dart';
 import '../../../../core/router/app_router.gr.dart';
 import 'package:crichere_flutter/features/league/domain/entities/league.dart' as domain;
+import 'package:crichere_flutter/features/franchise/presentation/providers/franchise_providers.dart';
+import 'package:crichere_flutter/features/auth/presentation/providers/auth_repository_provider.dart';
+import 'package:crichere_flutter/features/player/presentation/providers/player_providers.dart';
+import 'package:crichere_flutter/shared/widgets/user_picker.dart';
 
 @RoutePage()
 class LeagueDetailScreen extends ConsumerWidget {
@@ -180,8 +184,8 @@ class _OverviewTab extends ConsumerWidget {
             ),
           ElevatedButton(
             onPressed: () {
-              if (league.auctionId != null) {
-                context.router.push(LiveAuctionViewerRoute(auctionId: league.auctionId!));
+              if (league.currentAuctionId != null) {
+                context.router.push(LiveAuctionViewerRoute(auctionId: league.currentAuctionId!));
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Auction not initialized yet.')),
@@ -223,8 +227,8 @@ class _OverviewTab extends ConsumerWidget {
               Expanded(
                 child: CricCard(
                   onTap: () {
-                    if (league.auctionId != null) {
-                      context.router.push(AuctioneerPanelRoute(auctionId: league.auctionId!, leagueId: league.id));
+                    if (league.currentAuctionId != null) {
+                      context.router.push(AuctioneerPanelRoute(auctionId: league.currentAuctionId!, leagueId: league.id));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Auction not initialized yet.')),
@@ -275,6 +279,19 @@ class _OverviewTab extends ConsumerWidget {
                       const Icon(Icons.stars_outlined, color: CricColor.purple),
                       const SizedBox(height: CricSpacing.sm),
                       Text('PRE-ASSIGN', style: CricTextStyle.badge),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: CricSpacing.md),
+              Expanded(
+                child: CricCard(
+                  onTap: () => context.router.push(PricingRoute(leagueId: league.id)),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.sell_outlined, color: CricColor.blue),
+                      const SizedBox(height: CricSpacing.sm),
+                      Text('PRICING', style: CricTextStyle.badge),
                     ],
                   ),
                 ),
@@ -385,6 +402,116 @@ class _PlayersTab extends ConsumerWidget {
   final String leagueId;
   const _PlayersTab({required this.leagueId});
 
+  Future<void> _showRegisterDialog(BuildContext context, WidgetRef ref) async {
+    final basePriceController = TextEditingController();
+    final categoryController = TextEditingController();
+    final tagController = TextEditingController();
+    final user = ValueNotifier<({String id, String label})?>(null);
+    final saving = ValueNotifier(false);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: CricColor.slate2,
+        title: Text('Register Player', style: CricTextStyle.headingMd),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ValueListenableBuilder(
+                valueListenable: user,
+                builder: (context, value, _) => OutlinedButton.icon(
+                  icon: const Icon(Icons.person_outline, size: 18, color: CricColor.gold),
+                  label: Text(
+                    value?.label ?? 'Choose user',
+                    style: CricTextStyle.body.copyWith(
+                      color: value == null ? CricColor.textDim : CricColor.textPrimary,
+                    ),
+                  ),
+                  onPressed: () async {
+                    final picked = await showUserPicker(
+                      context,
+                      ref.read(authRepositoryProvider),
+                      title: 'Select player',
+                    );
+                    if (picked?.userId != null) {
+                      user.value = (id: picked!.userId!, label: picked.name ?? picked.phone ?? picked.userId!);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: basePriceController,
+                keyboardType: TextInputType.number,
+                style: CricTextStyle.body,
+                decoration: CricDecoration.textField(hint: 'Base price (optional)'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: categoryController,
+                style: CricTextStyle.body,
+                decoration: CricDecoration.textField(hint: 'Category (optional)'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: tagController,
+                style: CricTextStyle.body,
+                decoration: CricDecoration.textField(hint: 'Tag (optional)'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('CANCEL', style: CricTextStyle.badge.copyWith(color: CricColor.textDim)),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: saving,
+            builder: (context, isSaving, _) => ElevatedButton(
+              style: CricButtonStyle.primary,
+              onPressed: isSaving
+                  ? null
+                  : () async {
+                      final userId = user.value?.id;
+                      if (userId == null) {
+                        ScaffoldMessenger.of(dialogContext).showSnackBar(
+                          const SnackBar(content: Text('Please choose a user.')),
+                        );
+                        return;
+                      }
+                      saving.value = true;
+                      try {
+                        await ref.read(playerApiProvider).registerPlayer({
+                          'leagueId': leagueId,
+                          'userId': userId,
+                          if (basePriceController.text.trim().isNotEmpty)
+                            'basePrice': int.tryParse(basePriceController.text.trim()),
+                          if (categoryController.text.trim().isNotEmpty)
+                            'category': categoryController.text.trim(),
+                          if (tagController.text.trim().isNotEmpty) 'tag': tagController.text.trim(),
+                        });
+                        ref.invalidate(leaguePlayersProvider(leagueId));
+                        if (dialogContext.mounted) Navigator.pop(dialogContext);
+                      } catch (e) {
+                        saving.value = false;
+                        if (dialogContext.mounted) {
+                          ScaffoldMessenger.of(dialogContext)
+                              .showSnackBar(SnackBar(content: Text('Register failed: $e')));
+                        }
+                      }
+                    },
+              child: isSaving
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Text('REGISTER'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final playersAsync = ref.watch(leaguePlayersProvider(leagueId));
@@ -392,9 +519,20 @@ class _PlayersTab extends ConsumerWidget {
     return playersAsync.when(
       data: (players) => ListView.builder(
         padding: const EdgeInsets.all(CricSpacing.page),
-        itemCount: players.length,
+        itemCount: players.length + 1,
         itemBuilder: (context, index) {
-          final player = players[index];
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: CricSpacing.md),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.person_add_alt_1, color: CricColor.gold),
+                label: const Text('REGISTER PLAYER'),
+                style: CricButtonStyle.ghost,
+                onPressed: () => _showRegisterDialog(context, ref),
+              ),
+            );
+          }
+          final player = players[index - 1];
           return Padding(
             padding: const EdgeInsets.only(bottom: CricSpacing.sm),
             child: CricCard(
@@ -428,6 +566,106 @@ class _FranchisesTab extends ConsumerWidget {
   final String leagueId;
   const _FranchisesTab({required this.leagueId});
 
+  Future<void> _showCreateDialog(BuildContext context, WidgetRef ref) async {
+    final nameController = TextEditingController();
+    final purseController = TextEditingController(text: '40000');
+    final owner = ValueNotifier<({String id, String label})?>(null);
+    final saving = ValueNotifier(false);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: CricColor.slate2,
+        title: Text('Create Franchise', style: CricTextStyle.headingMd),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              style: CricTextStyle.body,
+              decoration: CricDecoration.textField(hint: 'Franchise name'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: purseController,
+              keyboardType: TextInputType.number,
+              style: CricTextStyle.body,
+              decoration: CricDecoration.textField(hint: 'Total purse (₹)'),
+            ),
+            const SizedBox(height: 12),
+            ValueListenableBuilder(
+              valueListenable: owner,
+              builder: (context, value, _) => OutlinedButton.icon(
+                icon: const Icon(Icons.person_outline, size: 18, color: CricColor.gold),
+                label: Text(
+                  value?.label ?? 'Choose owner',
+                  style: CricTextStyle.body.copyWith(
+                    color: value == null ? CricColor.textDim : CricColor.textPrimary,
+                  ),
+                ),
+                onPressed: () async {
+                  final picked = await showUserPicker(
+                    context,
+                    ref.read(authRepositoryProvider),
+                    title: 'Select franchise owner',
+                  );
+                  if (picked?.userId != null) {
+                    owner.value = (id: picked!.userId!, label: picked.name ?? picked.phone ?? picked.userId!);
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('CANCEL', style: CricTextStyle.badge.copyWith(color: CricColor.textDim)),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: saving,
+            builder: (context, isSaving, _) => ElevatedButton(
+              style: CricButtonStyle.primary,
+              onPressed: isSaving
+                  ? null
+                  : () async {
+                      final name = nameController.text.trim();
+                      final purse = int.tryParse(purseController.text.trim());
+                      final ownerId = owner.value?.id;
+                      if (name.isEmpty || purse == null || ownerId == null) {
+                        ScaffoldMessenger.of(dialogContext).showSnackBar(
+                          const SnackBar(content: Text('Name, purse and owner are required.')),
+                        );
+                        return;
+                      }
+                      saving.value = true;
+                      try {
+                        await ref.read(franchiseRepositoryProvider).createFranchise(
+                              leagueId: leagueId,
+                              name: name,
+                              ownerId: ownerId,
+                              totalPurse: purse,
+                            );
+                        ref.invalidate(leagueFranchisesProvider(leagueId));
+                        if (dialogContext.mounted) Navigator.pop(dialogContext);
+                      } catch (e) {
+                        saving.value = false;
+                        if (dialogContext.mounted) {
+                          ScaffoldMessenger.of(dialogContext)
+                              .showSnackBar(SnackBar(content: Text('Create failed: $e')));
+                        }
+                      }
+                    },
+              child: isSaving
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Text('CREATE'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final franchisesAsync = ref.watch(leagueFranchisesProvider(leagueId));
@@ -435,12 +673,24 @@ class _FranchisesTab extends ConsumerWidget {
     return franchisesAsync.when(
       data: (franchises) => ListView.builder(
         padding: const EdgeInsets.all(CricSpacing.page),
-        itemCount: franchises.length,
+        itemCount: franchises.length + 1,
         itemBuilder: (context, index) {
-          final franchise = franchises[index];
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: CricSpacing.md),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.add, color: CricColor.gold),
+                label: const Text('CREATE FRANCHISE'),
+                style: CricButtonStyle.ghost,
+                onPressed: () => _showCreateDialog(context, ref),
+              ),
+            );
+          }
+          final franchise = franchises[index - 1];
           return Padding(
             padding: const EdgeInsets.only(bottom: CricSpacing.md),
             child: CricCard(
+              onTap: () => context.router.push(FranchiseSquadRoute(franchiseId: franchise.id)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -457,18 +707,13 @@ class _FranchisesTab extends ConsumerWidget {
                       ),
                       const SizedBox(width: CricSpacing.md),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(franchise.name, style: CricTextStyle.headingMd),
-                            Text('11 Players · Owner: Amit G.', style: CricTextStyle.caption),
-                          ],
-                        ),
+                        child: Text(franchise.name, style: CricTextStyle.headingMd),
                       ),
+                      const Icon(Icons.chevron_right, color: CricColor.textDim),
                     ],
                   ),
                   const SizedBox(height: CricSpacing.lg),
-                  const PurseBar(spent: 18000, total: 40000),
+                  PurseBar(spent: franchise.startingPurse - franchise.currentPurse, total: franchise.startingPurse),
                 ],
               ),
             ),

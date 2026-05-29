@@ -4,6 +4,7 @@ import '../domain/entities/auth_enums.dart';
 import 'auth_api.dart';
 import 'models/auth_request.dart';
 import 'models/auth_response.dart';
+import '../domain/entities/user_profile.dart';
 import '../../../core/network/page_response.dart';
 import '../../league/domain/entities/league.dart';
 
@@ -59,12 +60,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<AuthResponse> getCurrentUser() async {
+  Future<UserProfile> getCurrentUser() async {
     return await _api.getCurrentUser();
   }
 
   @override
-  Future<AuthResponse> getUser(String id) async {
+  Future<UserProfile> getUser(String id) async {
     return await _api.getUser(id);
   }
 

@@ -10,6 +10,22 @@ class FranchiseRepositoryImpl implements FranchiseRepository {
   FranchiseRepositoryImpl(this._api);
 
   @override
+  Future<Franchise> createFranchise({required String leagueId, required String name, required String ownerId, required int totalPurse, String? logoUrl}) async {
+    return await _api.createFranchise({
+      'leagueId': leagueId,
+      'name': name,
+      'ownerId': ownerId,
+      'totalPurse': totalPurse,
+      if (logoUrl != null) 'logoUrl': logoUrl,
+    });
+  }
+
+  @override
+  Future<FranchiseInvite> createInvite(String franchiseId, String email) async {
+    return await _api.createInvite(franchiseId, {'email': email});
+  }
+
+  @override
   Future<Franchise> getFranchise(String id) async {
     return await _api.getFranchise(id);
   }

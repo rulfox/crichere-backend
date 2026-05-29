@@ -1,8 +1,6 @@
-import 'dart:async';
-import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:crichere_flutter/core/network/api_endpoints.dart';
+import 'package:crichere_flutter/core/network/sse_client.dart';
 import 'package:crichere_flutter/core/providers/auth_provider.dart';
 import '../../data/auction_api.dart';
 import '../../data/auction_repository_impl.dart';
@@ -12,48 +10,34 @@ import '../../domain/entities/auction_summary.dart';
 
 part 'auction_provider.g.dart';
 
+/// Tracks the SSE connection lifecycle for an auction so the UI can show
+/// connecting / live / reconnecting states. Updated by [auctionEvents].
 @riverpod
-Stream<AuctionEvent> auctionEvents(Ref ref, String auctionId) async* {
+class AuctionConnection extends _$AuctionConnection {
+  @override
+  SseConnectionStatus build(String auctionId) => SseConnectionStatus.connecting;
+
+  // ignore: use_setters_to_change_properties
+  void update(SseConnectionStatus status) => state = status;
+}
+
+/// Live auction event stream. Auto-reconnects with `Last-Event-ID` replay; the
+/// first event is always a [AuctionEvent.snapshot]. The bearer token is attached
+/// by the shared Dio interceptor.
+@riverpod
+Stream<AuctionEvent> auctionEvents(Ref ref, String auctionId) {
   final dio = ref.read(dioClientProvider).dio;
-  int backoffSeconds = 2;
-  const int maxBackoff = 30;
-
-  while (true) {
-    try {
-      // Open SSE stream via dio
-      final url = '${ApiEndpoints.baseUrl}/auctions/$auctionId/events';
-      final response = await dio.get<ResponseBody>(
-        url,
-        options: Options(
-          responseType: ResponseType.stream,
-          headers: {
-            'Accept': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-          },
-        ),
-      );
-
-      backoffSeconds = 2;
-
-      final lines = response.data!.stream
-          .cast<List<int>>()
-          .transform(utf8.decoder)
-          .transform(const LineSplitter());
-
-      await for (final line in lines) {
-        if (line.startsWith('data:')) {
-          final data = line.substring(5).trim();
-          if (data.isNotEmpty) {
-            final json = jsonDecode(data);
-            yield AuctionEvent.fromJson(json);
-          }
-        }
-      }
-    } catch (e) {
-      await Future.delayed(Duration(seconds: backoffSeconds));
-      backoffSeconds = (backoffSeconds * 2).clamp(2, maxBackoff);
-    }
-  }
+  final client = AuctionSseClient(
+    dio: dio,
+    url: '${ApiEndpoints.baseUrl}/auctions/$auctionId/events',
+    onStatus: (status) {
+      // Fired asynchronously while the stream is live; safe to push into the
+      // sibling connection provider.
+      ref.read(auctionConnectionProvider(auctionId).notifier).update(status);
+    },
+  );
+  ref.onDispose(client.close);
+  return client.connect();
 }
 
 @riverpod

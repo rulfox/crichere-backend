@@ -48,16 +48,34 @@ abstract class FeeObligationListResponse with _$FeeObligationListResponse {
   factory FeeObligationListResponse.fromJson(Map<String, dynamic> json) => _$FeeObligationListResponseFromJson(json);
 }
 
+// Matches backend FeePaymentResponse
 @freezed
 abstract class FeePayment with _$FeePayment {
   const factory FeePayment({
     required String id,
     required String obligationId,
     required int amount,
-    required String paymentMode, // CASH, ONLINE
-    required DateTime paidAt,
+    required String paymentMode, // CASH, ONLINE, REFUND, WAIVER
     String? notes,
+    String? recordedBy,
+    DateTime? createdAt,
   }) = _FeePayment;
 
   factory FeePayment.fromJson(Map<String, dynamic> json) => _$FeePaymentFromJson(json);
+}
+
+// Matches backend FeeSummaryResponse
+@freezed
+abstract class FeeSummary with _$FeeSummary {
+  const factory FeeSummary({
+    @Default(0) int totalExpected,
+    @Default(0) int totalCollected,
+    @Default(0) int balanceDue,
+    @Default(0) int unpaidCount,
+    @Default(0) int partiallyPaidCount,
+    @Default(0) int paidCount,
+    @Default(0) int waivedCount,
+  }) = _FeeSummary;
+
+  factory FeeSummary.fromJson(Map<String, dynamic> json) => _$FeeSummaryFromJson(json);
 }

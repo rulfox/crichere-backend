@@ -97,11 +97,11 @@ final currentUserProvider = CurrentUserProvider._();
 final class CurrentUserProvider
     extends
         $FunctionalProvider<
-          AsyncValue<AuthResponse>,
-          AuthResponse,
-          FutureOr<AuthResponse>
+          AsyncValue<UserProfile>,
+          UserProfile,
+          FutureOr<UserProfile>
         >
-    with $FutureModifier<AuthResponse>, $FutureProvider<AuthResponse> {
+    with $FutureModifier<UserProfile>, $FutureProvider<UserProfile> {
   CurrentUserProvider._()
     : super(
         from: null,
@@ -118,17 +118,17 @@ final class CurrentUserProvider
 
   @$internal
   @override
-  $FutureProviderElement<AuthResponse> $createElement(
+  $FutureProviderElement<UserProfile> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<AuthResponse> create(Ref ref) {
+  FutureOr<UserProfile> create(Ref ref) {
     return currentUser(ref);
   }
 }
 
-String _$currentUserHash() => r'4d9410bc980557f91bb2370eff4a97266fb4336c';
+String _$currentUserHash() => r'6e7505ab8a313acbe9a2a56fcb2849e377ae108d';
 
 @ProviderFor(sendOtpUseCase)
 final sendOtpUseCaseProvider = SendOtpUseCaseProvider._();

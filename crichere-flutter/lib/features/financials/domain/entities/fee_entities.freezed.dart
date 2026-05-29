@@ -879,8 +879,8 @@ as int,
 /// @nodoc
 mixin _$FeePayment {
 
- String get id; String get obligationId; int get amount; String get paymentMode;// CASH, ONLINE
- DateTime get paidAt; String? get notes;
+ String get id; String get obligationId; int get amount; String get paymentMode;// CASH, ONLINE, REFUND, WAIVER
+ String? get notes; String? get recordedBy; DateTime? get createdAt;
 /// Create a copy of FeePayment
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -893,16 +893,16 @@ $FeePaymentCopyWith<FeePayment> get copyWith => _$FeePaymentCopyWithImpl<FeePaym
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeePayment&&(identical(other.id, id) || other.id == id)&&(identical(other.obligationId, obligationId) || other.obligationId == obligationId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMode, paymentMode) || other.paymentMode == paymentMode)&&(identical(other.paidAt, paidAt) || other.paidAt == paidAt)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeePayment&&(identical(other.id, id) || other.id == id)&&(identical(other.obligationId, obligationId) || other.obligationId == obligationId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMode, paymentMode) || other.paymentMode == paymentMode)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.recordedBy, recordedBy) || other.recordedBy == recordedBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,obligationId,amount,paymentMode,paidAt,notes);
+int get hashCode => Object.hash(runtimeType,id,obligationId,amount,paymentMode,notes,recordedBy,createdAt);
 
 @override
 String toString() {
-  return 'FeePayment(id: $id, obligationId: $obligationId, amount: $amount, paymentMode: $paymentMode, paidAt: $paidAt, notes: $notes)';
+  return 'FeePayment(id: $id, obligationId: $obligationId, amount: $amount, paymentMode: $paymentMode, notes: $notes, recordedBy: $recordedBy, createdAt: $createdAt)';
 }
 
 
@@ -913,7 +913,7 @@ abstract mixin class $FeePaymentCopyWith<$Res>  {
   factory $FeePaymentCopyWith(FeePayment value, $Res Function(FeePayment) _then) = _$FeePaymentCopyWithImpl;
 @useResult
 $Res call({
- String id, String obligationId, int amount, String paymentMode, DateTime paidAt, String? notes
+ String id, String obligationId, int amount, String paymentMode, String? notes, String? recordedBy, DateTime? createdAt
 });
 
 
@@ -930,15 +930,16 @@ class _$FeePaymentCopyWithImpl<$Res>
 
 /// Create a copy of FeePayment
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? obligationId = null,Object? amount = null,Object? paymentMode = null,Object? paidAt = null,Object? notes = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? obligationId = null,Object? amount = null,Object? paymentMode = null,Object? notes = freezed,Object? recordedBy = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,obligationId: null == obligationId ? _self.obligationId : obligationId // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as int,paymentMode: null == paymentMode ? _self.paymentMode : paymentMode // ignore: cast_nullable_to_non_nullable
-as String,paidAt: null == paidAt ? _self.paidAt : paidAt // ignore: cast_nullable_to_non_nullable
-as DateTime,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
-as String?,
+as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,recordedBy: freezed == recordedBy ? _self.recordedBy : recordedBy // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -1023,10 +1024,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String obligationId,  int amount,  String paymentMode,  DateTime paidAt,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String obligationId,  int amount,  String paymentMode,  String? notes,  String? recordedBy,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FeePayment() when $default != null:
-return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that.paidAt,_that.notes);case _:
+return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that.notes,_that.recordedBy,_that.createdAt);case _:
   return orElse();
 
 }
@@ -1044,10 +1045,10 @@ return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String obligationId,  int amount,  String paymentMode,  DateTime paidAt,  String? notes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String obligationId,  int amount,  String paymentMode,  String? notes,  String? recordedBy,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _FeePayment():
-return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that.paidAt,_that.notes);case _:
+return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that.notes,_that.recordedBy,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1064,10 +1065,10 @@ return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String obligationId,  int amount,  String paymentMode,  DateTime paidAt,  String? notes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String obligationId,  int amount,  String paymentMode,  String? notes,  String? recordedBy,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FeePayment() when $default != null:
-return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that.paidAt,_that.notes);case _:
+return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that.notes,_that.recordedBy,_that.createdAt);case _:
   return null;
 
 }
@@ -1079,16 +1080,17 @@ return $default(_that.id,_that.obligationId,_that.amount,_that.paymentMode,_that
 @JsonSerializable()
 
 class _FeePayment implements FeePayment {
-  const _FeePayment({required this.id, required this.obligationId, required this.amount, required this.paymentMode, required this.paidAt, this.notes});
+  const _FeePayment({required this.id, required this.obligationId, required this.amount, required this.paymentMode, this.notes, this.recordedBy, this.createdAt});
   factory _FeePayment.fromJson(Map<String, dynamic> json) => _$FeePaymentFromJson(json);
 
 @override final  String id;
 @override final  String obligationId;
 @override final  int amount;
 @override final  String paymentMode;
-// CASH, ONLINE
-@override final  DateTime paidAt;
+// CASH, ONLINE, REFUND, WAIVER
 @override final  String? notes;
+@override final  String? recordedBy;
+@override final  DateTime? createdAt;
 
 /// Create a copy of FeePayment
 /// with the given fields replaced by the non-null parameter values.
@@ -1103,16 +1105,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeePayment&&(identical(other.id, id) || other.id == id)&&(identical(other.obligationId, obligationId) || other.obligationId == obligationId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMode, paymentMode) || other.paymentMode == paymentMode)&&(identical(other.paidAt, paidAt) || other.paidAt == paidAt)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeePayment&&(identical(other.id, id) || other.id == id)&&(identical(other.obligationId, obligationId) || other.obligationId == obligationId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMode, paymentMode) || other.paymentMode == paymentMode)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.recordedBy, recordedBy) || other.recordedBy == recordedBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,obligationId,amount,paymentMode,paidAt,notes);
+int get hashCode => Object.hash(runtimeType,id,obligationId,amount,paymentMode,notes,recordedBy,createdAt);
 
 @override
 String toString() {
-  return 'FeePayment(id: $id, obligationId: $obligationId, amount: $amount, paymentMode: $paymentMode, paidAt: $paidAt, notes: $notes)';
+  return 'FeePayment(id: $id, obligationId: $obligationId, amount: $amount, paymentMode: $paymentMode, notes: $notes, recordedBy: $recordedBy, createdAt: $createdAt)';
 }
 
 
@@ -1123,7 +1125,7 @@ abstract mixin class _$FeePaymentCopyWith<$Res> implements $FeePaymentCopyWith<$
   factory _$FeePaymentCopyWith(_FeePayment value, $Res Function(_FeePayment) _then) = __$FeePaymentCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String obligationId, int amount, String paymentMode, DateTime paidAt, String? notes
+ String id, String obligationId, int amount, String paymentMode, String? notes, String? recordedBy, DateTime? createdAt
 });
 
 
@@ -1140,15 +1142,297 @@ class __$FeePaymentCopyWithImpl<$Res>
 
 /// Create a copy of FeePayment
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? obligationId = null,Object? amount = null,Object? paymentMode = null,Object? paidAt = null,Object? notes = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? obligationId = null,Object? amount = null,Object? paymentMode = null,Object? notes = freezed,Object? recordedBy = freezed,Object? createdAt = freezed,}) {
   return _then(_FeePayment(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,obligationId: null == obligationId ? _self.obligationId : obligationId // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as int,paymentMode: null == paymentMode ? _self.paymentMode : paymentMode // ignore: cast_nullable_to_non_nullable
-as String,paidAt: null == paidAt ? _self.paidAt : paidAt // ignore: cast_nullable_to_non_nullable
-as DateTime,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
-as String?,
+as String,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,recordedBy: freezed == recordedBy ? _self.recordedBy : recordedBy // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$FeeSummary {
+
+ int get totalExpected; int get totalCollected; int get balanceDue; int get unpaidCount; int get partiallyPaidCount; int get paidCount; int get waivedCount;
+/// Create a copy of FeeSummary
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FeeSummaryCopyWith<FeeSummary> get copyWith => _$FeeSummaryCopyWithImpl<FeeSummary>(this as FeeSummary, _$identity);
+
+  /// Serializes this FeeSummary to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FeeSummary&&(identical(other.totalExpected, totalExpected) || other.totalExpected == totalExpected)&&(identical(other.totalCollected, totalCollected) || other.totalCollected == totalCollected)&&(identical(other.balanceDue, balanceDue) || other.balanceDue == balanceDue)&&(identical(other.unpaidCount, unpaidCount) || other.unpaidCount == unpaidCount)&&(identical(other.partiallyPaidCount, partiallyPaidCount) || other.partiallyPaidCount == partiallyPaidCount)&&(identical(other.paidCount, paidCount) || other.paidCount == paidCount)&&(identical(other.waivedCount, waivedCount) || other.waivedCount == waivedCount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,totalExpected,totalCollected,balanceDue,unpaidCount,partiallyPaidCount,paidCount,waivedCount);
+
+@override
+String toString() {
+  return 'FeeSummary(totalExpected: $totalExpected, totalCollected: $totalCollected, balanceDue: $balanceDue, unpaidCount: $unpaidCount, partiallyPaidCount: $partiallyPaidCount, paidCount: $paidCount, waivedCount: $waivedCount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FeeSummaryCopyWith<$Res>  {
+  factory $FeeSummaryCopyWith(FeeSummary value, $Res Function(FeeSummary) _then) = _$FeeSummaryCopyWithImpl;
+@useResult
+$Res call({
+ int totalExpected, int totalCollected, int balanceDue, int unpaidCount, int partiallyPaidCount, int paidCount, int waivedCount
+});
+
+
+
+
+}
+/// @nodoc
+class _$FeeSummaryCopyWithImpl<$Res>
+    implements $FeeSummaryCopyWith<$Res> {
+  _$FeeSummaryCopyWithImpl(this._self, this._then);
+
+  final FeeSummary _self;
+  final $Res Function(FeeSummary) _then;
+
+/// Create a copy of FeeSummary
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? totalExpected = null,Object? totalCollected = null,Object? balanceDue = null,Object? unpaidCount = null,Object? partiallyPaidCount = null,Object? paidCount = null,Object? waivedCount = null,}) {
+  return _then(_self.copyWith(
+totalExpected: null == totalExpected ? _self.totalExpected : totalExpected // ignore: cast_nullable_to_non_nullable
+as int,totalCollected: null == totalCollected ? _self.totalCollected : totalCollected // ignore: cast_nullable_to_non_nullable
+as int,balanceDue: null == balanceDue ? _self.balanceDue : balanceDue // ignore: cast_nullable_to_non_nullable
+as int,unpaidCount: null == unpaidCount ? _self.unpaidCount : unpaidCount // ignore: cast_nullable_to_non_nullable
+as int,partiallyPaidCount: null == partiallyPaidCount ? _self.partiallyPaidCount : partiallyPaidCount // ignore: cast_nullable_to_non_nullable
+as int,paidCount: null == paidCount ? _self.paidCount : paidCount // ignore: cast_nullable_to_non_nullable
+as int,waivedCount: null == waivedCount ? _self.waivedCount : waivedCount // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FeeSummary].
+extension FeeSummaryPatterns on FeeSummary {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FeeSummary value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FeeSummary() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FeeSummary value)  $default,){
+final _that = this;
+switch (_that) {
+case _FeeSummary():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FeeSummary value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FeeSummary() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int totalExpected,  int totalCollected,  int balanceDue,  int unpaidCount,  int partiallyPaidCount,  int paidCount,  int waivedCount)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FeeSummary() when $default != null:
+return $default(_that.totalExpected,_that.totalCollected,_that.balanceDue,_that.unpaidCount,_that.partiallyPaidCount,_that.paidCount,_that.waivedCount);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int totalExpected,  int totalCollected,  int balanceDue,  int unpaidCount,  int partiallyPaidCount,  int paidCount,  int waivedCount)  $default,) {final _that = this;
+switch (_that) {
+case _FeeSummary():
+return $default(_that.totalExpected,_that.totalCollected,_that.balanceDue,_that.unpaidCount,_that.partiallyPaidCount,_that.paidCount,_that.waivedCount);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int totalExpected,  int totalCollected,  int balanceDue,  int unpaidCount,  int partiallyPaidCount,  int paidCount,  int waivedCount)?  $default,) {final _that = this;
+switch (_that) {
+case _FeeSummary() when $default != null:
+return $default(_that.totalExpected,_that.totalCollected,_that.balanceDue,_that.unpaidCount,_that.partiallyPaidCount,_that.paidCount,_that.waivedCount);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FeeSummary implements FeeSummary {
+  const _FeeSummary({this.totalExpected = 0, this.totalCollected = 0, this.balanceDue = 0, this.unpaidCount = 0, this.partiallyPaidCount = 0, this.paidCount = 0, this.waivedCount = 0});
+  factory _FeeSummary.fromJson(Map<String, dynamic> json) => _$FeeSummaryFromJson(json);
+
+@override@JsonKey() final  int totalExpected;
+@override@JsonKey() final  int totalCollected;
+@override@JsonKey() final  int balanceDue;
+@override@JsonKey() final  int unpaidCount;
+@override@JsonKey() final  int partiallyPaidCount;
+@override@JsonKey() final  int paidCount;
+@override@JsonKey() final  int waivedCount;
+
+/// Create a copy of FeeSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FeeSummaryCopyWith<_FeeSummary> get copyWith => __$FeeSummaryCopyWithImpl<_FeeSummary>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FeeSummaryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FeeSummary&&(identical(other.totalExpected, totalExpected) || other.totalExpected == totalExpected)&&(identical(other.totalCollected, totalCollected) || other.totalCollected == totalCollected)&&(identical(other.balanceDue, balanceDue) || other.balanceDue == balanceDue)&&(identical(other.unpaidCount, unpaidCount) || other.unpaidCount == unpaidCount)&&(identical(other.partiallyPaidCount, partiallyPaidCount) || other.partiallyPaidCount == partiallyPaidCount)&&(identical(other.paidCount, paidCount) || other.paidCount == paidCount)&&(identical(other.waivedCount, waivedCount) || other.waivedCount == waivedCount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,totalExpected,totalCollected,balanceDue,unpaidCount,partiallyPaidCount,paidCount,waivedCount);
+
+@override
+String toString() {
+  return 'FeeSummary(totalExpected: $totalExpected, totalCollected: $totalCollected, balanceDue: $balanceDue, unpaidCount: $unpaidCount, partiallyPaidCount: $partiallyPaidCount, paidCount: $paidCount, waivedCount: $waivedCount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FeeSummaryCopyWith<$Res> implements $FeeSummaryCopyWith<$Res> {
+  factory _$FeeSummaryCopyWith(_FeeSummary value, $Res Function(_FeeSummary) _then) = __$FeeSummaryCopyWithImpl;
+@override @useResult
+$Res call({
+ int totalExpected, int totalCollected, int balanceDue, int unpaidCount, int partiallyPaidCount, int paidCount, int waivedCount
+});
+
+
+
+
+}
+/// @nodoc
+class __$FeeSummaryCopyWithImpl<$Res>
+    implements _$FeeSummaryCopyWith<$Res> {
+  __$FeeSummaryCopyWithImpl(this._self, this._then);
+
+  final _FeeSummary _self;
+  final $Res Function(_FeeSummary) _then;
+
+/// Create a copy of FeeSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? totalExpected = null,Object? totalCollected = null,Object? balanceDue = null,Object? unpaidCount = null,Object? partiallyPaidCount = null,Object? paidCount = null,Object? waivedCount = null,}) {
+  return _then(_FeeSummary(
+totalExpected: null == totalExpected ? _self.totalExpected : totalExpected // ignore: cast_nullable_to_non_nullable
+as int,totalCollected: null == totalCollected ? _self.totalCollected : totalCollected // ignore: cast_nullable_to_non_nullable
+as int,balanceDue: null == balanceDue ? _self.balanceDue : balanceDue // ignore: cast_nullable_to_non_nullable
+as int,unpaidCount: null == unpaidCount ? _self.unpaidCount : unpaidCount // ignore: cast_nullable_to_non_nullable
+as int,partiallyPaidCount: null == partiallyPaidCount ? _self.partiallyPaidCount : partiallyPaidCount // ignore: cast_nullable_to_non_nullable
+as int,paidCount: null == paidCount ? _self.paidCount : paidCount // ignore: cast_nullable_to_non_nullable
+as int,waivedCount: null == waivedCount ? _self.waivedCount : waivedCount // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

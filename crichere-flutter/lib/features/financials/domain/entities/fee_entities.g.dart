@@ -80,8 +80,11 @@ _FeePayment _$FeePaymentFromJson(Map<String, dynamic> json) => _FeePayment(
   obligationId: json['obligationId'] as String,
   amount: (json['amount'] as num).toInt(),
   paymentMode: json['paymentMode'] as String,
-  paidAt: DateTime.parse(json['paidAt'] as String),
   notes: json['notes'] as String?,
+  recordedBy: json['recordedBy'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
 );
 
 Map<String, dynamic> _$FeePaymentToJson(_FeePayment instance) =>
@@ -90,6 +93,28 @@ Map<String, dynamic> _$FeePaymentToJson(_FeePayment instance) =>
       'obligationId': instance.obligationId,
       'amount': instance.amount,
       'paymentMode': instance.paymentMode,
-      'paidAt': instance.paidAt.toIso8601String(),
       'notes': instance.notes,
+      'recordedBy': instance.recordedBy,
+      'createdAt': instance.createdAt?.toIso8601String(),
+    };
+
+_FeeSummary _$FeeSummaryFromJson(Map<String, dynamic> json) => _FeeSummary(
+  totalExpected: (json['totalExpected'] as num?)?.toInt() ?? 0,
+  totalCollected: (json['totalCollected'] as num?)?.toInt() ?? 0,
+  balanceDue: (json['balanceDue'] as num?)?.toInt() ?? 0,
+  unpaidCount: (json['unpaidCount'] as num?)?.toInt() ?? 0,
+  partiallyPaidCount: (json['partiallyPaidCount'] as num?)?.toInt() ?? 0,
+  paidCount: (json['paidCount'] as num?)?.toInt() ?? 0,
+  waivedCount: (json['waivedCount'] as num?)?.toInt() ?? 0,
+);
+
+Map<String, dynamic> _$FeeSummaryToJson(_FeeSummary instance) =>
+    <String, dynamic>{
+      'totalExpected': instance.totalExpected,
+      'totalCollected': instance.totalCollected,
+      'balanceDue': instance.balanceDue,
+      'unpaidCount': instance.unpaidCount,
+      'partiallyPaidCount': instance.partiallyPaidCount,
+      'paidCount': instance.paidCount,
+      'waivedCount': instance.waivedCount,
     };

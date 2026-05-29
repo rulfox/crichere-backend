@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,6 +22,86 @@ class FranchiseSquadScreen extends ConsumerStatefulWidget {
 class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
   final ScreenshotController _screenshotController = ScreenshotController();
 
+  Future<void> _showInviteDialog() async {
+    final emailController = TextEditingController();
+    final sending = ValueNotifier(false);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: CricColor.slate2,
+        title: Text('Invite Owner', style: CricTextStyle.headingMd),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Send an invite email so the recipient can claim ownership of this franchise.',
+                style: CricTextStyle.caption),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              style: CricTextStyle.body,
+              decoration: CricDecoration.textField(hint: 'owner@example.com'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('CANCEL', style: CricTextStyle.badge.copyWith(color: CricColor.textDim)),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: sending,
+            builder: (context, isSending, _) => ElevatedButton(
+              style: CricButtonStyle.primary,
+              onPressed: isSending
+                  ? null
+                  : () async {
+                      final email = emailController.text.trim();
+                      if (email.isEmpty) return;
+                      sending.value = true;
+                      try {
+                        final invite = await ref
+                            .read(franchiseRepositoryProvider)
+                            .createInvite(widget.franchiseId, email);
+                        if (dialogContext.mounted) Navigator.pop(dialogContext);
+                        _showInviteResult(invite.inviteUrl);
+                      } catch (e) {
+                        sending.value = false;
+                        if (dialogContext.mounted) {
+                          ScaffoldMessenger.of(dialogContext)
+                              .showSnackBar(SnackBar(content: Text('Invite failed: $e')));
+                        }
+                      }
+                    },
+              child: isSending
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Text('SEND INVITE'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showInviteResult(String? inviteUrl) {
+    if (!mounted) return;
+    if (inviteUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Invite sent.')));
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Invite sent — link copied to clipboard.'),
+        action: SnackBarAction(
+          label: 'COPY',
+          onPressed: () => Clipboard.setData(ClipboardData(text: inviteUrl)),
+        ),
+      ),
+    );
+    Clipboard.setData(ClipboardData(text: inviteUrl));
+  }
+
   @override
   Widget build(BuildContext context) {
     final squadAsync = ref.watch(squadProvider(widget.franchiseId));
@@ -36,6 +117,11 @@ class _FranchiseSquadScreenState extends ConsumerState<FranchiseSquadScreen> {
           onPressed: () => context.router.pop(),
         ),
         actions: [
+          IconButton(
+            tooltip: 'Invite owner',
+            icon: const Icon(Icons.person_add_alt_1_outlined, color: CricColor.textPrimary),
+            onPressed: _showInviteDialog,
+          ),
           IconButton(
             icon: const Icon(Icons.share_outlined, color: CricColor.gold),
             onPressed: () async {

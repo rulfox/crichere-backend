@@ -3,6 +3,7 @@ import 'package:crichere_flutter/core/providers/auth_provider.dart';
 import '../../data/admin_api.dart';
 import '../../data/admin_repository_impl.dart';
 import '../../domain/repositories/admin_repository.dart';
+import '../../domain/entities/admin_user.dart';
 import '../../../../features/league/domain/entities/league.dart';
 
 final adminApiProvider = Provider<AdminApi>((ref) {
@@ -19,4 +20,11 @@ final adminRepositoryProvider = Provider<AdminRepository>((ref) {
 
 final adminLeaguesProvider = FutureProvider<List<League>>((ref) {
   return ref.watch(adminRepositoryProvider).getLeagues();
+});
+
+/// Platform-admin user list, optionally filtered by a search string.
+final adminUsersProvider = FutureProvider.family<List<AdminUser>, String?>((ref, search) {
+  return ref.watch(adminRepositoryProvider).getUsers(
+        search: (search != null && search.trim().isNotEmpty) ? search.trim() : null,
+      );
 });

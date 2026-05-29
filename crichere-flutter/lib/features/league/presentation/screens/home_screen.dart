@@ -6,7 +6,8 @@ import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../providers/league_repository_provider.dart';
 import '../../../auth/presentation/providers/auth_repository_provider.dart';
-import '../../../auth/data/models/auth_response.dart';
+import '../../../auth/domain/entities/user_profile.dart';
+import '../../../../core/providers/auth_provider.dart';
 import '../../domain/entities/league.dart' as domain;
 import '../../../../core/router/app_router.gr.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
@@ -72,7 +73,7 @@ class _WebDashboardLayout extends HookConsumerWidget {
   final int selectedIndex;
   final Function(int) onIndexChanged;
   final AsyncValue<List<domain.League>> leaguesAsync;
-  final AsyncValue<AuthResponse> userAsync;
+  final AsyncValue<UserProfile> userAsync;
 
   const _WebDashboardLayout({
     required this.selectedIndex,
@@ -182,7 +183,7 @@ class _SidebarItem extends StatelessWidget {
 
 class _HomeTab extends ConsumerWidget {
   final AsyncValue<List<domain.League>> leaguesAsync;
-  final AsyncValue<AuthResponse> userAsync;
+  final AsyncValue<UserProfile> userAsync;
   final bool isAdminView;
   final VoidCallback? onToggleView;
   final bool isWeb;
@@ -299,7 +300,7 @@ class _PlayerOverview extends StatelessWidget {
             );
           },
           loading: () => ShimmerLoading.rectangular(height: 80),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         ),
         const SizedBox(height: CricSpacing.lg),
         const SectionHeader(title: 'MY LEAGUES', actionLabel: 'See all'),
@@ -401,8 +402,8 @@ class _AdminOverview extends StatelessWidget {
                       children: [
                         _AdminAction(icon: Icons.settings_outlined, label: 'MANAGE', onTap: () => context.router.push(LeagueDetailRoute(leagueId: league.id))),
                         _AdminAction(icon: Icons.gavel_outlined, label: 'AUCTION', onTap: () {
-                          if (league.auctionId != null) {
-                            context.router.push(AuctioneerPanelRoute(auctionId: league.auctionId!, leagueId: league.id));
+                          if (league.currentAuctionId != null) {
+                            context.router.push(AuctioneerPanelRoute(auctionId: league.currentAuctionId!, leagueId: league.id));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Auction not initialized yet.')),
@@ -600,7 +601,7 @@ class _AlertsTab extends ConsumerWidget {
 }
 
 class _ProfileTab extends ConsumerWidget {
-  final AsyncValue<AuthResponse> userAsync;
+  final AsyncValue<UserProfile> userAsync;
 
   const _ProfileTab({required this.userAsync});
 
@@ -634,6 +635,9 @@ class _ProfileTab extends ConsumerWidget {
                     leading: const Icon(Icons.logout, color: CricColor.red),
                     title: const Text('Logout', style: TextStyle(color: Colors.white)),
                     onTap: () async {
+                      // Unregister the FCM token while the access token is still
+                      // valid (the DELETE endpoint is authenticated), then log out.
+                      await ref.read(notificationServiceProvider).unregisterDeviceToken();
                       await ref.read(authRepositoryProvider).logout();
                       if (context.mounted) {
                         context.router.replaceAll([const PhoneEntryRoute()]);

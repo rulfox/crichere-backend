@@ -25,7 +25,7 @@ class AppRouter extends RootStackRouter {
         guards: guards,
         initial: initial,
         transitionsBuilder: TransitionsBuilders.noTransition,
-        durationInMilliseconds: 0,
+        duration: Duration.zero,
       );
     }
     return AutoRoute(page: page, path: path, guards: guards, initial: initial);
@@ -50,7 +50,11 @@ class AppRouter extends RootStackRouter {
     _route(page: LeagueCreateRoute.page, guards: [authGuard]),
     _route(page: PostAuctionRoute.page, guards: [authGuard]),
     _route(page: FranchiseInviteRoute.page, path: '/invite/:token', guards: [authGuard]),
+    // Public spectator share link — no auth guard.
+    _route(page: SpectatorRoute.page, path: '/spectate/:token'),
     _route(page: PlatformAdminRoute.page, path: '/admin', guards: [authGuard]),
+    _route(page: AdminUsersRoute.page, path: '/admin/users', guards: [authGuard]),
     _route(page: PreAssignmentRoute.page, path: '/leagues/:leagueId/pre-assignment', guards: [authGuard]),
+    _route(page: PricingRoute.page, path: '/leagues/:leagueId/pricing', guards: [authGuard]),
   ];
 }

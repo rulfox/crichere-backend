@@ -18,9 +18,16 @@ class PlatformAdminScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: CricColor.appBg,
-      appBar: const CricAppBar(
+      appBar: CricAppBar(
         showLogo: true,
         title: 'PLATFORM ADMIN DASHBOARD',
+        actions: [
+          IconButton(
+            tooltip: 'User management',
+            icon: const Icon(Icons.group_outlined, color: CricColor.textPrimary),
+            onPressed: () => context.router.push(const AdminUsersRoute()),
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {

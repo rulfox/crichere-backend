@@ -2,10 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:crichere_flutter/core/theme/crichere_design_tokens.dart';
 import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../../../auth/presentation/providers/auth_repository_provider.dart';
 import '../../../auth/domain/entities/auth_enums.dart';
+import '../providers/player_providers.dart';
 
 @RoutePage()
 class ProfileEditScreen extends HookConsumerWidget {
@@ -18,6 +20,39 @@ class ProfileEditScreen extends HookConsumerWidget {
     final battingStyle = useTextEditingController();
     final bowlingStyle = useTextEditingController();
     final isLoading = useState(false);
+    final isUploadingPhoto = useState(false);
+
+    // Pick an image and run the presigned-upload flow, then refresh the profile.
+    Future<void> pickAndUploadPhoto(String userId) async {
+      final picked = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        imageQuality: 85,
+      );
+      if (picked == null) return;
+      isUploadingPhoto.value = true;
+      try {
+        final bytes = await picked.readAsBytes();
+        await ref.read(photoUploadServiceProvider).uploadUserPhoto(
+              userId: userId,
+              bytes: bytes,
+              fileName: picked.name,
+              contentType: picked.mimeType ?? 'image/jpeg',
+            );
+        ref.invalidate(currentUserProvider);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Profile photo updated')));
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Photo upload failed: $e')));
+        }
+      } finally {
+        isUploadingPhoto.value = false;
+      }
+    }
 
     return Scaffold(
       backgroundColor: CricColor.appBg,
@@ -37,22 +72,32 @@ class ProfileEditScreen extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Center(
-                  child: Stack(
-                    children: [
-                      AvatarCircle(name: user.name ?? 'P', radius: 50),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: CricColor.gold,
-                            shape: BoxShape.circle,
+                  child: GestureDetector(
+                    onTap: isUploadingPhoto.value ? null : () => pickAndUploadPhoto(user.id),
+                    child: Stack(
+                      children: [
+                        AvatarCircle(name: user.name ?? 'P', radius: 50),
+                        if (isUploadingPhoto.value)
+                          const Positioned.fill(
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black54,
+                              child: CircularProgressIndicator(color: CricColor.gold),
+                            ),
                           ),
-                          child: const Icon(Icons.edit, size: 16, color: CricColor.navy),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: CricColor.gold,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit, size: 16, color: CricColor.navy),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: CricSpacing.xxl),
@@ -90,7 +135,7 @@ class ProfileEditScreen extends HookConsumerWidget {
                     isLoading.value = true;
                     try {
                       await ref.read(authRepositoryProvider).updateCricketProfile(
-                        user.userId ?? '',
+                        user.id,
                         selectedRole.value,
                         battingStyle.text,
                         bowlingStyle.text,
