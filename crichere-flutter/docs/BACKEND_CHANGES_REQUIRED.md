@@ -127,6 +127,28 @@ live" state. Confirm the error code string is stable; the client matches on it e
 
 ---
 
+## 8. `LeagueResponse` — missing presentation fields for League Detail (🟡 UX/contract)
+
+**Files:** `league/controller/LeagueController.kt` (`LeagueResponse`), `league/entity/League.kt`
+
+The S3 League Detail spec header reads *"By Rahul Kumar · Mumbai · Auction Live"* and the
+"League Details" section lists *Players/team*. `LeagueResponse` exposes none of these:
+
+- **Organiser name** — only `createdBy: UUID` is returned. The client currently does a second
+  round-trip (`GET /users/{id}`) per league-detail view to resolve the name (`userByIdProvider`).
+  Recommend embedding `createdByName` (and optionally `createdByPhoto`) in `LeagueResponse` to
+  avoid the extra fetch.
+- **Location / city** — no field exists. Spec shows a city next to the organiser. Add
+  `city: String?` (or `location`) to `League` + `LeagueResponse`, or confirm it's dropped.
+- **Players per team / squad size** — spec's "League Details" lists "Players/team". No such
+  field on `League`. Add `squadSize: Int?` (or `playersPerTeam`) if this is a real constraint;
+  the client omits the row for now.
+
+Until then the client shows "League organiser" as a fallback when the name fetch is pending and
+omits city / players-per-team.
+
+---
+
 ## How to use this doc
 
 When the backend pass begins, work top-down. For each item, either (a) implement the

@@ -29,6 +29,14 @@ Future<UserProfile> currentUser(Ref ref) {
   return ref.watch(authRepositoryProvider).getCurrentUser();
 }
 
+/// Resolves a user by id (e.g. to show a league organiser's name instead of a
+/// raw UUID). Backend `LeagueResponse` carries only `createdBy: UUID`, so the
+/// name has to be fetched separately — see BACKEND_CHANGES_REQUIRED.md.
+@riverpod
+Future<UserProfile> userById(Ref ref, String id) {
+  return ref.watch(authRepositoryProvider).getUser(id);
+}
+
 @riverpod
 SendOtpUseCase sendOtpUseCase(Ref ref) => SendOtpUseCase(ref.watch(authRepositoryProvider));
 
