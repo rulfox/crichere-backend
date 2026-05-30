@@ -14,9 +14,17 @@ import 'package:crichere_flutter/features/league/domain/usecases/import_players_
 
 part 'league_repository_provider.g.dart';
 
-@riverpod
+// keepAlive: the database must be a single instance for the whole app
+// lifetime. As an auto-dispose provider it was torn down whenever its last
+// listener dropped (e.g. switching tabs) and re-created on the next watch,
+// leaving the old AppDatabase open and racing the new one on the same
+// WASM/IndexedDB executor — Drift's "created AppDatabase multiple times"
+// warning and the cause of flaky cache reads.
+@Riverpod(keepAlive: true)
 AppDatabase appDatabase(Ref ref) {
-  return AppDatabase();
+  final db = AppDatabase();
+  ref.onDispose(db.close);
+  return db;
 }
 
 @riverpod

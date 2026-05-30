@@ -9,8 +9,15 @@ class AuthGuard extends AutoRouteGuard {
 
   @override
   void onNavigation(NavigationResolver resolver, StackRouter router) async {
-    final token = await _storage.read(key: 'accessToken');
-    
+    // A storage read that throws must not crash navigation — treat it as
+    // "no token" so the app falls back to the login flow gracefully.
+    String? token;
+    try {
+      token = await _storage.read(key: 'accessToken');
+    } catch (_) {
+      token = null;
+    }
+
     if (token != null) {
       // If user is trying to go to login/otp while authenticated, send them home
       if (resolver.route.name == PhoneEntryRoute.name || resolver.route.name == OtpRoute.name) {

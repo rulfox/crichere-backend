@@ -7,6 +7,8 @@ import '../../data/auction_repository_impl.dart';
 import '../../domain/repositories/auction_repository.dart';
 import '../../domain/entities/auction_event.dart';
 import '../../domain/entities/auction_summary.dart';
+import '../../domain/entities/auction_state_snapshot.dart';
+import '../../domain/entities/auction_models.dart';
 
 part 'auction_provider.g.dart';
 
@@ -55,4 +57,17 @@ AuctionRepository auctionRepository(Ref ref) {
 @riverpod
 Future<AuctionSummary> getAuctionSummary(Ref ref, String auctionId) {
   return ref.watch(auctionRepositoryProvider).getAuctionSummary(auctionId);
+}
+
+/// Rounds configured for an auction (League Detail → Rounds tab).
+@riverpod
+Future<List<RoundConfig>> auctionRounds(Ref ref, String auctionId) {
+  return ref.watch(auctionRepositoryProvider).getRounds(auctionId);
+}
+
+/// Audit log for an auction, newest first (League Detail → Audit tab).
+@riverpod
+Future<List<AuditLogResponse>> auctionAuditLog(Ref ref, String auctionId) async {
+  final log = await ref.watch(auctionRepositoryProvider).getAuditLog(auctionId);
+  return log.reversed.toList();
 }

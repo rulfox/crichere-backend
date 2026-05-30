@@ -300,7 +300,7 @@ class _PlayerOverview extends StatelessWidget {
             );
           },
           loading: () => ShimmerLoading.rectangular(height: 80),
-          error: (_, _) => const SizedBox.shrink(),
+          error: (e, _) => _LeaguesError(error: e),
         ),
         const SizedBox(height: CricSpacing.lg),
         const SectionHeader(title: 'MY LEAGUES', actionLabel: 'See all'),
@@ -330,7 +330,7 @@ class _PlayerOverview extends StatelessWidget {
             )).toList(),
           ),
           loading: () => ShimmerLoading.rectangular(height: 100),
-          error: (e, _) => Text('Error: $e'),
+          error: (e, _) => _LeaguesError(error: e),
         ),
       ],
     );
@@ -383,7 +383,18 @@ class _AdminOverview extends StatelessWidget {
         const SizedBox(height: 24),
         const SectionHeader(title: 'MY MANAGED LEAGUES'),
         leaguesAsync.when(
-          data: (leagues) => Column(
+          data: (leagues) => leagues.isEmpty
+            ? CricCard(
+                padding: const EdgeInsets.all(CricSpacing.base),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: CricSpacing.md),
+                    child: Text('No leagues yet. Create one to get started.',
+                        style: CricTextStyle.body.copyWith(color: CricColor.textDim)),
+                  ),
+                ),
+              )
+            : Column(
             children: leagues.map((league) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: CricCard(
@@ -419,7 +430,7 @@ class _AdminOverview extends StatelessWidget {
             )).toList(),
           ),
           loading: () => ShimmerLoading.rectangular(height: 100),
-          error: (e, _) => Text('Error: $e'),
+          error: (e, _) => _LeaguesError(error: e),
         ),
         const SizedBox(height: 16),
         ElevatedButton.icon(
@@ -504,10 +515,50 @@ class _DiscoverTab extends StatelessWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error: $e')),
+            error: (e, _) => Center(child: _LeaguesError(error: e)),
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Visible, styled error row for the leagues sections. The previous
+/// `Text('Error: $e')` rendered in the default (near-black) text color, which
+/// is invisible on the dark app background — so a provider failure looked like
+/// a blank "white" area. This makes failures legible and offers a retry.
+class _LeaguesError extends ConsumerWidget {
+  final Object error;
+  const _LeaguesError({required this.error});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return CricCard(
+      color: CricColor.red.withValues(alpha: 0.08),
+      borderColor: CricColor.red.withValues(alpha: 0.3),
+      padding: const EdgeInsets.all(CricSpacing.base),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: CricColor.red, size: 20),
+          const SizedBox(width: CricSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Couldn\'t load leagues',
+                    style: CricTextStyle.headingMd.copyWith(color: CricColor.red)),
+                const SizedBox(height: 2),
+                Text('$error',
+                    style: CricTextStyle.caption.copyWith(color: CricColor.textDim)),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => ref.invalidate(leaguesProvider),
+            child: Text('RETRY', style: CricTextStyle.badge.copyWith(color: CricColor.gold)),
+          ),
+        ],
+      ),
     );
   }
 }

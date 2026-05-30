@@ -10,6 +10,7 @@ import '../../financials/domain/entities/forfeit_entities.dart';
 import '../domain/entities/waitlist_entities.dart';
 import '../domain/entities/league_prices.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 
 class LeagueRepositoryImpl implements LeagueRepository {
   final LeagueApi _api;
@@ -19,47 +20,60 @@ class LeagueRepositoryImpl implements LeagueRepository {
 
   @override
   Future<List<domain.League>> getLeagues({bool forceRefresh = false, int? page, int? size}) async {
+    // Local cache is best-effort only. On web (Drift/WASM + IndexedDB) the
+    // executor can throw for reasons unrelated to the network (missing
+    // sqlite3.wasm, storage quota, private-mode IndexedDB). A cache failure
+    // must never sink an otherwise-good network result, so every cache
+    // touch below is wrapped and swallowed.
     if (!forceRefresh && page == null) {
-      final cached = await (_db.select(_db.leagues)).get();
-      if (cached.isNotEmpty) {
-        return cached.map((e) => domain.League(
-          id: e.id,
-          name: e.name,
-          format: e.format,
-          rulesUrl: e.rulesUrl,
-          mustSellAll: e.mustSellAll,
-          playerOrderMode: e.playerOrderMode,
-          waitingListMode: e.waitingListMode,
-          logoUrl: e.logoUrl,
-          bannerUrl: e.bannerUrl,
-          status: e.status,
-          auctionDate: e.auctionDate,
-          createdBy: e.createdBy,
-        )).toList();
+      try {
+        final cached = await (_db.select(_db.leagues)).get();
+        if (cached.isNotEmpty) {
+          return cached.map((e) => domain.League(
+            id: e.id,
+            name: e.name,
+            format: e.format,
+            rulesUrl: e.rulesUrl,
+            mustSellAll: e.mustSellAll,
+            playerOrderMode: e.playerOrderMode,
+            waitingListMode: e.waitingListMode,
+            logoUrl: e.logoUrl,
+            bannerUrl: e.bannerUrl,
+            status: e.status,
+            auctionDate: e.auctionDate,
+            createdBy: e.createdBy,
+          )).toList();
+        }
+      } catch (e, s) {
+        debugPrint('League cache read failed (ignored): $e\n$s');
       }
     }
 
     final paged = await _api.getLeagues(page: page, size: size);
     final remote = paged.content;
-    
+
     if (page == null || page == 0) {
-      await _db.batch((batch) {
-        batch.deleteAll(_db.leagues);
-        batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
-          id: e.id,
-          name: e.name,
-          format: Value(e.format),
-          rulesUrl: Value(e.rulesUrl),
-          mustSellAll: Value(e.mustSellAll),
-          playerOrderMode: Value(e.playerOrderMode),
-          waitingListMode: Value(e.waitingListMode),
-          logoUrl: Value(e.logoUrl),
-          bannerUrl: Value(e.bannerUrl),
-          status: e.status,
-          auctionDate: Value(e.auctionDate),
-          createdBy: e.createdBy,
-        )).toList());
-      });
+      try {
+        await _db.batch((batch) {
+          batch.deleteAll(_db.leagues);
+          batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
+            id: e.id,
+            name: e.name,
+            format: Value(e.format),
+            rulesUrl: Value(e.rulesUrl),
+            mustSellAll: Value(e.mustSellAll),
+            playerOrderMode: Value(e.playerOrderMode),
+            waitingListMode: Value(e.waitingListMode),
+            logoUrl: Value(e.logoUrl),
+            bannerUrl: Value(e.bannerUrl),
+            status: e.status,
+            auctionDate: Value(e.auctionDate),
+            createdBy: e.createdBy,
+          )).toList());
+        });
+      } catch (e, s) {
+        debugPrint('League cache write failed (ignored): $e\n$s');
+      }
     }
 
     return remote;

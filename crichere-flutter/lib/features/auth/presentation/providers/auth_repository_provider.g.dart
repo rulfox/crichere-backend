@@ -130,6 +130,100 @@ final class CurrentUserProvider
 
 String _$currentUserHash() => r'6e7505ab8a313acbe9a2a56fcb2849e377ae108d';
 
+/// Resolves a user by id (e.g. to show a league organiser's name instead of a
+/// raw UUID). Backend `LeagueResponse` carries only `createdBy: UUID`, so the
+/// name has to be fetched separately — see BACKEND_CHANGES_REQUIRED.md.
+
+@ProviderFor(userById)
+final userByIdProvider = UserByIdFamily._();
+
+/// Resolves a user by id (e.g. to show a league organiser's name instead of a
+/// raw UUID). Backend `LeagueResponse` carries only `createdBy: UUID`, so the
+/// name has to be fetched separately — see BACKEND_CHANGES_REQUIRED.md.
+
+final class UserByIdProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<UserProfile>,
+          UserProfile,
+          FutureOr<UserProfile>
+        >
+    with $FutureModifier<UserProfile>, $FutureProvider<UserProfile> {
+  /// Resolves a user by id (e.g. to show a league organiser's name instead of a
+  /// raw UUID). Backend `LeagueResponse` carries only `createdBy: UUID`, so the
+  /// name has to be fetched separately — see BACKEND_CHANGES_REQUIRED.md.
+  UserByIdProvider._({
+    required UserByIdFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'userByIdProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$userByIdHash();
+
+  @override
+  String toString() {
+    return r'userByIdProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<UserProfile> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<UserProfile> create(Ref ref) {
+    final argument = this.argument as String;
+    return userById(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserByIdProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$userByIdHash() => r'99d9335284dbf522cb39d3518a26408edf9faf4b';
+
+/// Resolves a user by id (e.g. to show a league organiser's name instead of a
+/// raw UUID). Backend `LeagueResponse` carries only `createdBy: UUID`, so the
+/// name has to be fetched separately — see BACKEND_CHANGES_REQUIRED.md.
+
+final class UserByIdFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<UserProfile>, String> {
+  UserByIdFamily._()
+    : super(
+        retry: null,
+        name: r'userByIdProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Resolves a user by id (e.g. to show a league organiser's name instead of a
+  /// raw UUID). Backend `LeagueResponse` carries only `createdBy: UUID`, so the
+  /// name has to be fetched separately — see BACKEND_CHANGES_REQUIRED.md.
+
+  UserByIdProvider call(String id) =>
+      UserByIdProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'userByIdProvider';
+}
+
 @ProviderFor(sendOtpUseCase)
 final sendOtpUseCaseProvider = SendOtpUseCaseProvider._();
 

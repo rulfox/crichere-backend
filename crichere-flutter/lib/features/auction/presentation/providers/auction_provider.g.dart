@@ -377,3 +377,175 @@ final class GetAuctionSummaryFamily extends $Family
   @override
   String toString() => r'getAuctionSummaryProvider';
 }
+
+/// Rounds configured for an auction (League Detail → Rounds tab).
+
+@ProviderFor(auctionRounds)
+final auctionRoundsProvider = AuctionRoundsFamily._();
+
+/// Rounds configured for an auction (League Detail → Rounds tab).
+
+final class AuctionRoundsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<RoundConfig>>,
+          List<RoundConfig>,
+          FutureOr<List<RoundConfig>>
+        >
+    with
+        $FutureModifier<List<RoundConfig>>,
+        $FutureProvider<List<RoundConfig>> {
+  /// Rounds configured for an auction (League Detail → Rounds tab).
+  AuctionRoundsProvider._({
+    required AuctionRoundsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'auctionRoundsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$auctionRoundsHash();
+
+  @override
+  String toString() {
+    return r'auctionRoundsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<RoundConfig>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<RoundConfig>> create(Ref ref) {
+    final argument = this.argument as String;
+    return auctionRounds(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AuctionRoundsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$auctionRoundsHash() => r'5b730ad67cc4eb7f77da12680da0c05affb52b13';
+
+/// Rounds configured for an auction (League Detail → Rounds tab).
+
+final class AuctionRoundsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<RoundConfig>>, String> {
+  AuctionRoundsFamily._()
+    : super(
+        retry: null,
+        name: r'auctionRoundsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Rounds configured for an auction (League Detail → Rounds tab).
+
+  AuctionRoundsProvider call(String auctionId) =>
+      AuctionRoundsProvider._(argument: auctionId, from: this);
+
+  @override
+  String toString() => r'auctionRoundsProvider';
+}
+
+/// Audit log for an auction, newest first (League Detail → Audit tab).
+
+@ProviderFor(auctionAuditLog)
+final auctionAuditLogProvider = AuctionAuditLogFamily._();
+
+/// Audit log for an auction, newest first (League Detail → Audit tab).
+
+final class AuctionAuditLogProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<AuditLogResponse>>,
+          List<AuditLogResponse>,
+          FutureOr<List<AuditLogResponse>>
+        >
+    with
+        $FutureModifier<List<AuditLogResponse>>,
+        $FutureProvider<List<AuditLogResponse>> {
+  /// Audit log for an auction, newest first (League Detail → Audit tab).
+  AuctionAuditLogProvider._({
+    required AuctionAuditLogFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'auctionAuditLogProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$auctionAuditLogHash();
+
+  @override
+  String toString() {
+    return r'auctionAuditLogProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<AuditLogResponse>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<AuditLogResponse>> create(Ref ref) {
+    final argument = this.argument as String;
+    return auctionAuditLog(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AuctionAuditLogProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$auctionAuditLogHash() => r'90aae6eacd9c245fcf7c235b28fbfd21617ac80a';
+
+/// Audit log for an auction, newest first (League Detail → Audit tab).
+
+final class AuctionAuditLogFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<AuditLogResponse>>, String> {
+  AuctionAuditLogFamily._()
+    : super(
+        retry: null,
+        name: r'auctionAuditLogProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Audit log for an auction, newest first (League Detail → Audit tab).
+
+  AuctionAuditLogProvider call(String auctionId) =>
+      AuctionAuditLogProvider._(argument: auctionId, from: this);
+
+  @override
+  String toString() => r'auctionAuditLogProvider';
+}
