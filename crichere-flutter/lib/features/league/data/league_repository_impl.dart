@@ -9,6 +9,8 @@ import '../../financials/domain/entities/fee_entities.dart';
 import '../../financials/domain/entities/forfeit_entities.dart';
 import '../domain/entities/waitlist_entities.dart';
 import '../domain/entities/league_prices.dart';
+import 'dart:async';
+
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
@@ -18,16 +20,18 @@ class LeagueRepositoryImpl implements LeagueRepository {
 
   LeagueRepositoryImpl(this._api, this._db);
 
+  // The Drift/WASM executor on web can not only throw but *hang* — e.g. when
+  // IndexedDB.open never fires success/error (DB blocked, private mode, some
+  // hosting setups). An awaited hang would leave the leagues provider stuck in
+  // `loading` forever (the white shimmer rectangle). So every cache touch is
+  // both swallowed AND time-bounded; the network is always the source of truth.
+  static const _cacheTimeout = Duration(seconds: 2);
+
   @override
   Future<List<domain.League>> getLeagues({bool forceRefresh = false, int? page, int? size}) async {
-    // Local cache is best-effort only. On web (Drift/WASM + IndexedDB) the
-    // executor can throw for reasons unrelated to the network (missing
-    // sqlite3.wasm, storage quota, private-mode IndexedDB). A cache failure
-    // must never sink an otherwise-good network result, so every cache
-    // touch below is wrapped and swallowed.
     if (!forceRefresh && page == null) {
       try {
-        final cached = await (_db.select(_db.leagues)).get();
+        final cached = await (_db.select(_db.leagues)).get().timeout(_cacheTimeout);
         if (cached.isNotEmpty) {
           return cached.map((e) => domain.League(
             id: e.id,
@@ -44,39 +48,46 @@ class LeagueRepositoryImpl implements LeagueRepository {
             createdBy: e.createdBy,
           )).toList();
         }
-      } catch (e, s) {
-        debugPrint('League cache read failed (ignored): $e\n$s');
+      } catch (e) {
+        // Includes TimeoutException when the web executor hangs.
+        debugPrint('League cache read skipped (ignored): $e');
       }
     }
 
     final paged = await _api.getLeagues(page: page, size: size);
     final remote = paged.content;
 
+    // Fire-and-forget the cache write: it must never block (or fail) the
+    // network result the UI is waiting on.
     if (page == null || page == 0) {
-      try {
-        await _db.batch((batch) {
-          batch.deleteAll(_db.leagues);
-          batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
-            id: e.id,
-            name: e.name,
-            format: Value(e.format),
-            rulesUrl: Value(e.rulesUrl),
-            mustSellAll: Value(e.mustSellAll),
-            playerOrderMode: Value(e.playerOrderMode),
-            waitingListMode: Value(e.waitingListMode),
-            logoUrl: Value(e.logoUrl),
-            bannerUrl: Value(e.bannerUrl),
-            status: e.status,
-            auctionDate: Value(e.auctionDate),
-            createdBy: e.createdBy,
-          )).toList());
-        });
-      } catch (e, s) {
-        debugPrint('League cache write failed (ignored): $e\n$s');
-      }
+      unawaited(_cacheLeagues(remote));
     }
 
     return remote;
+  }
+
+  Future<void> _cacheLeagues(List<domain.League> remote) async {
+    try {
+      await _db.batch((batch) {
+        batch.deleteAll(_db.leagues);
+        batch.insertAll(_db.leagues, remote.map((e) => LeaguesCompanion.insert(
+          id: e.id,
+          name: e.name,
+          format: Value(e.format),
+          rulesUrl: Value(e.rulesUrl),
+          mustSellAll: Value(e.mustSellAll),
+          playerOrderMode: Value(e.playerOrderMode),
+          waitingListMode: Value(e.waitingListMode),
+          logoUrl: Value(e.logoUrl),
+          bannerUrl: Value(e.bannerUrl),
+          status: e.status,
+          auctionDate: Value(e.auctionDate),
+          createdBy: e.createdBy,
+        )).toList());
+      }).timeout(_cacheTimeout);
+    } catch (e) {
+      debugPrint('League cache write skipped (ignored): $e');
+    }
   }
 
   @override
