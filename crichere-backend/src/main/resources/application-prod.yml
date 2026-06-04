@@ -1,3 +1,10 @@
+server:
+  # Trust Railway's reverse-proxy X-Forwarded-Proto header so Spring sees HTTPS
+  # as the request scheme. Without this, Spring's CORS filter compares
+  # "https://api.crichere.com" (Origin) vs "http://..." (internal scheme) and
+  # treats every same-origin POST as cross-origin → 403 "Invalid CORS request".
+  forward-headers-strategy: FRAMEWORK
+
 spring:
   flyway:
     ignore-migration-patterns: "*:missing"
@@ -13,11 +20,10 @@ spring:
       maximum-pool-size: 20
   data:
     redis:
-      # Railway exposes REDIS_URL (preferred) as well as REDISHOST / REDISPORT / REDISPASSWORD.
-      # Use the full URL so authentication and any port overrides are handled automatically.
-      url: ${REDIS_URL:redis://${REDISHOST:localhost}:${REDISPORT:6379}}
-      # Explicit password fallback in case REDIS_URL is not set by the addon.
-      password: ${REDISPASSWORD:}
+      # Build a URL that embeds the password so auth works whether Railway exposes
+      # REDIS_URL (full URL with credentials) or separate REDISHOST/REDISPORT/REDISPASSWORD.
+      # Format: redis://:PASSWORD@HOST:PORT  (colon-before-password is required by URI spec)
+      url: ${REDIS_URL:redis://:${REDISPASSWORD:}@${REDISHOST:localhost}:${REDISPORT:6379}}
 
 springdoc:
   swagger-ui:
@@ -34,4 +40,6 @@ crichere:
     msg91-auth-key: ${MSG91_AUTH_KEY}
     msg91-template-id: ${MSG91_TEMPLATE_ID}
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+    # Comma-separated list of allowed web origins for the Flutter web frontend.
+    # Add your Railway preview URL here too during development if needed.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://crichere.com,https://www.crichere.com}
