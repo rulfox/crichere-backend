@@ -7,6 +7,7 @@ import org.slf4j.MDC
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -27,6 +28,20 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             messageKey = ex.messageKey
         )
         return ResponseEntity.status(ex.status).body(response)
+    }
+
+    override fun handleHttpMessageNotReadable(
+        ex: HttpMessageNotReadableException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val response = ResponseHelper.error(
+            code = "BadRequest",
+            message = "Request body is missing or malformed",
+            messageKey = "error.bad_request"
+        )
+        return ResponseEntity.badRequest().body(response)
     }
 
     override fun handleMethodArgumentNotValid(
