@@ -31,13 +31,21 @@ class DioClient {
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        // Use `is Map` (not `is Map<String, dynamic>`) because in Flutter Web
-        // (dart2js), XHR JSON responses are JavaScript objects that satisfy
-        // `Map` but NOT the generic `Map<String, dynamic>` type check.
         if (response.data is Map) {
           final map = response.data as Map;
           if (map.containsKey('data')) {
-            response.data = map['data'];
+            final innerData = map['data'];
+            if (innerData is Map) {
+              response.data = Map<String, dynamic>.from(innerData);
+            } else if (innerData is List) {
+              // Usually retrofit expects List<dynamic> for lists, so this is fine
+              response.data = innerData;
+            } else {
+              response.data = innerData;
+            }
+          } else {
+             // If there's no data wrapper but it's a map, ensure it is Map<String, dynamic>
+             response.data = Map<String, dynamic>.from(map);
           }
         }
         return handler.next(response);
