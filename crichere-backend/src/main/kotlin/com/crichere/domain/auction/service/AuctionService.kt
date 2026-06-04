@@ -1169,12 +1169,25 @@ class AuctionService(
             org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization(
                 object : org.springframework.transaction.support.TransactionSynchronization {
                     override fun afterCommit() {
-                        redisTemplate.convertAndSend("auction:$auctionId", json)
+                        try {
+                            redisTemplate.convertAndSend("auction:$auctionId", json)
+                        } catch (ex: Exception) {
+                            // Redis publish failed — DB state is already committed and correct.
+                            // Log and continue; SSE clients will miss this event but the
+                            // operation itself succeeded. Fix Redis to restore real-time delivery.
+                            org.slf4j.LoggerFactory.getLogger(AuctionService::class.java)
+                                .error("Redis publish failed for auction $auctionId action $action — SSE event dropped", ex)
+                        }
                     }
                 }
             )
         } else {
-            redisTemplate.convertAndSend("auction:$auctionId", json)
+            try {
+                redisTemplate.convertAndSend("auction:$auctionId", json)
+            } catch (ex: Exception) {
+                org.slf4j.LoggerFactory.getLogger(AuctionService::class.java)
+                    .error("Redis publish failed for auction $auctionId action $action — SSE event dropped", ex)
+            }
         }
     }
 
