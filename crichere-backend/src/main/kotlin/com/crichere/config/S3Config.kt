@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner
 
 @Configuration
 class S3Config(
-    @Value("\${crichere.s3.region}") private val region: String
+    @param:Value("\${crichere.s3.region}") private val region: String
 ) {
 
     @Bean

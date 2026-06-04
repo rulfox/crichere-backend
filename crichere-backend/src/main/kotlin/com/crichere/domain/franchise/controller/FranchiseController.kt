@@ -1,52 +1,56 @@
 package com.crichere.domain.franchise.controller
 
 import com.crichere.common.response.ApiResponse
-import com.crichere.common.response.ResponseHelper
+import com.crichere.common.response.toResponseEntity
 import com.crichere.domain.franchise.dto.*
 import com.crichere.domain.franchise.entity.Franchise
-import com.crichere.domain.franchise.service.FranchiseService
+import com.crichere.domain.franchise.usecase.*
+import com.crichere.domain.franchise.mapper.toResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import org.springframework.beans.factory.annotation.Value
 
 @RestController
 @RequestMapping("/franchises")
 @Tag(name = "Franchise Management")
 class FranchiseController(
-    private val franchiseService: FranchiseService
+    private val createFranchiseUseCase: CreateFranchiseUseCase,
+    private val getFranchiseQuery: GetFranchiseQuery,
+    private val updateFranchiseUseCase: UpdateFranchiseUseCase,
+    private val createFranchiseInviteUseCase: CreateFranchiseInviteUseCase,
+    private val getFranchiseInvitesQuery: GetFranchiseInvitesQuery,
+    private val acceptFranchiseInviteUseCase: AcceptFranchiseInviteUseCase,
+    private val getFranchiseSquadQuery: GetFranchiseSquadQuery,
+    @param:Value("\${app.base-url:http://localhost:8080}") private val baseUrl: String
 ) {
 
+    private fun getInviteUrl(token: UUID): String = "$baseUrl/api/v1/public/invites/validate?token=$token"
+
     @PostMapping
-    @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN_' + #request.leagueId)")
-    fun createFranchise(@Valid @RequestBody request: FranchiseCreateRequest): ApiResponse<FranchiseResponse> {
-        val franchise = franchiseService.createFranchise(
-            Franchise(
-                leagueId = request.leagueId,
-                name = request.name,
-                logoUrl = request.logoUrl,
-                ownerId = request.ownerId,
-                totalPurse = request.totalPurse,
-                remainingPurse = request.totalPurse
-            )
+    fun createFranchise(@Valid @RequestBody request: FranchiseCreateRequest): ResponseEntity<ApiResponse<FranchiseResponse>> {
+        val franchiseToCreate = Franchise(
+            leagueId = request.leagueId,
+            name = request.name,
+            logoUrl = request.logoUrl,
+            ownerId = request.ownerId,
+            totalPurse = request.totalPurse,
+            remainingPurse = request.totalPurse
         )
-        val response = FranchiseResponse(
-            id = franchise.id,
-            leagueId = franchise.leagueId,
-            name = franchise.name,
-            logoUrl = franchise.logoUrl,
-            ownerId = franchise.ownerId,
-            totalPurse = franchise.totalPurse,
-            remainingPurse = franchise.remainingPurse
-        )
-        return ResponseHelper.success(data = response, message = "Franchise created successfully", messageKey = "success.franchise_created")
+        
+        return createFranchiseUseCase.execute(franchiseToCreate)
+            .map { it.toResponse() }
+            .toResponseEntity("Franchise created successfully", "success.franchise_created", org.springframework.http.HttpStatus.CREATED)
     }
 
     @GetMapping("/{id}")
-    fun getFranchise(@PathVariable id: UUID): ApiResponse<FranchiseResponse> {
-        val franchise = franchiseService.getFranchise(id)
-        return ResponseHelper.success(data = mapToResponse(franchise))
+    fun getFranchise(@PathVariable id: UUID): ResponseEntity<ApiResponse<FranchiseResponse>> {
+        return getFranchiseQuery.execute(id)
+            .map { it.toResponse() }
+            .toResponseEntity()
     }
 
     @PatchMapping("/{id}")
@@ -54,57 +58,48 @@ class FranchiseController(
     fun updateFranchise(
         @PathVariable id: UUID,
         @Valid @RequestBody request: FranchiseUpdateRequest
-    ): ApiResponse<FranchiseResponse> {
-        val franchise = franchiseService.updateFranchise(id, request)
-        return ResponseHelper.success(data = mapToResponse(franchise), message = "Franchise updated successfully")
+    ): ResponseEntity<ApiResponse<FranchiseResponse>> {
+        return updateFranchiseUseCase.execute(id, request)
+            .map { it.toResponse() }
+            .toResponseEntity("Franchise updated successfully")
     }
 
     @GetMapping("/{id}/invites")
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('FRANCHISE_OWNER_' + #id)")
-    fun getInvites(@PathVariable id: UUID): ApiResponse<List<FranchiseInviteResponse>> {
-        val invites = franchiseService.getInvites(id)
-        return ResponseHelper.success(data = invites.map { i ->
-            FranchiseInviteResponse(
-                id = i.id,
-                franchiseId = i.franchiseId,
-                email = i.email,
-                token = i.token,
-                status = i.status,
-                expiresAt = i.expiresAt,
-                inviteUrl = franchiseService.getInviteUrl(i.token)
-            )
-        })
+    fun getInvites(@PathVariable id: UUID): ResponseEntity<ApiResponse<List<FranchiseInviteResponse>>> {
+        return getFranchiseInvitesQuery.execute(id)
+            .map { invites -> invites.map { it.toResponse(getInviteUrl(it.token)) } }
+            .toResponseEntity()
     }
 
     @GetMapping("/{id}/squad")
-    fun getSquad(@PathVariable id: UUID): ApiResponse<FranchiseSquadResponse> {
-        val franchise = franchiseService.getFranchise(id)
-        val squad = franchiseService.getSquad(id)
-        return ResponseHelper.success(data = FranchiseSquadResponse(
-            franchiseId = id,
-            franchiseName = franchise.name,
-            players = squad
-        ))
+    fun getSquad(@PathVariable id: UUID): ResponseEntity<ApiResponse<FranchiseSquadResponse>> {
+        val franchiseResult = getFranchiseQuery.execute(id)
+        if (franchiseResult is com.crichere.common.domain.Result.Failure) {
+            return franchiseResult.toResponseEntity()
+        }
+        val franchise = (franchiseResult as com.crichere.common.domain.Result.Success).data
+        
+        return getFranchiseSquadQuery.execute(id)
+            .map { squad ->
+                FranchiseSquadResponse(
+                    franchiseId = id,
+                    franchiseName = franchise.name,
+                    players = squad
+                )
+            }
+            .toResponseEntity()
     }
 
     @PostMapping("/{id}/invites")
-    @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
     @org.springframework.security.access.prepost.PreAuthorize("hasRole('PLATFORM_ADMIN') or hasRole('LEAGUE_ADMIN') or hasRole('FRANCHISE_OWNER_' + #id)")
     fun createInvite(
         @PathVariable id: UUID,
         @Valid @RequestBody request: FranchiseInviteRequest
-    ): ApiResponse<FranchiseInviteResponse> {
-        val invite = franchiseService.createInvite(id, request.email)
-        val response = FranchiseInviteResponse(
-            id = invite.id,
-            franchiseId = invite.franchiseId,
-            email = invite.email,
-            token = invite.token,
-            status = invite.status,
-            expiresAt = invite.expiresAt,
-            inviteUrl = franchiseService.getInviteUrl(invite.token)
-        )
-        return ResponseHelper.success(data = response, message = "Invite created successfully", messageKey = "success.invite_created")
+    ): ResponseEntity<ApiResponse<FranchiseInviteResponse>> {
+        return createFranchiseInviteUseCase.execute(id, request.email)
+            .map { it.toResponse(getInviteUrl(it.token)) }
+            .toResponseEntity("Invite created successfully", "success.invite_created", org.springframework.http.HttpStatus.CREATED)
     }
 
     @PostMapping("/accept")
@@ -112,19 +107,10 @@ class FranchiseController(
     fun acceptInvite(
         @Valid @RequestBody request: InviteAcceptRequest,
         @org.springframework.security.core.annotation.AuthenticationPrincipal userDetails: org.springframework.security.core.userdetails.UserDetails
-    ): ApiResponse<FranchiseResponse> {
+    ): ResponseEntity<ApiResponse<FranchiseResponse>> {
         val userId = UUID.fromString(userDetails.username)
-        val franchise = franchiseService.acceptInvite(request.token, userId)
-        return ResponseHelper.success(data = mapToResponse(franchise), message = "Invite accepted successfully", messageKey = "success.invite_accepted")
+        return acceptFranchiseInviteUseCase.execute(request.token, userId)
+            .map { it.toResponse() }
+            .toResponseEntity("Invite accepted successfully", "success.invite_accepted")
     }
-
-    private fun mapToResponse(f: Franchise) = FranchiseResponse(
-        id = f.id,
-        leagueId = f.leagueId,
-        name = f.name,
-        logoUrl = f.logoUrl,
-        ownerId = f.ownerId,
-        totalPurse = f.totalPurse,
-        remainingPurse = f.remainingPurse
-    )
 }

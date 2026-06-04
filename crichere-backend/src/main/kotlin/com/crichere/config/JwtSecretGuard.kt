@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class JwtSecretGuard(
-    @Value("\${crichere.jwt.secret}") private val secret: String,
-    @Value("\${spring.profiles.active:default}") private val activeProfile: String
+    @param:Value("\${crichere.jwt.secret}") private val secret: String,
+    @param:Value("\${spring.profiles.active:default}") private val activeProfile: String
 ) {
     private val log = LoggerFactory.getLogger(JwtSecretGuard::class.java)
 

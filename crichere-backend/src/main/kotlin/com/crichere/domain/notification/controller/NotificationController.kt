@@ -5,10 +5,11 @@ import com.crichere.common.response.ResponseHelper
 import com.crichere.domain.notification.dto.DeviceTokenRequest
 import com.crichere.domain.notification.dto.NotificationListResponse
 import com.crichere.domain.notification.dto.NotificationResponse
-import com.crichere.domain.notification.service.NotificationService
+import com.crichere.domain.notification.usecase.*
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
@@ -17,15 +18,28 @@ import java.util.*
 @RestController
 @RequestMapping("/notifications")
 @Tag(name = "Notification Management")
-class NotificationController(private val notificationService: NotificationService) {
+class NotificationController(
+    private val registerDeviceTokenUseCase: RegisterDeviceTokenUseCase,
+    private val removeDeviceTokenUseCase: RemoveDeviceTokenUseCase,
+    private val getUnreadCountQuery: GetUnreadCountQuery,
+    private val getNotificationsQuery: GetNotificationsQuery,
+    private val markNotificationAsReadUseCase: MarkNotificationAsReadUseCase,
+    private val markAllNotificationsAsReadUseCase: MarkAllNotificationsAsReadUseCase,
+    private val deleteNotificationUseCase: DeleteNotificationUseCase
+) {
 
     @PostMapping("/device-token")
     fun registerToken(
         @Valid @RequestBody request: DeviceTokenRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<Nothing> {
-        notificationService.registerDeviceToken(UUID.fromString(user.username), request.token, request.platform)
-        return ResponseHelper.success(message = "Device token registered", messageKey = "success.device_token_registered")
+        val result = registerDeviceTokenUseCase.execute(UUID.fromString(user.username), request.token, request.platform)
+        return if (result is com.crichere.common.domain.Result.Success) {
+            ResponseHelper.success(message = "Device token registered", messageKey = "success.device_token_registered")
+        } else {
+            val error = (result as com.crichere.common.domain.Result.Failure).error
+            ResponseHelper.error(HttpStatus.BAD_REQUEST.name, error.message, error.messageKey ?: "error.bad_request")
+        }
     }
 
     @DeleteMapping("/device-token")
@@ -33,15 +47,25 @@ class NotificationController(private val notificationService: NotificationServic
         @RequestBody request: Map<String, String>,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<Nothing> {
-        val token = request["token"] ?: throw com.crichere.common.exception.BusinessLogicException("Token is required", "error.token_required")
-        notificationService.removeDeviceToken(UUID.fromString(user.username), token)
-        return ResponseHelper.success(message = "Device token removed", messageKey = "success.device_token_removed")
+        val token = request["token"] ?: return ResponseHelper.error(HttpStatus.BAD_REQUEST.name, "Token is required", "error.token_required")
+        val result = removeDeviceTokenUseCase.execute(UUID.fromString(user.username), token)
+        return if (result is com.crichere.common.domain.Result.Success) {
+            ResponseHelper.success(message = "Device token removed", messageKey = "success.device_token_removed")
+        } else {
+            val error = (result as com.crichere.common.domain.Result.Failure).error
+            ResponseHelper.error(HttpStatus.BAD_REQUEST.name, error.message, error.messageKey ?: "error.bad_request")
+        }
     }
 
     @GetMapping("/unread-count")
     fun getUnreadCount(@AuthenticationPrincipal user: UserDetails): ApiResponse<Map<String, Long>> {
-        val count = notificationService.getUnreadCount(UUID.fromString(user.username))
-        return ResponseHelper.success(data = mapOf("unreadCount" to count))
+        val result = getUnreadCountQuery.execute(UUID.fromString(user.username))
+        return if (result is com.crichere.common.domain.Result.Success) {
+            ResponseHelper.success<Map<String, Long>>(data = mapOf("unreadCount" to result.data))
+        } else {
+            val error = (result as com.crichere.common.domain.Result.Failure).error
+            ResponseHelper.error(HttpStatus.BAD_REQUEST.name, error.message, error.messageKey ?: "error.bad_request")
+        }
     }
 
     @GetMapping
@@ -51,7 +75,13 @@ class NotificationController(private val notificationService: NotificationServic
         @RequestParam(defaultValue = "20") size: Int,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<NotificationListResponse> {
-        return ResponseHelper.success(data = notificationService.getNotifications(UUID.fromString(user.username), unreadOnly, PageRequest.of(page, size)))
+        val result = getNotificationsQuery.execute(UUID.fromString(user.username), unreadOnly, PageRequest.of(page, size))
+        return if (result is com.crichere.common.domain.Result.Success) {
+            ResponseHelper.success<NotificationListResponse>(data = result.data)
+        } else {
+            val error = (result as com.crichere.common.domain.Result.Failure).error
+            ResponseHelper.error(HttpStatus.BAD_REQUEST.name, error.message, error.messageKey ?: "error.bad_request")
+        }
     }
 
     @PatchMapping("/{id}/read")
@@ -59,13 +89,24 @@ class NotificationController(private val notificationService: NotificationServic
         @PathVariable id: UUID,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<NotificationResponse> {
-        return ResponseHelper.success(data = notificationService.markAsRead(id, UUID.fromString(user.username)))
+        val result = markNotificationAsReadUseCase.execute(id, UUID.fromString(user.username))
+        return if (result is com.crichere.common.domain.Result.Success) {
+            ResponseHelper.success<NotificationResponse>(data = result.data)
+        } else {
+            val error = (result as com.crichere.common.domain.Result.Failure).error
+            ResponseHelper.error(HttpStatus.BAD_REQUEST.name, error.message, error.messageKey ?: "error.bad_request")
+        }
     }
 
     @PatchMapping("/read-all")
     fun markAllAsRead(@AuthenticationPrincipal user: UserDetails): ApiResponse<Nothing> {
-        notificationService.markAllAsRead(UUID.fromString(user.username))
-        return ResponseHelper.success(message = "All notifications marked as read")
+        val result = markAllNotificationsAsReadUseCase.execute(UUID.fromString(user.username))
+        return if (result is com.crichere.common.domain.Result.Success) {
+            ResponseHelper.success(message = "All notifications marked as read")
+        } else {
+            val error = (result as com.crichere.common.domain.Result.Failure).error
+            ResponseHelper.error(HttpStatus.BAD_REQUEST.name, error.message, error.messageKey ?: "error.bad_request")
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -73,7 +114,12 @@ class NotificationController(private val notificationService: NotificationServic
         @PathVariable id: UUID,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<Nothing> {
-        notificationService.deleteNotification(id, UUID.fromString(user.username))
-        return ResponseHelper.success(message = "Notification deleted")
+        val result = deleteNotificationUseCase.execute(id, UUID.fromString(user.username))
+        return if (result is com.crichere.common.domain.Result.Success) {
+            ResponseHelper.success(message = "Notification deleted")
+        } else {
+            val error = (result as com.crichere.common.domain.Result.Failure).error
+            ResponseHelper.error(HttpStatus.BAD_REQUEST.name, error.message, error.messageKey ?: "error.bad_request")
+        }
     }
 }

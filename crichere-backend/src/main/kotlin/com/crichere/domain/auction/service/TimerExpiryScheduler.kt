@@ -2,6 +2,8 @@ package com.crichere.domain.auction.service
 
 import com.crichere.domain.auction.enums.PlayerAuctionStateValue
 import com.crichere.domain.auction.repository.PlayerAuctionStateRepository
+import com.crichere.domain.auction.usecase.SellPlayerUseCase
+import com.crichere.domain.auction.usecase.UnsoldPlayerUseCase
 import com.crichere.domain.league.repository.AuctionRepository
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.LoggerFactory
@@ -20,7 +22,8 @@ import java.util.*
 class TimerExpiryScheduler(
     private val auctionRepository: AuctionRepository,
     private val playerStateRepository: PlayerAuctionStateRepository,
-    private val auctionService: AuctionService
+    private val sellPlayerUseCase: SellPlayerUseCase,
+    private val unsoldPlayerUseCase: UnsoldPlayerUseCase
 ) {
     private val logger = LoggerFactory.getLogger(TimerExpiryScheduler::class.java)
 
@@ -47,9 +50,9 @@ class TimerExpiryScheduler(
                 val highBidder = state.currentHighestBidderId
                 val highBid = state.currentHighestBid
                 if (highBidder != null && highBid != null) {
-                    auctionService.sellPlayer(a.id, playerId, highBidder, highBid, systemActor)
+                    sellPlayerUseCase.execute(a.id, playerId, highBidder, highBid, systemActor)
                 } else {
-                    auctionService.unsoldPlayer(a.id, playerId, systemActor)
+                    unsoldPlayerUseCase.execute(a.id, playerId, systemActor)
                 }
             } catch (t: Throwable) {
                 logger.warn("Failed to auto-finalize auction ${a.id}: ${t.message}")

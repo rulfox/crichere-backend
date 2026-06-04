@@ -5,7 +5,6 @@ import com.crichere.common.response.ResponseHelper
 import com.crichere.domain.forfeit.dto.*
 import com.crichere.domain.forfeit.enums.ForfeitStatus
 import com.crichere.domain.forfeit.enums.ForfeitType
-import com.crichere.domain.forfeit.service.ForfeitService
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
@@ -15,10 +14,18 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
+import com.crichere.domain.forfeit.usecase.*
+
 @RestController
 @RequestMapping("/leagues/{leagueId}")
 @Tag(name = "Forfeit Management")
-class ForfeitController(private val forfeitService: ForfeitService) {
+class ForfeitController(
+    private val createForfeitRequestUseCase: CreateForfeitRequestUseCase,
+    private val approveForfeitRequestUseCase: ApproveForfeitRequestUseCase,
+    private val rejectForfeitRequestUseCase: RejectForfeitRequestUseCase,
+    private val cancelForfeitRequestUseCase: CancelForfeitRequestUseCase,
+    private val getForfeitRequestsQuery: GetForfeitRequestsQuery
+) {
 
     @PostMapping("/forfeit")
     @PreAuthorize("isAuthenticated()")
@@ -27,8 +34,14 @@ class ForfeitController(private val forfeitService: ForfeitService) {
         @Valid @RequestBody request: ForfeitRequestCreateRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<ForfeitRequestResponse> {
-        // Membership check should be done in service or via a custom security expression
-        return ResponseHelper.success(data = forfeitService.createRequest(leagueId, UUID.fromString(user.username), request))
+        return when (val result = createForfeitRequestUseCase.execute(leagueId, UUID.fromString(user.username), request)) {
+            is com.crichere.common.domain.Result.Success -> ResponseHelper.success(data = result.data)
+            is com.crichere.common.domain.Result.Failure -> ResponseHelper.error(
+                code = result.error.httpStatus.name,
+                message = result.error.message,
+                messageKey = result.error.messageKey ?: "error.unknown"
+            )
+        }
     }
 
     @GetMapping("/forfeit-requests")
@@ -40,14 +53,23 @@ class ForfeitController(private val forfeitService: ForfeitService) {
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int
     ): ApiResponse<ForfeitRequestListResponse> {
-        val resultPage = forfeitService.getRequests(leagueId, status, type, PageRequest.of(page, size))
-        return ResponseHelper.success(data = ForfeitRequestListResponse(
-            requests = resultPage.content,
-            totalElements = resultPage.totalElements,
-            totalPages = resultPage.totalPages,
-            pageNumber = resultPage.number,
-            pageSize = resultPage.size
-        ))
+        return when (val result = getForfeitRequestsQuery.execute(leagueId, status, type, PageRequest.of(page, size))) {
+            is com.crichere.common.domain.Result.Success -> {
+                val resultPage = result.data
+                ResponseHelper.success(data = ForfeitRequestListResponse(
+                    requests = resultPage.content,
+                    totalElements = resultPage.totalElements,
+                    totalPages = resultPage.totalPages,
+                    pageNumber = resultPage.number,
+                    pageSize = resultPage.size
+                ))
+            }
+            is com.crichere.common.domain.Result.Failure -> ResponseHelper.error(
+                code = result.error.httpStatus.name,
+                message = result.error.message,
+                messageKey = result.error.messageKey ?: "error.unknown"
+            )
+        }
     }
 
     @PatchMapping("/forfeit-requests/{requestId}/approve")
@@ -58,7 +80,14 @@ class ForfeitController(private val forfeitService: ForfeitService) {
         @Valid @RequestBody request: ForfeitApproveRequest,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<ForfeitRequestResponse> {
-        return ResponseHelper.success(data = forfeitService.approveRequest(leagueId, requestId, request, UUID.fromString(user.username)))
+        return when (val result = approveForfeitRequestUseCase.execute(leagueId, requestId, request, UUID.fromString(user.username))) {
+            is com.crichere.common.domain.Result.Success -> ResponseHelper.success(data = result.data)
+            is com.crichere.common.domain.Result.Failure -> ResponseHelper.error(
+                code = result.error.httpStatus.name,
+                message = result.error.message,
+                messageKey = result.error.messageKey ?: "error.unknown"
+            )
+        }
     }
 
     @PatchMapping("/forfeit-requests/{requestId}/reject")
@@ -68,8 +97,18 @@ class ForfeitController(private val forfeitService: ForfeitService) {
         @PathVariable requestId: UUID,
         @RequestBody request: Map<String, String>
     ): ApiResponse<ForfeitRequestResponse> {
-        val notes = request["adminNotes"] ?: throw com.crichere.common.exception.BusinessLogicException("Admin notes are required", "error.notes_required")
-        return ResponseHelper.success(data = forfeitService.rejectRequest(requestId, notes))
+        val notes = request["adminNotes"]
+        if (notes == null) {
+            return ResponseHelper.error(code = org.springframework.http.HttpStatus.BAD_REQUEST.name, message = "Admin notes are required", messageKey = "error.notes_required")
+        }
+        return when (val result = rejectForfeitRequestUseCase.execute(requestId, notes)) {
+            is com.crichere.common.domain.Result.Success -> ResponseHelper.success(data = result.data)
+            is com.crichere.common.domain.Result.Failure -> ResponseHelper.error(
+                code = result.error.httpStatus.name,
+                message = result.error.message,
+                messageKey = result.error.messageKey ?: "error.unknown"
+            )
+        }
     }
 
     @PatchMapping("/forfeit-requests/{requestId}/cancel")
@@ -79,7 +118,13 @@ class ForfeitController(private val forfeitService: ForfeitService) {
         @PathVariable requestId: UUID,
         @AuthenticationPrincipal user: UserDetails
     ): ApiResponse<ForfeitRequestResponse> {
-        // Ownership check is done in service
-        return ResponseHelper.success(data = forfeitService.cancelRequest(requestId, UUID.fromString(user.username)))
+        return when (val result = cancelForfeitRequestUseCase.execute(requestId, UUID.fromString(user.username))) {
+            is com.crichere.common.domain.Result.Success -> ResponseHelper.success(data = result.data)
+            is com.crichere.common.domain.Result.Failure -> ResponseHelper.error(
+                code = result.error.httpStatus.name,
+                message = result.error.message,
+                messageKey = result.error.messageKey ?: "error.unknown"
+            )
+        }
     }
 }

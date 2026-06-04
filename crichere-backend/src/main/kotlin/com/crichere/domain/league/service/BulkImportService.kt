@@ -17,8 +17,7 @@ import java.util.UUID
 class BulkImportService(
     private val userRepository: UserRepository,
     private val leaguePlayerRepository: LeaguePlayerRepository,
-    private val leagueRepository: LeagueRepository,
-    private val leagueService: LeagueService
+    private val leagueRepository: LeagueRepository
 ) {
 
     @Transactional

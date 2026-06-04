@@ -10,7 +10,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 class CorsConfig(
-    @Value("\${crichere.cors.allowed-origins}") private val allowedOrigins: String,
+    @param:Value("\${crichere.cors.allowed-origins}") private val allowedOrigins: String,
     private val environment: Environment
 ) {
 

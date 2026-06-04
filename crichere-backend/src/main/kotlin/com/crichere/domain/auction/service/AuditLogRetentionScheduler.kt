@@ -18,7 +18,7 @@ import java.time.temporal.ChronoUnit
 @Component
 class AuditLogRetentionScheduler(
     private val auditLogRepository: AuctionAuditLogRepository,
-    @Value("\${crichere.audit-log.retention-days:90}") private val retentionDays: Long
+    @param:Value("\${crichere.audit-log.retention-days:90}") private val retentionDays: Long
 ) {
     private val log = LoggerFactory.getLogger(AuditLogRetentionScheduler::class.java)
 
