@@ -186,7 +186,7 @@ class ClaimProfileScreen extends HookConsumerWidget {
                       TextField(
                         controller: cityController,
                         style: CricTextStyle.body,
-                        decoration: CricDecoration.textField(hint: 'Mumbai'),
+                        decoration: CricDecoration.textField(hint: 'City'),
                       ),
                     ],
                   ),

@@ -6,6 +6,7 @@ import 'package:crichere_flutter/shared/widgets/cric/cric_widgets.dart';
 import '../../../league/presentation/providers/league_repository_provider.dart';
 import '../providers/fee_providers.dart';
 import '../../domain/entities/fee_entities.dart';
+import '../../../auth/presentation/providers/auth_repository_provider.dart';
 
 @RoutePage()
 class FeeManagementScreen extends ConsumerWidget {
@@ -31,7 +32,7 @@ class FeeManagementScreen extends ConsumerWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(obligation.userId, style: CricTextStyle.body.copyWith(color: CricColor.gold)),
+              _UserNameLabel(userId: obligation.userId),
               const SizedBox(height: 16),
               TextField(
                 controller: amountController,
@@ -145,7 +146,7 @@ class FeeManagementScreen extends ConsumerWidget {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(o.userId, style: CricTextStyle.headingMd),
+                                      _UserNameLabel(userId: o.userId),
                                       Text('${o.feeType} · ₹${o.paidAmount}/₹${o.totalAmount}', style: CricTextStyle.caption),
                                     ],
                                   ),
@@ -195,5 +196,17 @@ class _StatItem extends StatelessWidget {
         Text(value, style: CricTextStyle.displayLg.copyWith(fontSize: 20, color: color)),
       ],
     );
+  }
+}
+
+class _UserNameLabel extends ConsumerWidget {
+  final String userId;
+  const _UserNameLabel({required this.userId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userAsync = ref.watch(userByIdProvider(userId));
+    final name = userAsync.asData?.value.name ?? userAsync.asData?.value.phone ?? userId;
+    return Text(name, style: CricTextStyle.headingMd);
   }
 }

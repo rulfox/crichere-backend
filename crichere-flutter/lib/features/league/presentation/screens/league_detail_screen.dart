@@ -1043,7 +1043,7 @@ class _FranchisesTab extends ConsumerWidget {
 
   Future<void> _showCreateDialog(BuildContext context, WidgetRef ref) async {
     final nameController = TextEditingController();
-    final purseController = TextEditingController(text: '40000');
+    final purseController = TextEditingController(text: '');
     final owner = ValueNotifier<({String id, String label})?>(null);
     final saving = ValueNotifier(false);
 

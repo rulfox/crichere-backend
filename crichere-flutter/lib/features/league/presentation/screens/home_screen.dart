@@ -299,7 +299,7 @@ class _PlayerOverview extends StatelessWidget {
               ),
             );
           },
-          loading: () => ShimmerLoading.rectangular(height: 80),
+          loading: () => const LiveLeagueCardShimmer(),
           error: (e, _) => _LeaguesError(error: e),
         ),
         const SizedBox(height: CricSpacing.lg),
@@ -329,7 +329,7 @@ class _PlayerOverview extends StatelessWidget {
               ),
             )).toList(),
           ),
-          loading: () => ShimmerLoading.rectangular(height: 100),
+          loading: () => Column(children: List.generate(3, (i) => const LeagueCardShimmer())),
           error: (e, _) => _LeaguesError(error: e),
         ),
       ],
@@ -429,7 +429,7 @@ class _AdminOverview extends StatelessWidget {
               ),
             )).toList(),
           ),
-          loading: () => ShimmerLoading.rectangular(height: 100),
+          loading: () => Column(children: List.generate(3, (i) => const LeagueCardShimmer())),
           error: (e, _) => _LeaguesError(error: e),
         ),
         const SizedBox(height: 16),
@@ -514,7 +514,10 @@ class _DiscoverTab extends StatelessWidget {
                 ],
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => ListView(
+              padding: const EdgeInsets.symmetric(horizontal: CricSpacing.page),
+              children: List.generate(5, (i) => const LeagueDiscoveryCardShimmer()),
+            ),
             error: (e, _) => Center(child: _LeaguesError(error: e)),
           ),
         ),
@@ -585,7 +588,7 @@ class _LeagueDiscoveryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(league.name, style: CricTextStyle.headingMd),
-                      Text('Mumbai · 6 franchises', style: CricTextStyle.caption),
+                      Text('${league.format ?? 'Cricket'} league', style: CricTextStyle.caption),
                     ],
                   ),
                 ),
@@ -597,9 +600,9 @@ class _LeagueDiscoveryCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             if (league.status == 'AUCTION_LIVE')
-              const StatusChip(type: StatusType.live, customLabel: '47 watching')
+              const StatusChip(type: StatusType.live)
             else
-              Text('⏱ Jun 15 · Purse ₹40k', style: CricTextStyle.caption.copyWith(color: CricColor.gold)),
+              Text('⏱ ${league.auctionDate?.toString().split(' ')[0] ?? 'TBD'}', style: CricTextStyle.caption.copyWith(color: CricColor.gold)),
           ],
         ),
       ),

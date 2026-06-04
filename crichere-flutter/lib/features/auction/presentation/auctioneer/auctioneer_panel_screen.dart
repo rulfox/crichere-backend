@@ -209,7 +209,7 @@ class AuctioneerPanelScreen extends HookConsumerWidget {
                               contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               leading: const AvatarCircle(name: '', radius: 14),
                               title: Text(p.playerName ?? p.playerId, style: CricTextStyle.headingMd.copyWith(fontSize: 14)),
-                              subtitle: Text('Base: ₹${p.basePriceOverride ?? p.basePrice ?? "1k"}', style: CricTextStyle.caption),
+                              subtitle: Text('Base: ₹${p.basePriceOverride ?? p.basePrice ?? 0}', style: CricTextStyle.caption),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
