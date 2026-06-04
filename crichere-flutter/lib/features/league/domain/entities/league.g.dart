@@ -17,9 +17,7 @@ _League _$LeagueFromJson(Map<String, dynamic> json) => _League(
   logoUrl: json['logoUrl'] as String?,
   bannerUrl: json['bannerUrl'] as String?,
   status: json['status'] as String,
-  auctionDate: json['auctionDate'] == null
-      ? null
-      : DateTime.parse(json['auctionDate'] as String),
+  auctionDate: _parseDate(json['auctionDate']),
   createdBy: json['createdBy'] as String,
   auctionIds:
       (json['auctionIds'] as List<dynamic>?)

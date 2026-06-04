@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$League {
 
- String get id; String get name; String? get format; String? get rulesUrl; bool get mustSellAll; String get playerOrderMode; String get waitingListMode; String? get logoUrl; String? get bannerUrl; String get status; DateTime? get auctionDate; String get createdBy; List<String> get auctionIds;
+ String get id; String get name; String? get format; String? get rulesUrl; bool get mustSellAll; String get playerOrderMode; String get waitingListMode; String? get logoUrl; String? get bannerUrl; String get status;@JsonKey(fromJson: _parseDate) DateTime? get auctionDate; String get createdBy; List<String> get auctionIds;
 /// Create a copy of League
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $LeagueCopyWith<$Res>  {
   factory $LeagueCopyWith(League value, $Res Function(League) _then) = _$LeagueCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String status, DateTime? auctionDate, String createdBy, List<String> auctionIds
+ String id, String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String status,@JsonKey(fromJson: _parseDate) DateTime? auctionDate, String createdBy, List<String> auctionIds
 });
 
 
@@ -165,7 +165,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status,  DateTime? auctionDate,  String createdBy,  List<String> auctionIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status, @JsonKey(fromJson: _parseDate)  DateTime? auctionDate,  String createdBy,  List<String> auctionIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _League() when $default != null:
 return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.status,_that.auctionDate,_that.createdBy,_that.auctionIds);case _:
@@ -186,7 +186,7 @@ return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAl
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status,  DateTime? auctionDate,  String createdBy,  List<String> auctionIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status, @JsonKey(fromJson: _parseDate)  DateTime? auctionDate,  String createdBy,  List<String> auctionIds)  $default,) {final _that = this;
 switch (_that) {
 case _League():
 return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.status,_that.auctionDate,_that.createdBy,_that.auctionIds);case _:
@@ -206,7 +206,7 @@ return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAl
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status,  DateTime? auctionDate,  String createdBy,  List<String> auctionIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String? format,  String? rulesUrl,  bool mustSellAll,  String playerOrderMode,  String waitingListMode,  String? logoUrl,  String? bannerUrl,  String status, @JsonKey(fromJson: _parseDate)  DateTime? auctionDate,  String createdBy,  List<String> auctionIds)?  $default,) {final _that = this;
 switch (_that) {
 case _League() when $default != null:
 return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAll,_that.playerOrderMode,_that.waitingListMode,_that.logoUrl,_that.bannerUrl,_that.status,_that.auctionDate,_that.createdBy,_that.auctionIds);case _:
@@ -221,7 +221,7 @@ return $default(_that.id,_that.name,_that.format,_that.rulesUrl,_that.mustSellAl
 @JsonSerializable()
 
 class _League extends League {
-  const _League({required this.id, required this.name, this.format, this.rulesUrl, this.mustSellAll = false, this.playerOrderMode = 'RANDOM', this.waitingListMode = 'ADMIN_PICKS', this.logoUrl, this.bannerUrl, required this.status, this.auctionDate, required this.createdBy, final  List<String> auctionIds = const <String>[]}): _auctionIds = auctionIds,super._();
+  const _League({required this.id, required this.name, this.format, this.rulesUrl, this.mustSellAll = false, this.playerOrderMode = 'RANDOM', this.waitingListMode = 'ADMIN_PICKS', this.logoUrl, this.bannerUrl, required this.status, @JsonKey(fromJson: _parseDate) this.auctionDate, required this.createdBy, final  List<String> auctionIds = const <String>[]}): _auctionIds = auctionIds,super._();
   factory _League.fromJson(Map<String, dynamic> json) => _$LeagueFromJson(json);
 
 @override final  String id;
@@ -234,7 +234,7 @@ class _League extends League {
 @override final  String? logoUrl;
 @override final  String? bannerUrl;
 @override final  String status;
-@override final  DateTime? auctionDate;
+@override@JsonKey(fromJson: _parseDate) final  DateTime? auctionDate;
 @override final  String createdBy;
  final  List<String> _auctionIds;
 @override@JsonKey() List<String> get auctionIds {
@@ -277,7 +277,7 @@ abstract mixin class _$LeagueCopyWith<$Res> implements $LeagueCopyWith<$Res> {
   factory _$LeagueCopyWith(_League value, $Res Function(_League) _then) = __$LeagueCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String status, DateTime? auctionDate, String createdBy, List<String> auctionIds
+ String id, String name, String? format, String? rulesUrl, bool mustSellAll, String playerOrderMode, String waitingListMode, String? logoUrl, String? bannerUrl, String status,@JsonKey(fromJson: _parseDate) DateTime? auctionDate, String createdBy, List<String> auctionIds
 });
 
 

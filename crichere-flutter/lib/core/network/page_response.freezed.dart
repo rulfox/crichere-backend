@@ -11,19 +11,16 @@ part of 'page_response.dart';
 
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$PageResponse<T> {
 
- List<T> get content; int get totalElements; int get totalPages; int get pageNumber; int get pageSize;
+ List<T> get content; int get totalElements; int get totalPages;@JsonKey(name: 'number', defaultValue: 0) int get pageNumber;@JsonKey(name: 'size', defaultValue: 0) int get pageSize;
 /// Create a copy of PageResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $PageResponseCopyWith<T, PageResponse<T>> get copyWith => _$PageResponseCopyWithImpl<T, PageResponse<T>>(this as PageResponse<T>, _$identity);
 
-  /// Serializes this PageResponse to a JSON map.
-  Map<String, dynamic> toJson(Object? Function(T) toJsonT);
 
 
 @override
@@ -31,7 +28,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is PageResponse<T>&&const DeepCollectionEquality().equals(other.content, content)&&(identical(other.totalElements, totalElements) || other.totalElements == totalElements)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageNumber, pageNumber) || other.pageNumber == pageNumber)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(content),totalElements,totalPages,pageNumber,pageSize);
 
@@ -48,7 +45,7 @@ abstract mixin class $PageResponseCopyWith<T,$Res>  {
   factory $PageResponseCopyWith(PageResponse<T> value, $Res Function(PageResponse<T>) _then) = _$PageResponseCopyWithImpl;
 @useResult
 $Res call({
- List<T> content, int totalElements, int totalPages, int pageNumber, int pageSize
+ List<T> content, int totalElements, int totalPages,@JsonKey(name: 'number', defaultValue: 0) int pageNumber,@JsonKey(name: 'size', defaultValue: 0) int pageSize
 });
 
 
@@ -157,7 +154,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<T> content,  int totalElements,  int totalPages,  int pageNumber,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<T> content,  int totalElements,  int totalPages, @JsonKey(name: 'number', defaultValue: 0)  int pageNumber, @JsonKey(name: 'size', defaultValue: 0)  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PageResponse() when $default != null:
 return $default(_that.content,_that.totalElements,_that.totalPages,_that.pageNumber,_that.pageSize);case _:
@@ -178,7 +175,7 @@ return $default(_that.content,_that.totalElements,_that.totalPages,_that.pageNum
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<T> content,  int totalElements,  int totalPages,  int pageNumber,  int pageSize)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<T> content,  int totalElements,  int totalPages, @JsonKey(name: 'number', defaultValue: 0)  int pageNumber, @JsonKey(name: 'size', defaultValue: 0)  int pageSize)  $default,) {final _that = this;
 switch (_that) {
 case _PageResponse():
 return $default(_that.content,_that.totalElements,_that.totalPages,_that.pageNumber,_that.pageSize);case _:
@@ -198,7 +195,7 @@ return $default(_that.content,_that.totalElements,_that.totalPages,_that.pageNum
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<T> content,  int totalElements,  int totalPages,  int pageNumber,  int pageSize)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<T> content,  int totalElements,  int totalPages, @JsonKey(name: 'number', defaultValue: 0)  int pageNumber, @JsonKey(name: 'size', defaultValue: 0)  int pageSize)?  $default,) {final _that = this;
 switch (_that) {
 case _PageResponse() when $default != null:
 return $default(_that.content,_that.totalElements,_that.totalPages,_that.pageNumber,_that.pageSize);case _:
@@ -210,23 +207,23 @@ return $default(_that.content,_that.totalElements,_that.totalPages,_that.pageNum
 }
 
 /// @nodoc
-@JsonSerializable(genericArgumentFactories: true)
+
 
 class _PageResponse<T> implements PageResponse<T> {
-  const _PageResponse({required final  List<T> content, required this.totalElements, required this.totalPages, required this.pageNumber, required this.pageSize}): _content = content;
-  factory _PageResponse.fromJson(Map<String, dynamic> json,T Function(Object?) fromJsonT) => _$PageResponseFromJson(json,fromJsonT);
+  const _PageResponse({final  List<T> content = const [], this.totalElements = 0, this.totalPages = 0, @JsonKey(name: 'number', defaultValue: 0) this.pageNumber = 0, @JsonKey(name: 'size', defaultValue: 0) this.pageSize = 0}): _content = content;
+  
 
  final  List<T> _content;
-@override List<T> get content {
+@override@JsonKey() List<T> get content {
   if (_content is EqualUnmodifiableListView) return _content;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_content);
 }
 
-@override final  int totalElements;
-@override final  int totalPages;
-@override final  int pageNumber;
-@override final  int pageSize;
+@override@JsonKey() final  int totalElements;
+@override@JsonKey() final  int totalPages;
+@override@JsonKey(name: 'number', defaultValue: 0) final  int pageNumber;
+@override@JsonKey(name: 'size', defaultValue: 0) final  int pageSize;
 
 /// Create a copy of PageResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -234,17 +231,14 @@ class _PageResponse<T> implements PageResponse<T> {
 @pragma('vm:prefer-inline')
 _$PageResponseCopyWith<T, _PageResponse<T>> get copyWith => __$PageResponseCopyWithImpl<T, _PageResponse<T>>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
-  return _$PageResponseToJson<T>(this, toJsonT);
-}
+
 
 @override
 bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is _PageResponse<T>&&const DeepCollectionEquality().equals(other._content, _content)&&(identical(other.totalElements, totalElements) || other.totalElements == totalElements)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.pageNumber, pageNumber) || other.pageNumber == pageNumber)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_content),totalElements,totalPages,pageNumber,pageSize);
 
@@ -261,7 +255,7 @@ abstract mixin class _$PageResponseCopyWith<T,$Res> implements $PageResponseCopy
   factory _$PageResponseCopyWith(_PageResponse<T> value, $Res Function(_PageResponse<T>) _then) = __$PageResponseCopyWithImpl;
 @override @useResult
 $Res call({
- List<T> content, int totalElements, int totalPages, int pageNumber, int pageSize
+ List<T> content, int totalElements, int totalPages,@JsonKey(name: 'number', defaultValue: 0) int pageNumber,@JsonKey(name: 'size', defaultValue: 0) int pageSize
 });
 
 
